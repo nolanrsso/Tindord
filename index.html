@@ -969,15 +969,8 @@
   }
   }
 
-  // Language switcher
-  (() => {
-    const root = document.getElementById('langSwitch');
-    const btn  = root.querySelector('.ls-btn');
-    const menu = root.querySelector('.ls-menu');
-    const cur  = root.querySelector('.ls-current');
-    let open = false;
-
-    const I18N = {
+  // Shared i18n dictionary (used by language switcher AND auth modal)
+  const I18N = {
       FR: {
         login:        'Se connecter',
         badge:        'Bêta ouverte · <b>+10 000 membres</b> sur Discord',
@@ -1043,6 +1036,14 @@
         msg_short_pw: 'Password must be at least 6 characters.',
       },
     };
+
+  // Language switcher
+  (() => {
+    const root = document.getElementById('langSwitch');
+    const btn  = root.querySelector('.ls-btn');
+    const menu = root.querySelector('.ls-menu');
+    const cur  = root.querySelector('.ls-current');
+    let open = false;
 
     function applyLang(code){
       const dict = I18N[code] || I18N.FR;
