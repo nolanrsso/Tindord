@@ -310,6 +310,223 @@
     .login .dot{width:8px;height:8px}
   }
 
+  /* ============================================================
+     SCREENS — landing / onboarding / swipe / account
+     Toggled via body[data-screen="..."]
+     ============================================================ */
+  .screen{display:none}
+  body[data-screen="landing"]    #screen-landing,
+  body[data-screen="onboarding"] #screen-onboarding,
+  body[data-screen="swipe"]      #screen-swipe,
+  body[data-screen="account"]    #screen-account { display:flex }
+
+  /* Hide bubble-only landing extras on non-landing screens (decluttering) */
+  body:not([data-screen="landing"]) .corner-ctrl--discord{display:none}
+  body:not([data-screen="landing"]) #langSwitch{bottom:14px;right:14px}
+
+  /* Account chip in header */
+  .account-chip{
+    display:none;align-items:center;gap:10px;padding:6px 12px 6px 6px;
+    border-radius:999px;background:rgba(255,255,255,.05);
+    border:1px solid var(--stroke-2);cursor:pointer;text-decoration:none;
+    color:#fff;font-weight:600;font-size:13.5px;
+    transition:.18s ease;
+  }
+  body[data-auth="in"] .account-chip{display:inline-flex}
+  body[data-auth="in"] .login{display:none}
+  .account-chip:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);transform:translateY(-1px)}
+  .account-chip .avatar{
+    width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    font-family:"Clash Display",sans-serif;font-weight:700;font-size:14px;
+    background:linear-gradient(135deg,#FF7EB6,#9146FF);color:#fff;
+    box-shadow:0 0 0 1.5px rgba(255,255,255,.18) inset;
+  }
+  .account-chip .avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+
+  /* ===== Onboarding ===== */
+  #screen-onboarding{
+    position:relative;z-index:2;flex:1 1 auto;flex-direction:column;
+    align-items:center;justify-content:center;padding:30px 24px 30px;
+  }
+  .onb-card{
+    width:min(92vw,520px);
+    padding:34px 32px 28px;border-radius:24px;
+    background:linear-gradient(180deg, rgba(28,22,58,.78), rgba(18,12,42,.78));
+    border:1px solid var(--stroke-2);
+    backdrop-filter:blur(22px) saturate(150%);
+    -webkit-backdrop-filter:blur(22px) saturate(150%);
+    box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset, 0 0 80px rgba(145,70,255,.18);
+    color:#fff;text-align:center;
+    animation:authCardIn .25s cubic-bezier(.2,.7,.3,1);
+  }
+  .onb-progress{display:flex;gap:6px;margin:0 auto 24px;width:fit-content}
+  .onb-progress span{
+    width:42px;height:4px;border-radius:2px;background:rgba(255,255,255,.10);
+    transition:.25s ease;
+  }
+  .onb-progress span.done{background:linear-gradient(90deg,#FF7EB6,#9146FF)}
+  .onb-step h2{
+    font-family:"Clash Display",sans-serif;font-weight:700;
+    font-size:26px;letter-spacing:-.01em;margin:0 0 6px;
+    background:linear-gradient(180deg,#fff 0%,#d9c6ff 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .onb-step .sub{color:var(--ink-dim);font-size:14px;margin:0 0 22px}
+  .onb-options{display:grid;gap:12px;margin-bottom:20px}
+  .onb-options.three{grid-template-columns:repeat(3,1fr)}
+  .onb-opt{
+    padding:18px 14px;border-radius:14px;cursor:pointer;
+    background:rgba(255,255,255,.04);border:1.5px solid var(--stroke-2);
+    color:#fff;font-family:inherit;font-weight:600;font-size:14px;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    transition:.16s ease;
+  }
+  .onb-opt:hover{background:rgba(255,255,255,.08);transform:translateY(-2px)}
+  .onb-opt.selected{background:rgba(145,70,255,.18);border-color:rgba(145,70,255,.65);box-shadow:0 0 30px rgba(145,70,255,.30)}
+  .onb-opt .emoji{font-size:32px;line-height:1}
+  .onb-opt .label{font-size:13.5px}
+  .onb-age{
+    width:100%;box-sizing:border-box;
+    padding:18px 16px;border-radius:14px;
+    background:rgba(255,255,255,.04);border:1.5px solid var(--stroke-2);
+    color:#fff;font-family:"Clash Display",sans-serif;font-weight:700;
+    font-size:28px;text-align:center;outline:none;
+    transition:.18s ease;letter-spacing:.05em;
+  }
+  .onb-age:focus{border-color:rgba(145,70,255,.6);background:rgba(255,255,255,.07);box-shadow:0 0 0 4px rgba(145,70,255,.18)}
+  .onb-actions{display:flex;gap:10px;margin-top:6px}
+  .onb-btn{
+    flex:1;padding:13px 18px;border-radius:13px;border:none;cursor:pointer;
+    font-family:inherit;font-weight:700;font-size:14.5px;
+    transition:.16s ease;
+  }
+  .onb-btn--prev{background:rgba(255,255,255,.05);color:#fff;border:1px solid var(--stroke-2)}
+  .onb-btn--prev:hover{background:rgba(255,255,255,.10)}
+  .onb-btn--next{
+    background:linear-gradient(180deg,#A65BFF 0%, #6B2BFF 100%);color:#fff;
+    box-shadow:0 0 0 1px rgba(255,255,255,.12) inset, 0 6px 18px rgba(107,43,255,.45), 0 0 30px rgba(145,70,255,.35);
+  }
+  .onb-btn--next:hover{transform:translateY(-1px)}
+  .onb-btn--next:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+  /* ===== Swipe deck ===== */
+  #screen-swipe{
+    position:relative;z-index:2;flex:1 1 auto;flex-direction:column;
+    align-items:center;justify-content:center;padding:20px 24px 30px;gap:18px;
+  }
+  .swipe-wrap{position:relative;width:min(92vw,360px);height:min(72vh,560px)}
+  .swipe-card{
+    position:absolute;inset:0;border-radius:24px;overflow:hidden;
+    background:linear-gradient(160deg, #2a1850, #150b2c 60%);
+    border:1px solid var(--stroke-2);
+    box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
+    color:#fff;cursor:grab;user-select:none;
+    display:flex;flex-direction:column;
+    transition:transform .25s cubic-bezier(.2,.7,.3,1), opacity .25s ease;
+    will-change:transform;
+  }
+  .swipe-card:active{cursor:grabbing}
+  .swipe-card .photo{
+    flex:1;display:grid;place-items:center;
+    font-family:"Clash Display",sans-serif;font-weight:800;font-size:110px;color:#fff;
+    position:relative;
+  }
+  .swipe-card .photo .avi{
+    width:160px;height:160px;border-radius:50%;display:grid;place-items:center;
+    box-shadow:0 12px 50px rgba(0,0,0,.45), 0 0 0 4px rgba(255,255,255,.08);
+  }
+  .swipe-card .badge-stamp{
+    position:absolute;top:24px;padding:8px 16px;border-radius:10px;
+    font-family:"Clash Display",sans-serif;font-weight:800;font-size:26px;letter-spacing:.08em;
+    border:3px solid;opacity:0;transform:rotate(-12deg);transition:opacity .12s ease;
+    pointer-events:none;
+  }
+  .swipe-card .badge-stamp.like {right:24px;color:#3BD17C;border-color:#3BD17C;text-shadow:0 0 14px #3BD17C}
+  .swipe-card .badge-stamp.nope {left:24px;color:#FF4FA0;border-color:#FF4FA0;transform:rotate(12deg);text-shadow:0 0 14px #FF4FA0}
+  .swipe-card .info{
+    padding:18px 20px 22px;background:linear-gradient(180deg, transparent, rgba(0,0,0,.45));
+    backdrop-filter:blur(2px);
+  }
+  .swipe-card .info .name-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .swipe-card .info .name{font-family:"Clash Display",sans-serif;font-weight:700;font-size:24px;letter-spacing:-.01em}
+  .swipe-card .info .age{color:var(--ink-dim);font-weight:600;font-size:18px}
+  .swipe-card .info .meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .swipe-card .info .chip{
+    padding:5px 10px;border-radius:999px;font-size:12px;font-weight:600;
+    background:rgba(255,255,255,.08);border:1px solid var(--stroke-2);color:#fff;
+  }
+  .swipe-card .info .bio{margin-top:10px;font-size:13.5px;color:var(--ink-dim);line-height:1.45}
+
+  .swipe-actions{display:flex;gap:18px;align-items:center;justify-content:center}
+  .swipe-btn{
+    width:62px;height:62px;border-radius:50%;border:none;cursor:pointer;
+    display:grid;place-items:center;color:#fff;
+    transition:.16s ease;
+    box-shadow:0 12px 30px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06) inset;
+  }
+  .swipe-btn:hover{transform:translateY(-3px) scale(1.05)}
+  .swipe-btn--no  {background:linear-gradient(180deg,#FF4FA0,#C7186E)}
+  .swipe-btn--yes {background:linear-gradient(180deg,#3BD17C,#1f8f55)}
+  .swipe-empty{
+    text-align:center;color:var(--ink-dim);font-size:15px;padding:40px 20px;
+  }
+  .swipe-empty h3{color:#fff;font-family:"Clash Display",sans-serif;font-size:22px;margin:0 0 6px}
+
+  /* ===== Account screen ===== */
+  #screen-account{
+    position:relative;z-index:2;flex:1 1 auto;flex-direction:column;
+    align-items:center;justify-content:flex-start;padding:30px 24px 30px;overflow-y:auto;
+  }
+  body[data-screen="onboarding"], body[data-screen="swipe"], body[data-screen="account"]{overflow:auto !important}
+  body[data-screen="onboarding"] html, body[data-screen="swipe"] html, body[data-screen="account"] html{overflow:auto !important}
+  .acc-card{
+    width:min(92vw,560px);
+    padding:30px 28px;border-radius:24px;
+    background:linear-gradient(180deg, rgba(28,22,58,.78), rgba(18,12,42,.78));
+    border:1px solid var(--stroke-2);
+    backdrop-filter:blur(22px) saturate(150%);
+    -webkit-backdrop-filter:blur(22px) saturate(150%);
+    box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
+    color:#fff;
+  }
+  .acc-head{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+  .acc-avatar{
+    width:84px;height:84px;border-radius:50%;display:grid;place-items:center;
+    font-family:"Clash Display",sans-serif;font-weight:800;font-size:34px;color:#fff;
+    box-shadow:0 0 0 3px rgba(255,255,255,.10) inset, 0 12px 30px rgba(145,70,255,.35);
+  }
+  .acc-name{font-family:"Clash Display",sans-serif;font-weight:700;font-size:24px;letter-spacing:-.01em;margin:0}
+  .acc-handle{color:var(--ink-dim);font-size:14px;margin:2px 0 0}
+  .acc-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .acc-field label{font-size:12.5px;font-weight:600;color:var(--ink-dim);letter-spacing:.02em}
+  .acc-field .val{
+    padding:12px 14px;border-radius:11px;
+    background:rgba(255,255,255,.04);border:1px solid var(--stroke-2);
+    color:#fff;font-size:14.5px;
+  }
+  .acc-field textarea{
+    width:100%;box-sizing:border-box;min-height:96px;resize:vertical;
+    padding:12px 14px;border-radius:11px;outline:none;
+    background:rgba(255,255,255,.04);border:1.5px solid var(--stroke-2);
+    color:#fff;font-family:inherit;font-size:14.5px;line-height:1.45;
+    transition:.18s ease;
+  }
+  .acc-field textarea:focus{border-color:rgba(145,70,255,.6);background:rgba(255,255,255,.07);box-shadow:0 0 0 4px rgba(145,70,255,.18)}
+  .acc-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .acc-btn{
+    padding:11px 18px;border-radius:12px;border:none;cursor:pointer;
+    font-family:inherit;font-weight:700;font-size:14px;
+    transition:.16s ease;
+  }
+  .acc-btn--primary{background:linear-gradient(180deg,#A65BFF 0%, #6B2BFF 100%);color:#fff;box-shadow:0 6px 18px rgba(107,43,255,.45)}
+  .acc-btn--primary:hover{transform:translateY(-1px)}
+  .acc-btn--ghost{background:rgba(255,255,255,.05);color:#fff;border:1px solid var(--stroke-2)}
+  .acc-btn--ghost:hover{background:rgba(255,255,255,.10)}
+  .acc-btn--danger{background:rgba(255,79,160,.12);color:#FF7EB6;border:1px solid rgba(255,79,160,.35);margin-left:auto}
+  .acc-btn--danger:hover{background:rgba(255,79,160,.22)}
+  .acc-msg{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;display:none;background:rgba(59,209,124,.12);border:1px solid rgba(59,209,124,.35);color:#9CF0BD}
+  .acc-msg[data-show="true"]{display:block;animation:authViewIn .22s ease-out}
+
   /* Auth modal */
   .auth-backdrop{
     position:fixed;inset:0;z-index:60;display:none;
@@ -411,7 +628,7 @@
   .auth-msg[data-show="true"]{display:block;animation:authViewIn .22s ease-out}
 </style>
 </head>
-<body>
+<body data-screen="landing" data-auth="out">
 
 <div class="scene" aria-hidden="true">
   <div class="blob b1"></div>
@@ -456,6 +673,10 @@
     </a>
     <nav class="nav" aria-label="Navigation">
       <a href="#" class="login" id="loginBtn"><span class="dot"></span><span data-i18n="login">Se connecter</span></a>
+      <a href="#" class="account-chip" id="accountChip" aria-label="Mon compte">
+        <span class="avatar" id="accountChipAvatar">?</span>
+        <span data-i18n="my_account">Mon compte</span>
+      </a>
     </nav>
   </header>
 
@@ -525,7 +746,7 @@
     </ul>
   </div>
 
-  <section class="hero" data-screen-label="Hero">
+  <section id="screen-landing" class="screen hero" data-screen-label="Hero">
     <div class="bubbles" id="bubbles" aria-hidden="true"></div>
 
     <span class="badge" role="status">
@@ -560,6 +781,111 @@
     </div>
 
     <div class="badge corner" style="font-size: 9px" data-i18n="footer">EXPLOSE LES BULLE ON SAIT JAMAIS ELLE TE CACHE PEUT ETRE QUELQUE CHOSE</div>
+  </section>
+
+  <!-- ============================================================
+       ONBOARDING — 3 steps: gender, age, looking-for
+       ============================================================ -->
+  <section id="screen-onboarding" class="screen">
+    <div class="onb-card">
+      <div class="onb-progress" id="onbProgress">
+        <span class="done"></span><span></span><span></span>
+      </div>
+
+      <!-- Step 1: gender -->
+      <div class="onb-step" data-step="1">
+        <h2 data-i18n="onb_q1">Tu es ?</h2>
+        <p class="sub" data-i18n="onb_q1_sub">Cette info aide à proposer les bonnes rencontres</p>
+        <div class="onb-options three" id="onbGender">
+          <button type="button" class="onb-opt" data-val="male"><span class="emoji">👨</span><span class="label" data-i18n="gender_male">Homme</span></button>
+          <button type="button" class="onb-opt" data-val="female"><span class="emoji">👩</span><span class="label" data-i18n="gender_female">Femme</span></button>
+          <button type="button" class="onb-opt" data-val="other"><span class="emoji">✨</span><span class="label" data-i18n="gender_other">Autre</span></button>
+        </div>
+        <div class="onb-actions">
+          <button type="button" class="onb-btn onb-btn--next" id="onbNext1" disabled data-i18n="continue">Continuer</button>
+        </div>
+      </div>
+
+      <!-- Step 2: age -->
+      <div class="onb-step" data-step="2" hidden>
+        <h2 data-i18n="onb_q2">Quel âge as-tu ?</h2>
+        <p class="sub" data-i18n="onb_q2_sub">Tu dois avoir 16 ans ou plus</p>
+        <input class="onb-age" id="onbAge" type="number" inputmode="numeric" min="16" max="99" placeholder="18" />
+        <div class="onb-actions">
+          <button type="button" class="onb-btn onb-btn--prev" data-go="1" data-i18n="back">Retour</button>
+          <button type="button" class="onb-btn onb-btn--next" id="onbNext2" disabled data-i18n="continue">Continuer</button>
+        </div>
+      </div>
+
+      <!-- Step 3: looking for -->
+      <div class="onb-step" data-step="3" hidden>
+        <h2 data-i18n="onb_q3">Tu cherches quoi ?</h2>
+        <p class="sub" data-i18n="onb_q3_sub">Tu pourras changer plus tard dans ton profil</p>
+        <div class="onb-options three" id="onbLooking">
+          <button type="button" class="onb-opt" data-val="chill"><span class="emoji">🛋️</span><span class="label" data-i18n="look_chill">Chill</span></button>
+          <button type="button" class="onb-opt" data-val="game"><span class="emoji">🎮</span><span class="label" data-i18n="look_game">Une game</span></button>
+          <button type="button" class="onb-opt" data-val="sleep"><span class="emoji">💤</span><span class="label" data-i18n="look_sleep">Sleepcall</span></button>
+        </div>
+        <div class="onb-actions">
+          <button type="button" class="onb-btn onb-btn--prev" data-go="2" data-i18n="back">Retour</button>
+          <button type="button" class="onb-btn onb-btn--next" id="onbFinish" disabled data-i18n="onb_finish">Découvrir Tindord</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SWIPE deck
+       ============================================================ -->
+  <section id="screen-swipe" class="screen">
+    <div class="swipe-wrap" id="swipeWrap"></div>
+    <div class="swipe-actions">
+      <button class="swipe-btn swipe-btn--no" id="swipeNo" type="button" aria-label="Passer">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <button class="swipe-btn swipe-btn--yes" id="swipeYes" type="button" aria-label="Liker">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.3-9.3C1 8.3 3 4.5 6.7 4.5c1.9 0 3.5 1 4.3 2.4l1 1.7 1-1.7C13.8 5.5 15.4 4.5 17.3 4.5 21 4.5 23 8.3 21.3 11.7 19 16.5 12 21 12 21Z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ACCOUNT — view + edit bio
+       ============================================================ -->
+  <section id="screen-account" class="screen">
+    <div class="acc-card">
+      <div class="acc-head">
+        <div class="acc-avatar" id="accAvatar">?</div>
+        <div>
+          <h2 class="acc-name" id="accName">—</h2>
+          <p class="acc-handle" id="accHandle">@—</p>
+        </div>
+      </div>
+
+      <div class="acc-field">
+        <label data-i18n="acc_gender">Genre</label>
+        <div class="val" id="accGender">—</div>
+      </div>
+      <div class="acc-field">
+        <label data-i18n="acc_age">Âge</label>
+        <div class="val" id="accAge">—</div>
+      </div>
+      <div class="acc-field">
+        <label data-i18n="acc_looking">Je cherche</label>
+        <div class="val" id="accLooking">—</div>
+      </div>
+      <div class="acc-field">
+        <label data-i18n="acc_bio">Bio</label>
+        <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
+      </div>
+
+      <div class="acc-actions">
+        <button type="button" class="acc-btn acc-btn--primary" id="accSave" data-i18n="save">Enregistrer</button>
+        <button type="button" class="acc-btn acc-btn--ghost"   id="accBackSwipe" data-i18n="back_to_swipe">← Retour aux profils</button>
+        <button type="button" class="acc-btn acc-btn--danger"  id="accLogout" data-i18n="logout">Se déconnecter</button>
+      </div>
+      <div class="acc-msg" id="accMsg" data-show="false"></div>
+    </div>
   </section>
 </main>
 
@@ -1002,6 +1328,32 @@
         msg_created:  'Compte créé. Bienvenue sur Tindord !',
         msg_invalid:  'Email ou mot de passe invalide.',
         msg_short_pw: 'Le mot de passe doit faire au moins 6 caractères.',
+        my_account:   'Mon compte',
+        onb_q1:       'Tu es ?',
+        onb_q1_sub:   'Cette info aide à proposer les bonnes rencontres',
+        onb_q2:       'Quel âge as-tu ?',
+        onb_q2_sub:   'Tu dois avoir 16 ans ou plus',
+        onb_q3:       'Tu cherches quoi ?',
+        onb_q3_sub:   'Tu pourras changer plus tard dans ton profil',
+        gender_male:  'Homme',
+        gender_female:'Femme',
+        gender_other: 'Autre',
+        look_chill:   'Chill',
+        look_game:    'Une game',
+        look_sleep:   'Sleepcall',
+        continue:     'Continuer',
+        back:         'Retour',
+        onb_finish:   'Découvrir Tindord',
+        acc_gender:   'Genre',
+        acc_age:      'Âge',
+        acc_looking:  'Je cherche',
+        acc_bio:      'Bio',
+        save:         'Enregistrer',
+        back_to_swipe:'← Retour aux profils',
+        logout:       'Se déconnecter',
+        saved:        'Profil mis à jour ✓',
+        no_more:      'Plus personne pour le moment !',
+        no_more_sub:  'Reviens plus tard pour découvrir de nouveaux profils.',
       },
       EN: {
         login:        'Sign in',
@@ -1034,6 +1386,32 @@
         msg_created:  'Account created. Welcome to Tindord!',
         msg_invalid:  'Invalid email or password.',
         msg_short_pw: 'Password must be at least 6 characters.',
+        my_account:   'My account',
+        onb_q1:       'You are?',
+        onb_q1_sub:   'This helps us suggest the right matches',
+        onb_q2:       'How old are you?',
+        onb_q2_sub:   'You must be 16 or older',
+        onb_q3:       'What are you looking for?',
+        onb_q3_sub:   'You can change this later in your profile',
+        gender_male:  'Male',
+        gender_female:'Female',
+        gender_other: 'Other',
+        look_chill:   'Chill',
+        look_game:    'A game',
+        look_sleep:   'Sleepcall',
+        continue:     'Continue',
+        back:         'Back',
+        onb_finish:   'Discover Tindord',
+        acc_gender:   'Gender',
+        acc_age:      'Age',
+        acc_looking:  'Looking for',
+        acc_bio:      'Bio',
+        save:         'Save',
+        back_to_swipe:'← Back to swipe',
+        logout:       'Sign out',
+        saved:        'Profile updated ✓',
+        no_more:      'No one left for now!',
+        no_more_sub:  'Come back later to discover new profiles.',
       },
     };
 
@@ -1080,13 +1458,19 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) setOpen(false); });
   })();
 
-  // CTA click feedback
+  // CTA click — feedback + fake Discord login (real OAuth comes once Supabase is wired)
   document.getElementById('join').addEventListener('click', (e) => {
+    e.preventDefault();
     const b = e.currentTarget;
     b.animate(
       [{ transform: 'translateY(-2px) scale(1)' }, { transform: 'translateY(-2px) scale(0.97)' }, { transform: 'translateY(-2px) scale(1)' }],
       { duration: 220, easing: 'ease-out' }
     );
+    const names = ['NolanGG','PixelChamp','LunaBlade','TacoCat','MidLaner','xX_Dragon_Xx'];
+    const name = names[Math.floor(Math.random()*names.length)];
+    setTimeout(() => {
+      window.__tindord && window.__tindord.onLogin({ displayName: name, discordTag: name.toLowerCase(), mode:'discord' });
+    }, 220);
   });
 
   // ===== Auth modal =====
@@ -1119,7 +1503,14 @@
       if (e.key === 'Escape' && modal.getAttribute('data-open') === 'true') close();
     });
 
-    document.getElementById('authDiscord').addEventListener('click', () => { window.location.href = DISCORD_URL; });
+    document.getElementById('authDiscord').addEventListener('click', () => {
+      // TODO: real Discord OAuth needs a backend (or Supabase) to exchange the code.
+      // For now, fake a Discord-style user so the swipe demo can run end-to-end.
+      const names = ['NolanGG','PixelChamp','LunaBlade','TacoCat','MidLaner','xX_Dragon_Xx'];
+      const name = names[Math.floor(Math.random()*names.length)];
+      close();
+      window.__tindord && window.__tindord.onLogin({ displayName: name, discordTag: name.toLowerCase(), mode:'discord' });
+    });
 
     // ----- Email view -----
     const card        = document.getElementById('authCard');
@@ -1197,11 +1588,227 @@
         localStorage.setItem('tindord_user', JSON.stringify({ email, mode, ts: Date.now() }));
       } catch(_){}
       showMsg(mode === 'signup' ? t('msg_created') : t('msg_signed'), true);
-      setTimeout(() => { close(); setView('providers'); setMode('signin'); emailForm.reset(); }, 1100);
+      setTimeout(() => {
+        close(); setView('providers'); setMode('signin'); emailForm.reset();
+        window.__tindord && window.__tindord.onLogin({ email, displayName: email.split('@')[0], mode });
+      }, 1100);
     });
 
     // Reset to providers view whenever modal reopens
     trigger.addEventListener('click', () => { setView('providers'); setMode('signin'); emailForm.reset(); });
+  })();
+
+  /* ============================================================
+     APP STATE MACHINE — landing → onboarding → swipe → account
+     ============================================================ */
+  (() => {
+    const KEY = 'tindord_state';
+    let state = { user:null, profile:null };
+    try { const raw = localStorage.getItem(KEY); if (raw) state = JSON.parse(raw); } catch(_){}
+
+    function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(_){} }
+    function tx(k){
+      const code = (document.documentElement.lang || 'fr').toUpperCase();
+      return (I18N[code] && I18N[code][k]) || (I18N.FR[k]) || k;
+    }
+    function setScreen(name){
+      document.body.setAttribute('data-screen', name);
+      if (name === 'account') renderAccount();
+      if (name === 'swipe')   ensureDeck();
+    }
+    function setAuth(on){
+      document.body.setAttribute('data-auth', on ? 'in' : 'out');
+      if (on) updateChip();
+    }
+    function updateChip(){
+      const u = state.user || {};
+      const avi = document.getElementById('accountChipAvatar');
+      if (u.avatarUrl) avi.innerHTML = `<img src="${u.avatarUrl}" alt="">`;
+      else avi.textContent = (u.displayName || u.email || 'U').charAt(0).toUpperCase();
+    }
+
+    // Hand-off used by login/signup handlers
+    window.__tindord = {
+      onLogin(user){
+        state.user = Object.assign({}, state.user || {}, user);
+        save(); setAuth(true);
+        setScreen(state.profile ? 'swipe' : 'onboarding');
+      },
+    };
+
+    // ---------- Onboarding ----------
+    const draft = { gender:null, age:null, looking:null };
+    function selectOpt(container, value){
+      container.querySelectorAll('.onb-opt').forEach(b => b.classList.toggle('selected', b.dataset.val === value));
+    }
+    document.getElementById('onbGender').addEventListener('click', e => {
+      const b = e.target.closest('.onb-opt'); if (!b) return;
+      draft.gender = b.dataset.val;
+      selectOpt(b.parentElement, draft.gender);
+      document.getElementById('onbNext1').disabled = false;
+    });
+    document.getElementById('onbAge').addEventListener('input', e => {
+      const v = parseInt(e.target.value, 10);
+      draft.age = (v >= 16 && v <= 99) ? v : null;
+      document.getElementById('onbNext2').disabled = draft.age == null;
+    });
+    document.getElementById('onbLooking').addEventListener('click', e => {
+      const b = e.target.closest('.onb-opt'); if (!b) return;
+      draft.looking = b.dataset.val;
+      selectOpt(b.parentElement, draft.looking);
+      document.getElementById('onbFinish').disabled = false;
+    });
+    function goStep(n){
+      document.querySelectorAll('.onb-step').forEach(s => {
+        s.hidden = parseInt(s.dataset.step, 10) !== n;
+      });
+      const dots = document.getElementById('onbProgress').children;
+      for (let i=0; i<dots.length; i++) dots[i].classList.toggle('done', i < n);
+    }
+    document.getElementById('onbNext1').addEventListener('click', () => goStep(2));
+    document.getElementById('onbNext2').addEventListener('click', () => goStep(3));
+    document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => goStep(parseInt(b.dataset.go, 10))));
+    document.getElementById('onbFinish').addEventListener('click', () => {
+      state.profile = { gender:draft.gender, age:draft.age, looking:draft.looking, bio:'' };
+      save();
+      setScreen('swipe');
+    });
+
+    // ---------- Swipe deck ----------
+    const PROFILES = [
+      { name:'Alex', age:21, gender:'male',   looking:'game',  bio:'CS2 Faceit lvl 8, on tryhard ?',                  games:['CS2','Valorant','Apex'],    color:['#FF7EB6','#9146FF'], initial:'A' },
+      { name:'Léa',  age:19, gender:'female', looking:'chill', bio:'Stardew & Animal Crossing, binôme cosy 🌱',        games:['Stardew','Hades'],          color:['#5BE9FF','#9146FF'], initial:'L' },
+      { name:'Mo',   age:23, gender:'male',   looking:'sleep', bio:'Insomniaque. Qui dort en sleepcall ce soir ?',     games:['Minecraft','Rocket League'],color:['#FFB66E','#FF4FA0'], initial:'M' },
+      { name:'Sam',  age:20, gender:'other',  looking:'game',  bio:'LoL main support, je carry les mid 🙃',             games:['LoL','TFT'],                color:['#3BD17C','#5BE9FF'], initial:'S' },
+      { name:'Nora', age:22, gender:'female', looking:'chill', bio:"Films d'horreur + popcorn, t'es chaud ?",          games:['Phasmo','Stardew'],         color:['#A65BFF','#FF7EB6'], initial:'N' },
+      { name:'Theo', age:25, gender:'male',   looking:'game',  bio:'Apex predator EU. Cherche duo sérieux.',           games:['Apex','Warzone'],           color:['#FF4FA0','#9146FF'], initial:'T' },
+      { name:'Iris', age:18, gender:'female', looking:'sleep', bio:'Voix douce, sleepcall calme ☁️',                    games:['Minecraft'],                color:['#5BE9FF','#FF7EB6'], initial:'I' },
+      { name:'Kai',  age:24, gender:'other',  looking:'chill', bio:'Lecture, lo-fi, débats existentiels jusqu\'à 4h.', games:['Disco Elysium'],            color:['#9146FF','#3BD17C'], initial:'K' },
+      { name:'Zoé',  age:21, gender:'female', looking:'game',  bio:'Valo Diamond, mais je rage pas (trop)',            games:['Valorant','Overwatch'],     color:['#FF7EB6','#FFB66E'], initial:'Z' },
+      { name:'Hugo', age:26, gender:'male',   looking:'chill', bio:'Resi 4 marathon. Streaming le soir.',              games:['Resident Evil','Elden Ring'],color:['#6B2BFF','#5BE9FF'], initial:'H' },
+    ];
+    let deckIdx = 0;
+    function ensureDeck(){
+      const wrap = document.getElementById('swipeWrap');
+      wrap.innerHTML = '';
+      if (deckIdx >= PROFILES.length) {
+        wrap.innerHTML = `<div class="swipe-empty"><h3>${tx('no_more')}</h3><p>${tx('no_more_sub')}</p></div>`;
+        return;
+      }
+      // Render up to 3 cards stacked, top card last in DOM = on top visually
+      const end = Math.min(deckIdx + 3, PROFILES.length);
+      for (let i = end - 1; i >= deckIdx; i--){
+        const card = buildCard(PROFILES[i], i === deckIdx);
+        wrap.appendChild(card);
+      }
+    }
+    function buildCard(p, isTop){
+      const c = document.createElement('div');
+      c.className = 'swipe-card';
+      if (!isTop) {
+        c.style.transform = 'scale(0.96) translateY(10px)';
+        c.style.pointerEvents = 'none';
+        c.style.opacity = '0.85';
+      }
+      const lookLabel = { chill:tx('look_chill'), game:tx('look_game'), sleep:tx('look_sleep') }[p.looking] || p.looking;
+      c.innerHTML = `
+        <div class="badge-stamp like">LIKE</div>
+        <div class="badge-stamp nope">NOPE</div>
+        <div class="photo" style="background:linear-gradient(160deg, ${p.color[0]} 0%, ${p.color[1]} 100%)">
+          <div class="avi" style="background:linear-gradient(135deg, ${p.color[1]}, ${p.color[0]})">${p.initial}</div>
+        </div>
+        <div class="info">
+          <div class="name-row"><span class="name">${p.name}</span><span class="age">${p.age}</span></div>
+          <div class="meta"><span class="chip">${lookLabel}</span>${p.games.map(g => `<span class="chip">🎮 ${g}</span>`).join('')}</div>
+          <p class="bio">${p.bio}</p>
+        </div>`;
+      if (isTop) attachDrag(c);
+      return c;
+    }
+    function attachDrag(card){
+      let sx=0, sy=0, dx=0, dy=0, dragging=false;
+      const like = card.querySelector('.badge-stamp.like');
+      const nope = card.querySelector('.badge-stamp.nope');
+      function onDown(e){
+        dragging = true;
+        const p = e.touches ? e.touches[0] : e;
+        sx = p.clientX; sy = p.clientY; dx = 0; dy = 0;
+        card.style.transition = 'none';
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        document.addEventListener('touchmove', onMove, { passive:false });
+        document.addEventListener('touchend', onUp);
+      }
+      function onMove(e){
+        if (!dragging) return;
+        if (e.touches) e.preventDefault();
+        const p = e.touches ? e.touches[0] : e;
+        dx = p.clientX - sx; dy = p.clientY - sy;
+        card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx * 0.06}deg)`;
+        like.style.opacity = Math.max(0, Math.min(1, dx / 120));
+        nope.style.opacity = Math.max(0, Math.min(1, -dx / 120));
+      }
+      function onUp(){
+        dragging = false;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onUp);
+        card.style.transition = '';
+        if (Math.abs(dx) > 110) commitSwipe(dx > 0 ? 'yes' : 'no', card);
+        else { card.style.transform = ''; like.style.opacity = 0; nope.style.opacity = 0; }
+      }
+      card.addEventListener('mousedown', onDown);
+      card.addEventListener('touchstart', onDown, { passive:true });
+    }
+    function commitSwipe(dir, cardEl){
+      const off = dir === 'yes' ? window.innerWidth + 200 : -(window.innerWidth + 200);
+      cardEl.style.transition = 'transform .35s ease-out, opacity .35s';
+      cardEl.style.transform = `translate(${off}px, ${dir === 'yes' ? -80 : 80}px) rotate(${dir === 'yes' ? 22 : -22}deg)`;
+      cardEl.style.opacity = '0';
+      setTimeout(() => { deckIdx++; ensureDeck(); }, 320);
+    }
+    function topCard(){ return document.querySelector('#swipeWrap .swipe-card:last-child'); }
+    document.getElementById('swipeYes').addEventListener('click', () => { const t = topCard(); if (t) commitSwipe('yes', t); });
+    document.getElementById('swipeNo').addEventListener('click',  () => { const t = topCard(); if (t) commitSwipe('no',  t); });
+
+    // ---------- Account screen ----------
+    function renderAccount(){
+      const u = state.user || {};
+      const p = state.profile || {};
+      document.getElementById('accName').textContent = u.displayName || u.email || 'Tindord user';
+      document.getElementById('accHandle').textContent = u.discordTag ? '@' + u.discordTag : (u.email || '—');
+      const avi = document.getElementById('accAvatar');
+      if (u.avatarUrl) avi.innerHTML = `<img src="${u.avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+      else { avi.textContent = (u.displayName || u.email || 'T').charAt(0).toUpperCase(); avi.style.background = 'linear-gradient(135deg,#FF7EB6,#9146FF)'; }
+      document.getElementById('accGender').textContent  = ({ male:tx('gender_male'), female:tx('gender_female'), other:tx('gender_other') }[p.gender] || '—');
+      document.getElementById('accAge').textContent     = p.age || '—';
+      document.getElementById('accLooking').textContent = ({ chill:tx('look_chill'), game:tx('look_game'), sleep:tx('look_sleep') }[p.looking] || '—');
+      document.getElementById('accBio').value           = p.bio || '';
+    }
+    document.getElementById('accountChip').addEventListener('click', (e) => { e.preventDefault(); setScreen('account'); });
+    document.getElementById('accSave').addEventListener('click', () => {
+      state.profile = state.profile || { gender:null, age:null, looking:null };
+      state.profile.bio = document.getElementById('accBio').value.trim();
+      save();
+      const msg = document.getElementById('accMsg');
+      msg.textContent = tx('saved');
+      msg.setAttribute('data-show', 'true');
+      setTimeout(() => msg.setAttribute('data-show', 'false'), 1800);
+    });
+    document.getElementById('accBackSwipe').addEventListener('click', () => setScreen('swipe'));
+    document.getElementById('accLogout').addEventListener('click', () => {
+      state = { user:null, profile:null };
+      save();
+      setAuth(false);
+      setScreen('landing');
+    });
+
+    // ---------- Init from persisted state ----------
+    if (state.user) {
+      setAuth(true);
+      setScreen(state.profile ? 'swipe' : 'onboarding');
+    }
   })();
 </script>
 </body>
