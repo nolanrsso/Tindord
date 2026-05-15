@@ -541,11 +541,11 @@
     position:relative;z-index:2;flex:1 1 auto;flex-direction:column;
     align-items:center;justify-content:center;padding:20px 24px 30px;gap:18px;
   }
-  /* Stage = card + floating bubbles further around it */
+  /* Stage = card + floating orb-bubbles */
   .swipe-stage{
     position:relative;
-    width:min(98vw,820px);
-    height:min(80vh,680px);
+    width:min(98vw,920px);
+    height:min(84vh,740px);
     display:grid;place-items:center;
     pointer-events:none;
   }
@@ -553,51 +553,65 @@
   .swipe-stage .orbit{
     position:absolute;inset:0;pointer-events:none;
   }
-  .swipe-stage .orbit .orb{
-    position:absolute;display:grid;place-items:center;
-    width:78px;height:78px;border-radius:22px;
-    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
-    border:1px solid rgba(255,255,255,.10);
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
-    box-shadow:0 14px 34px rgba(13,11,30,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
-    cursor:pointer;pointer-events:auto;
-    transition:transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s ease, border-color .25s ease;
+  /* Orb wrapper — carries absolute position + float animation */
+  .swipe-stage .orbit .orb-wrap{
+    position:absolute;
+    display:flex;flex-direction:column;align-items:center;gap:9px;
+    pointer-events:auto;
     animation:orbFloat 6s ease-in-out infinite;
-    overflow:hidden;
-    color:#fff;
   }
-  .swipe-stage .orbit .orb:hover{transform:translateY(-5px) scale(1.06);border-color:rgba(255,255,255,.28)}
-  .swipe-stage .orbit .orb svg{width:38px;height:38px}
-  .swipe-stage .orbit .orb .ico{font-size:30px}
-  .swipe-stage .orbit .orb .tag{
-    position:absolute;bottom:5px;left:5px;right:5px;
-    text-align:center;font-size:9.5px;font-weight:700;letter-spacing:.04em;
-    text-transform:uppercase;color:#fff;
-    text-shadow:0 1px 6px rgba(0,0,0,.7);
-    pointer-events:none;
+  /* Orb bubble — fully circular, vibrant */
+  .swipe-stage .orbit .orb{
+    width:92px;height:92px;border-radius:50%;
+    display:grid;place-items:center;
+    border:1.5px solid rgba(255,255,255,.22);
+    backdrop-filter:blur(18px) saturate(150%);
+    -webkit-backdrop-filter:blur(18px) saturate(150%);
+    box-shadow:0 20px 48px rgba(13,11,30,.7), 0 0 0 1px rgba(255,255,255,.07) inset;
+    cursor:pointer;pointer-events:auto;
+    transition:transform .22s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease, border-color .22s ease;
+    color:#fff;position:relative;overflow:hidden;
   }
-  /* Kind-specific tinted backgrounds (no more identical grey orbs) */
-  .swipe-stage .orbit .orb[data-kind="voice"]{background:linear-gradient(135deg, #5865F2, #9146FF);border-color:rgba(145,70,255,.45);box-shadow:0 14px 34px rgba(88,101,242,.4)}
-  .swipe-stage .orbit .orb[data-kind="music"]{background:linear-gradient(135deg, #1DB954, #0a8043);border-color:rgba(29,185,84,.4);box-shadow:0 14px 34px rgba(29,185,84,.35)}
-  .swipe-stage .orbit .orb[data-kind="anime"]{background:linear-gradient(135deg, #FF7EB6, #C026D3);border-color:rgba(192,38,211,.45);box-shadow:0 14px 34px rgba(192,38,211,.35)}
-  .swipe-stage .orbit .orb[data-kind="game"] {background:linear-gradient(135deg, #FFB66E, #FF4FA0);border-color:rgba(255,79,160,.45);box-shadow:0 14px 34px rgba(255,79,160,.35)}
+  /* Inner specular shimmer */
+  .swipe-stage .orbit .orb::before{
+    content:"";position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(circle at 34% 28%, rgba(255,255,255,.30) 0%, transparent 56%);
+    pointer-events:none;z-index:1;
+  }
+  .swipe-stage .orbit .orb:hover{transform:scale(1.12);border-color:rgba(255,255,255,.42)}
+  .swipe-stage .orbit .orb:active{transform:scale(.93)}
+  .swipe-stage .orbit .orb svg{width:38px;height:38px;position:relative;z-index:2;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+  /* Kind-specific vibrant gradients */
+  .swipe-stage .orbit .orb[data-kind="voice"]{background:linear-gradient(145deg,#7289DA,#5865F2,#9146FF);border-color:rgba(145,70,255,.58);box-shadow:0 20px 48px rgba(88,101,242,.55), 0 0 0 1px rgba(255,255,255,.07) inset}
+  .swipe-stage .orbit .orb[data-kind="music"]{background:linear-gradient(145deg,#1ed760,#1DB954,#0e7a38);border-color:rgba(29,185,84,.55);box-shadow:0 20px 48px rgba(29,185,84,.52), 0 0 0 1px rgba(255,255,255,.07) inset}
+  .swipe-stage .orbit .orb[data-kind="anime"]{background:linear-gradient(145deg,#FF9CC0,#FF7EB6,#b020b8);border-color:rgba(192,38,211,.55);box-shadow:0 20px 48px rgba(192,38,211,.52), 0 0 0 1px rgba(255,255,255,.07) inset}
+  .swipe-stage .orbit .orb[data-kind="game"] {background:linear-gradient(145deg,#FFD080,#FFB66E,#FF4FA0);border-color:rgba(255,79,160,.55);box-shadow:0 20px 48px rgba(255,79,160,.52), 0 0 0 1px rgba(255,255,255,.07) inset}
   .swipe-stage .orbit .orb[data-kind="voice"].playing{animation:voicePulse 1s ease-in-out infinite}
-  @keyframes voicePulse{0%,100%{box-shadow:0 0 0 3px rgba(145,70,255,.5), 0 0 24px rgba(145,70,255,.6)}50%{box-shadow:0 0 0 6px rgba(145,70,255,.25), 0 0 50px rgba(145,70,255,.95)}}
-  @keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-  /* 6 orbit positions — further from the card (stage is now wider) */
-  .orbit .orb:nth-child(1){top:6%;   left:0;    animation-delay:-.4s}
-  .orbit .orb:nth-child(2){top:18%;  right:0;   animation-delay:-1.2s}
-  .orbit .orb:nth-child(3){top:48%;  left:0;    animation-delay:-.8s}
-  .orbit .orb:nth-child(4){top:56%;  right:0;   animation-delay:-2.2s}
-  .orbit .orb:nth-child(5){bottom:6%;left:8%;   animation-delay:-1.6s}
-  .orbit .orb:nth-child(6){bottom:6%;right:8%;  animation-delay:-3s}
+  @keyframes voicePulse{
+    0%,100%{box-shadow:0 0 0 4px rgba(145,70,255,.5), 0 0 32px rgba(145,70,255,.75)}
+    50%    {box-shadow:0 0 0 10px rgba(145,70,255,.2), 0 0 70px rgba(145,70,255,1)}
+  }
+  @keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  /* Orb label — floats below each bubble */
+  .orb-label{
+    font-size:10.5px;font-weight:700;color:#fff;
+    text-shadow:0 1px 10px rgba(0,0,0,.95);
+    max-width:96px;text-align:center;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    letter-spacing:.015em;pointer-events:none;opacity:.92;
+  }
+  /* 6 orbit positions */
+  .orbit .orb-wrap:nth-child(1){top:5%;   left:0;    animation-delay:-.4s}
+  .orbit .orb-wrap:nth-child(2){top:16%;  right:0;   animation-delay:-1.2s}
+  .orbit .orb-wrap:nth-child(3){top:46%;  left:0;    animation-delay:-.8s}
+  .orbit .orb-wrap:nth-child(4){top:54%;  right:0;   animation-delay:-2.2s}
+  .orbit .orb-wrap:nth-child(5){bottom:4%;left:5%;   animation-delay:-1.6s}
+  .orbit .orb-wrap:nth-child(6){bottom:4%;right:5%;  animation-delay:-3s}
   @media (max-width:780px){
     .swipe-stage{width:96vw;height:78vh}
-    .orbit .orb{width:60px;height:60px;border-radius:18px}
+    .orbit .orb{width:70px;height:70px}
     .orbit .orb svg{width:28px;height:28px}
-    .orbit .orb .ico{font-size:22px}
-    .orbit .orb .tag{font-size:8.5px}
+    .orb-label{font-size:9px;max-width:72px}
   }
 
   /* Toast for orb clicks */
@@ -2599,16 +2613,21 @@
       orbit.innerHTML = '';
       if (!p || !p.orbs) return;
       p.orbs.slice(0, 6).forEach((o) => {
-        const el = document.createElement('button');
-        el.type = 'button';
-        el.className = 'orb';
-        el.dataset.kind = o.kind;
-        el.title = `${o.title} · ${o.sub || ''}`;
-        // Short label (game/music/anime title trimmed) underneath
-        const short = (o.title || '').length > 12 ? o.title.slice(0, 11) + '…' : (o.title || '');
-        el.innerHTML = `${ORB_SVG[o.kind] || ORB_SVG.music}<span class="tag">${escapeHtmlMini(short)}</span>`;
-        el.addEventListener('click', (ev) => { ev.stopPropagation(); playOrb(o, el); });
-        orbit.appendChild(el);
+        const wrap = document.createElement('div');
+        wrap.className = 'orb-wrap';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'orb';
+        btn.dataset.kind = o.kind;
+        btn.title = `${o.title} · ${o.sub || ''}`;
+        btn.innerHTML = ORB_SVG[o.kind] || ORB_SVG.music;
+        btn.addEventListener('click', (ev) => { ev.stopPropagation(); playOrb(o, btn); });
+        const label = document.createElement('span');
+        label.className = 'orb-label';
+        label.textContent = (o.title || '').length > 14 ? o.title.slice(0, 13) + '…' : (o.title || '');
+        wrap.appendChild(btn);
+        wrap.appendChild(label);
+        orbit.appendChild(wrap);
       });
     }
     function escapeHtmlMini(s){ return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
