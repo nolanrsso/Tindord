@@ -583,6 +583,7 @@
   .swipe-stage .orbit .orb:hover{transform:scale(1.12);border-color:rgba(255,255,255,.42)}
   .swipe-stage .orbit .orb:active{transform:scale(.93)}
   .swipe-stage .orbit .orb svg{width:38px;height:38px;position:relative;z-index:2;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+  .swipe-stage .orbit .orb .orb-cover{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:2}
   /* Kind-specific vibrant gradients */
   .swipe-stage .orbit .orb[data-kind="voice"]{background:linear-gradient(145deg,#7289DA,#5865F2,#9146FF);border-color:rgba(145,70,255,.58);box-shadow:0 20px 48px rgba(88,101,242,.55), 0 0 0 1px rgba(255,255,255,.07) inset}
   .swipe-stage .orbit .orb[data-kind="music"]{background:linear-gradient(145deg,#1ed760,#1DB954,#0e7a38);border-color:rgba(29,185,84,.55);box-shadow:0 20px 48px rgba(29,185,84,.52), 0 0 0 1px rgba(255,255,255,.07) inset}
@@ -1002,6 +1003,44 @@
   .acc-msg{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;display:none;background:rgba(59,209,124,.12);border:1px solid rgba(59,209,124,.35);color:#9CF0BD}
   .acc-msg[data-show="true"]{display:block;animation:authViewIn .22s ease-out}
 
+  /* ===== GIF placement stage (account) ===== */
+  .gif-stage{
+    position:relative;width:100%;aspect-ratio:920/740;border-radius:16px;
+    background:rgba(255,255,255,.03);border:1.5px dashed rgba(255,255,255,.12);
+    margin-top:10px;overflow:hidden;
+  }
+  .gif-stage-card{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:36%;aspect-ratio:300/420;border-radius:14px;
+    background:linear-gradient(180deg,rgba(145,70,255,.18),rgba(255,126,182,.10));
+    border:1px solid rgba(255,255,255,.10);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:4px;pointer-events:none;
+  }
+  .gif-stage-card span{font-size:28px}
+  .gif-stage-card small{color:#b9bbbe;font-size:10.5px}
+  .gif-item{
+    position:absolute;width:64px;height:64px;border-radius:10px;overflow:hidden;
+    cursor:grab;user-select:none;box-shadow:0 6px 18px rgba(0,0,0,.5);
+    border:2px solid rgba(255,255,255,.20);touch-action:none;z-index:3;
+  }
+  .gif-item:active{cursor:grabbing}
+  .gif-item img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  .gif-item .gif-del{
+    position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;
+    background:#2f3136;color:#fff;border:1.5px solid rgba(255,255,255,.2);
+    font-size:11px;cursor:pointer;display:grid;place-items:center;padding:0;z-index:5;
+  }
+  .gif-item .gif-del:hover{background:#ff4f80;border-color:#ff4f80}
+
+  /* ===== GIFs on swipe stage ===== */
+  .swipe-stage .swipe-gifs{position:absolute;inset:0;pointer-events:none;z-index:6}
+  .swipe-stage .swipe-gif{
+    position:absolute;width:120px;height:120px;border-radius:14px;overflow:hidden;
+    transform:translate(-50%,-50%);box-shadow:0 12px 32px rgba(0,0,0,.5);
+    border:2px solid rgba(255,255,255,.20);
+  }
+  .swipe-stage .swipe-gif img{width:100%;height:100%;object-fit:cover;display:block}
+
   /* ===== Toggle switch ===== */
   .toggle{display:inline-flex;align-items:center;cursor:pointer;user-select:none}
   .toggle input{display:none}
@@ -1174,6 +1213,7 @@
     pointer-events:none;z-index:1;
   }
   .acc-orb-circle svg{width:28px;height:28px;color:#fff;position:relative;z-index:2}
+  .acc-orb-circle .orb-cover{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:2}
   .acc-orb-circle[data-kind="music"]{background:linear-gradient(145deg,#1ed760,#1DB954,#0e7a38);box-shadow:0 8px 24px rgba(29,185,84,.5)}
   .acc-orb-circle[data-kind="game"] {background:linear-gradient(145deg,#FFD080,#FFB66E,#FF4FA0);box-shadow:0 8px 24px rgba(255,79,160,.5)}
   .acc-orb-circle[data-kind="anime"]{background:linear-gradient(145deg,#FF9CC0,#FF7EB6,#b020b8);box-shadow:0 8px 24px rgba(192,38,211,.5)}
@@ -1634,6 +1674,20 @@
               <option value="elle">🙋‍♀️ Femmes (Elle)</option>
             </select>
             <button type="button" class="acc-btn acc-btn--ghost" id="openLikedMe" style="margin:0">👀 Voir qui m'a liké</button>
+          </div>
+        </div>
+
+        <div class="acc-field" style="margin-top:14px">
+          <label>🎞️ Mes GIFs <span id="gifCounterPill" class="pill" style="margin-left:6px">0/5</span></label>
+          <small style="color:#b9bbbe;font-weight:400;display:block;margin-bottom:8px">Cherche un GIF puis fais-le glisser autour de ta carte. Ils apparaissent sur ton profil de swipe.</small>
+          <div class="acc-orb-form">
+            <div class="acc-orb-input-wrap">
+              <input class="acc-input" id="gifInput" type="text" placeholder="Recherche un GIF sur Giphy…" autocomplete="off" />
+              <div class="spotify-sugg" id="gifSugg"></div>
+            </div>
+          </div>
+          <div class="gif-stage" id="gifStage" aria-label="Zone de placement des GIFs">
+            <div class="gif-stage-card"><span>👤</span><small>Ta carte</small></div>
           </div>
         </div>
       </div>
@@ -2844,6 +2898,29 @@
       const p = (myP && deckIdx === 0) ? myP : pool[deckIdx - offset];
       wrap.appendChild(buildCard(p, true));
       renderOrbs(p);
+      renderSwipeGifs(p);
+    }
+
+    function renderSwipeGifs(p){
+      const stage = document.querySelector('.swipe-stage');
+      if (!stage) return;
+      let layer = stage.querySelector('.swipe-gifs');
+      if (!layer) {
+        layer = document.createElement('div');
+        layer.className = 'swipe-gifs';
+        stage.appendChild(layer);
+      }
+      layer.innerHTML = '';
+      const isMe = p && p.isMe;
+      const gifs = isMe && state.user && state.user.boost ? (state.user.gifs || []) : [];
+      gifs.forEach(g => {
+        const el = document.createElement('div');
+        el.className = 'swipe-gif';
+        el.style.left = g.x + '%';
+        el.style.top  = g.y + '%';
+        el.innerHTML = `<img src="${g.full || g.preview}" alt="">`;
+        layer.appendChild(el);
+      });
     }
     function activityIcon(type){
       if (type === 'call')  return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5be9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>`;
@@ -2937,6 +3014,12 @@
       /* Film strip */
       film:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M17 7h5M2 17h5M17 17h5"/></svg>',
     };
+    /* Build the inside of an orb: a cover image (if available) or a fallback SVG */
+    function orbInner(o){
+      if (o && o.cover) return `<img class="orb-cover" src="${o.cover}" alt="" />`;
+      return ORB_SVG[o.kind] || ORB_SVG.music;
+    }
+
     /* Render the orb constellation around the top card */
     function renderOrbs(p){
       const orbit = document.getElementById('swipeOrbit');
@@ -2951,7 +3034,7 @@
         btn.className = 'orb';
         btn.dataset.kind = o.kind;
         btn.title = `${o.title} · ${o.sub || ''}`;
-        btn.innerHTML = ORB_SVG[o.kind] || ORB_SVG.music;
+        btn.innerHTML = orbInner(o);
         btn.addEventListener('click', (ev) => { ev.stopPropagation(); playOrb(o, btn); });
         const label = document.createElement('span');
         label.className = 'orb-label';
@@ -2996,6 +3079,40 @@
       }));
     }
     let _spotifyAudio = null;
+
+    /* Jikan API for anime covers (free, no auth) */
+    async function searchAnime(query){
+      try {
+        const resp = await fetch('https://api.jikan.moe/v4/anime?q=' + encodeURIComponent(query) + '&limit=6&sfw=true');
+        const d = await resp.json();
+        return (d.data || []).map(a => ({
+          name:   a.title_english || a.title,
+          sub:    a.title_japanese || (a.type || '') + (a.year ? ' · ' + a.year : ''),
+          cover:  a.images?.webp?.image_url || a.images?.jpg?.image_url || null,
+        }));
+      } catch(_){ return []; }
+    }
+
+    /* Wikipedia search → thumbnails (free, CORS-friendly). Used for games + films. */
+    async function searchWiki(query, kindHint){
+      const hint = kindHint === 'film' ? ' film' : kindHint === 'game' ? ' video game' : '';
+      try {
+        const url = 'https://en.wikipedia.org/w/api.php?action=query&format=json' +
+          '&prop=pageimages|pageterms&piprop=thumbnail&pithumbsize=300&wbptterms=description' +
+          '&generator=search&gsrlimit=6&origin=*&gsrsearch=' + encodeURIComponent(query + hint);
+        const resp = await fetch(url);
+        const d = await resp.json();
+        const pages = d.query?.pages ? Object.values(d.query.pages) : [];
+        return pages
+          .sort((a,b) => (a.index||0) - (b.index||0))
+          .map(p => ({
+            name:  p.title,
+            sub:   (p.terms?.description?.[0] || '').slice(0,60),
+            cover: p.thumbnail?.source || null,
+          }))
+          .filter(r => r.cover);
+      } catch(_){ return []; }
+    }
 
     /* Toast + media playback for an orb */
     let _voice = null;
@@ -3279,7 +3396,7 @@
         const circle = document.createElement('div');
         circle.className = 'acc-orb-circle';
         circle.dataset.kind = o.kind;
-        circle.innerHTML = ORB_SVG[o.kind] || ORB_SVG.music;
+        circle.innerHTML = orbInner(o);
         const lbl = document.createElement('span');
         lbl.className = 'acc-orb-lbl';
         lbl.textContent = o.title;
@@ -3340,38 +3457,51 @@
     document.getElementById('accOrbAdd').addEventListener('click', () => addOrb());
     document.getElementById('accOrbInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); addOrb(); } });
 
-    /* Live Spotify search when category = music */
+    /* Live search dropdown — kind-aware (Spotify / Jikan / Wikipedia) */
     document.getElementById('accOrbInput').addEventListener('input', e => {
       _pendingSpotifyOrb = null;
       const val = e.target.value.trim();
       const sugg = document.getElementById('spotifySugg');
-      if (selectedOrbKind !== 'music' || val.length < 2){ closeSugg(); return; }
+      if (val.length < 2){ closeSugg(); return; }
       clearTimeout(_suggDebounce);
       _suggDebounce = setTimeout(async () => {
-        try {
-          const results = await searchSpotifyTracks(val);
-          if (!results.length){ closeSugg(); return; }
-          sugg.innerHTML = '';
-          results.forEach(r => {
-            const item = document.createElement('div');
-            item.className = 'sp-item';
-            const ms = r.durationMs;
-            const dur = ms ? Math.floor(ms/60000)+':'+String(Math.floor((ms%60000)/1000)).padStart(2,'0') : '';
-            item.innerHTML =
-              (r.cover ? `<img src="${r.cover}" alt="">` : '<div class="sp-no-cover">🎵</div>') +
-              `<div class="sp-info"><div class="sp-title">${escapeHtmlMini(r.name)}</div>` +
-              `<div class="sp-artist">${escapeHtmlMini(r.artist)}</div></div>` +
-              (dur ? `<span class="sp-dur">${dur}</span>` : '');
-            item.addEventListener('mousedown', ev => {
-              ev.preventDefault();
-              const orb = {kind:'music', title:r.name+' · '+r.artist, previewUrl:r.previewUrl, cover:r.cover};
-              document.getElementById('accOrbInput').value = orb.title;
-              addOrb(orb);
-            });
-            sugg.appendChild(item);
+        let results = [];
+        if (selectedOrbKind === 'music') {
+          const tracks = await searchSpotifyTracks(val);
+          results = tracks.map(t => ({
+            name:t.name, sub:t.artist, cover:t.cover,
+            orb:{kind:'music', title:t.name+' · '+t.artist, previewUrl:t.previewUrl, cover:t.cover},
+          }));
+        } else if (selectedOrbKind === 'anime') {
+          const animes = await searchAnime(val);
+          results = animes.map(a => ({
+            name:a.name, sub:a.sub, cover:a.cover,
+            orb:{kind:'anime', title:a.name, cover:a.cover},
+          }));
+        } else if (selectedOrbKind === 'game' || selectedOrbKind === 'film') {
+          const pages = await searchWiki(val, selectedOrbKind);
+          results = pages.map(p => ({
+            name:p.name, sub:p.sub, cover:p.cover,
+            orb:{kind:selectedOrbKind, title:p.name, cover:p.cover},
+          }));
+        }
+        if (!results.length){ closeSugg(); return; }
+        sugg.innerHTML = '';
+        results.forEach(r => {
+          const item = document.createElement('div');
+          item.className = 'sp-item';
+          item.innerHTML =
+            (r.cover ? `<img src="${r.cover}" alt="">` : '<div class="sp-no-cover">'+({music:'🎵',anime:'📺',game:'🎮',film:'🎬'}[selectedOrbKind]||'✨')+'</div>') +
+            `<div class="sp-info"><div class="sp-title">${escapeHtmlMini(r.name)}</div>` +
+            `<div class="sp-artist">${escapeHtmlMini(r.sub || '')}</div></div>`;
+          item.addEventListener('mousedown', ev => {
+            ev.preventDefault();
+            document.getElementById('accOrbInput').value = r.orb.title;
+            addOrb(r.orb);
           });
-          sugg.classList.add('open');
-        } catch(_){}
+          sugg.appendChild(item);
+        });
+        sugg.classList.add('open');
       }, 320);
     });
     document.getElementById('accOrbInput').addEventListener('blur', () => setTimeout(closeSugg, 200));
@@ -3613,6 +3743,134 @@
       }
     });
 
+    /* ===== Boost: GIFs (Giphy) ===== */
+    const GIPHY_KEY = 'dc6zaTOxFJmzC';
+    const MAX_GIFS = 5;
+    let _gifDebounce = null;
+
+    async function searchGiphy(query){
+      try {
+        const url = 'https://api.giphy.com/v1/gifs/search?api_key=' + GIPHY_KEY +
+          '&q=' + encodeURIComponent(query) + '&limit=12&rating=pg-13&bundle=messaging_non_clips';
+        const resp = await fetch(url);
+        const d = await resp.json();
+        if (d.meta?.status && d.meta.status !== 200) {
+          showToast('⚠️', 'Clé Giphy invalide', 'Crée la tienne sur developers.giphy.com');
+          return [];
+        }
+        return (d.data || []).map(g => ({
+          preview: g.images?.fixed_height_small?.url || g.images?.fixed_width_small?.url,
+          full:    g.images?.fixed_height?.url || g.images?.original?.url,
+        })).filter(g => g.preview && g.full);
+      } catch(_){ return []; }
+    }
+
+    function refreshGifCounter(){
+      const pill = document.getElementById('gifCounterPill');
+      const n = ((state.user && state.user.gifs) || []).length;
+      if (pill) pill.textContent = n + '/' + MAX_GIFS;
+    }
+
+    function renderGifStage(){
+      const stage = document.getElementById('gifStage');
+      stage.querySelectorAll('.gif-item').forEach(n => n.remove());
+      const gifs = (state.user && state.user.gifs) || [];
+      gifs.forEach((g, i) => {
+        const item = document.createElement('div');
+        item.className = 'gif-item';
+        item.style.left = g.x + '%';
+        item.style.top  = g.y + '%';
+        item.style.transform = 'translate(-50%,-50%)';
+        item.innerHTML = `<img src="${g.preview}" alt=""><button type="button" class="gif-del" aria-label="Supprimer">×</button>`;
+        item.querySelector('.gif-del').addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          state.user.gifs.splice(i, 1);
+          save();
+          renderGifStage();
+          refreshGifCounter();
+        });
+        attachGifDrag(item, i, stage);
+        stage.appendChild(item);
+      });
+      refreshGifCounter();
+    }
+
+    function attachGifDrag(item, idx, stage){
+      let dragging = false;
+      const onDown = (e) => {
+        if (e.target.classList.contains('gif-del')) return;
+        dragging = true;
+        e.preventDefault();
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        document.addEventListener('touchmove', onMove, { passive:false });
+        document.addEventListener('touchend', onUp);
+      };
+      const onMove = (e) => {
+        if (!dragging) return;
+        const p = e.touches ? e.touches[0] : e;
+        const rect = stage.getBoundingClientRect();
+        const x = Math.max(4, Math.min(96, ((p.clientX - rect.left) / rect.width) * 100));
+        const y = Math.max(4, Math.min(96, ((p.clientY - rect.top) / rect.height) * 100));
+        item.style.left = x + '%';
+        item.style.top  = y + '%';
+        if (state.user && state.user.gifs && state.user.gifs[idx]) {
+          state.user.gifs[idx].x = x;
+          state.user.gifs[idx].y = y;
+        }
+      };
+      const onUp = () => {
+        if (!dragging) return;
+        dragging = false;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onUp);
+        save();
+      };
+      item.addEventListener('mousedown', onDown);
+      item.addEventListener('touchstart', onDown, { passive:false });
+    }
+
+    document.getElementById('gifInput').addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      const sugg = document.getElementById('gifSugg');
+      if (val.length < 2) { sugg.innerHTML=''; sugg.classList.remove('open'); return; }
+      clearTimeout(_gifDebounce);
+      _gifDebounce = setTimeout(async () => {
+        const results = await searchGiphy(val);
+        if (!results.length) { sugg.innerHTML=''; sugg.classList.remove('open'); return; }
+        sugg.innerHTML = '';
+        sugg.style.display = 'grid';
+        sugg.style.gridTemplateColumns = 'repeat(3,1fr)';
+        sugg.style.gap = '6px';
+        sugg.style.padding = '8px';
+        results.forEach(r => {
+          const it = document.createElement('div');
+          it.style.cssText = 'cursor:pointer;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#000';
+          it.innerHTML = `<img src="${r.preview}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">`;
+          it.addEventListener('mousedown', (ev) => {
+            ev.preventDefault();
+            if (!state.user || !state.user.boost) { openBoostModal(); return; }
+            state.user.gifs = state.user.gifs || [];
+            if (state.user.gifs.length >= MAX_GIFS) { showToast('🎞️', 'Limite atteinte', MAX_GIFS + ' GIFs max'); return; }
+            state.user.gifs.push({ preview:r.preview, full:r.full, x:50, y:30 });
+            save();
+            document.getElementById('gifInput').value = '';
+            sugg.innerHTML=''; sugg.classList.remove('open');
+            renderGifStage();
+            showToast('🎞️', 'GIF ajouté', 'Fais-le glisser pour le positionner');
+          });
+          sugg.appendChild(it);
+        });
+        sugg.classList.add('open');
+      }, 320);
+    });
+    document.getElementById('gifInput').addEventListener('blur', () => setTimeout(() => {
+      const s = document.getElementById('gifSugg');
+      s.innerHTML=''; s.classList.remove('open');
+    }, 200));
+
     /* ===== Boost banner + pricing modal ===== */
     function refreshBoostUI(){
       const banner = document.getElementById('boostBanner');
@@ -3640,6 +3898,7 @@
       document.getElementById('boostFakeNitro').checked = !!(state.user && state.user.fakeNitro);
       document.getElementById('boostGenderFilter').value = (state.user && state.user.genderFilter) || 'all';
       renderSwipeMusicCurrent();
+      renderGifStage();
       renderUserOrbs();
     }
     function openBoostModal(){ document.getElementById('boostModal').setAttribute('data-open','true'); refreshBoostUI(); }
