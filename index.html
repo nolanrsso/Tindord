@@ -541,13 +541,13 @@
   /* ===== Swipe deck ===== */
   #screen-swipe{
     position:relative;z-index:2;flex:1 1 auto;flex-direction:column;
-    align-items:center;justify-content:center;padding:20px 24px 30px;gap:18px;
+    align-items:center;justify-content:flex-start;padding:10px 24px 20px;gap:10px;min-height:0;
   }
   /* Stage = card + floating orb-bubbles */
   .swipe-stage{
     position:relative;
     width:min(98vw,920px);
-    height:min(84vh,740px);
+    height:min(70vh,640px);flex:1 1 auto;min-height:0;
     display:grid;place-items:center;
     pointer-events:none;
   }
@@ -769,6 +769,34 @@
   .swipe-card .badge-stamp.like {right:18px;color:#03d100;border-color:#03d100;transform:rotate(-12deg);text-shadow:0 0 14px rgba(3,209,0,.6)}
   .swipe-card .badge-stamp.nope {left:18px;color:#ff008c;border-color:#ff008c;transform:rotate(12deg);text-shadow:0 0 14px rgba(255,0,140,.6)}
 
+  /* Swipe toolbar — quick access to likes, filter, music + stats */
+  .swipe-tools{
+    display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;
+    padding:8px 14px;border-radius:18px;background:rgba(28,29,34,.78);
+    border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(8px);
+  }
+  .stool-btn{
+    display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:12px;
+    border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);
+    color:#fff;font-family:inherit;cursor:pointer;transition:.16s ease;
+  }
+  .stool-btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.07);border-color:rgba(145,70,255,.5)}
+  .stool-ico{font-size:18px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
+  .stool-lbl{display:flex;flex-direction:column;line-height:1.1;text-align:left}
+  .stool-lbl b{font-family:"Clash Display",sans-serif;font-weight:700;font-size:13px}
+  .stool-lbl small{font-size:9.5px;color:#b9bbbe;text-transform:uppercase;letter-spacing:.06em}
+  .stool-stats{
+    display:flex;gap:10px;align-items:center;padding:0 6px 0 14px;
+    border-left:1px solid rgba(255,255,255,.08);font-size:11.5px;color:#dcddde;
+  }
+  .stool-stats b{color:#fff;font-weight:700;margin-right:2px}
+  @media (max-width:640px){
+    .swipe-tools{padding:6px 8px;gap:6px}
+    .stool-btn{padding:6px 10px}
+    .stool-lbl b{font-size:12px}
+    .stool-stats{padding-left:8px;flex-direction:column;align-items:flex-start;gap:2px;font-size:10.5px}
+  }
+
   /* Action buttons — blended with the "draggable gradient icon" aesthetic */
   .swipe-actions{display:flex;gap:22px;align-items:center;justify-content:center}
   .swipe-btn{
@@ -861,6 +889,25 @@
   }
   .swipe-empty h3{color:#fff;font-family:"Clash Display",sans-serif;font-size:22px;margin:0 0 6px}
 
+  /* ===== Account tabs ===== */
+  .acc-tabs{
+    display:flex;gap:6px;flex-wrap:wrap;padding:6px;border-radius:14px;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+    margin-bottom:14px;
+  }
+  .acc-tab-btn{
+    flex:1 1 auto;min-width:64px;padding:8px 10px;border-radius:10px;border:none;
+    background:transparent;color:#b9bbbe;font-family:inherit;font-weight:700;font-size:12px;
+    cursor:pointer;transition:.15s ease;white-space:nowrap;
+  }
+  .acc-tab-btn:hover{color:#fff;background:rgba(255,255,255,.05)}
+  .acc-tab-btn.active{background:linear-gradient(180deg,#A65BFF,#6B2BFF);color:#fff;box-shadow:0 4px 14px rgba(107,43,255,.35)}
+  .acc-tab-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+  .acc-tab{flex:1 1 auto;min-height:0;overflow:auto;padding-right:4px}
+  .acc-tab[hidden]{display:none !important}
+  .acc-tab .acc-section,
+  .acc-section.acc-tab{border-top:none;margin-top:0;padding-top:6px}
+
   /* ===== Account screen — new sections ===== */
   .acc-section{padding:14px 0;border-top:1px solid rgba(255,255,255,.06);margin-top:8px}
   .acc-section:first-child{border-top:none;margin-top:0}
@@ -949,13 +996,19 @@
   /* ===== Account screen ===== */
   #screen-account{
     position:relative;z-index:2;flex:1 1 auto;flex-direction:column;
-    align-items:center;justify-content:flex-start;padding:30px 24px 30px;overflow-y:auto;
+    align-items:center;justify-content:center;padding:14px 24px;overflow:hidden;min-height:0;
   }
-  body[data-screen="onboarding"], body[data-screen="swipe"], body[data-screen="account"]{overflow:auto !important}
-  body[data-screen="onboarding"] html, body[data-screen="swipe"] html, body[data-screen="account"] html{overflow:auto !important}
+  /* Desktop : no scroll anywhere. Mobile : allow internal scroll. */
+  @media (min-width:761px){
+    html, body{height:100vh;max-height:100vh;overflow:hidden !important}
+    body[data-screen="onboarding"], body[data-screen="swipe"], body[data-screen="account"]{overflow:hidden !important}
+  }
+  @media (max-width:760px){
+    body[data-screen="onboarding"], body[data-screen="swipe"], body[data-screen="account"]{overflow:auto !important}
+  }
   .acc-card{
-    width:min(92vw,560px);
-    padding:30px 28px;border-radius:24px;
+    width:min(92vw,640px);max-height:calc(100vh - 110px);
+    padding:18px 22px;border-radius:24px;display:flex;flex-direction:column;min-height:0;
     background:linear-gradient(180deg, rgba(28,22,58,.78), rgba(18,12,42,.78));
     border:1px solid var(--stroke-2);
     backdrop-filter:blur(22px) saturate(150%);
@@ -1574,6 +1627,27 @@
       <button type="button" data-val="sleep"><span class="emo">💤</span><span class="lbl"><b data-i18n="look_sleep">Sleepcall</b><small data-i18n="look_sleep_sub">Voix douce pour s'endormir</small></span></button>
     </div>
 
+    <!-- Toolbar : raccourcis pendant le swipe -->
+    <div class="swipe-tools" id="swipeTools">
+      <button class="stool-btn" id="stoolLikes" type="button" aria-label="Likes secrets">
+        <span class="stool-ico">👀</span>
+        <span class="stool-lbl"><b id="stoolLikesCount">0</b><small>likes</small></span>
+      </button>
+      <button class="stool-btn" id="stoolFilter" type="button" aria-label="Filtre">
+        <span class="stool-ico">🔍</span>
+        <span class="stool-lbl"><b id="stoolFilterLbl">Tous</b><small>filtre</small></span>
+      </button>
+      <button class="stool-btn" id="stoolMusic" type="button" aria-label="Musique d'ambiance">
+        <span class="stool-ico" id="stoolMusicIco">🎵</span>
+        <span class="stool-lbl"><b id="stoolMusicLbl">Off</b><small>musique</small></span>
+      </button>
+      <div class="stool-stats" id="stoolStats">
+        <span>👁️ <b id="stoolViewed">0</b> vu</span>
+        <span>💚 <b id="stoolLikesGiven">0</b> liké</span>
+        <span>🔥 <b id="stoolRate">—</b> ratio</span>
+      </div>
+    </div>
+
     <div class="swipe-stage">
       <div class="orbit" id="swipeOrbit" aria-hidden="true"></div>
       <div class="swipe-wrap" id="swipeWrap"></div>
@@ -1613,8 +1687,19 @@
         <span class="bb-cta" id="boostBannerCta">Découvrir</span>
       </button>
 
+      <!-- Tabs bar -->
+      <div class="acc-tabs" id="accTabs">
+        <button type="button" class="acc-tab-btn active" data-tab="profil">🪪 Profil</button>
+        <button type="button" class="acc-tab-btn" data-tab="bulles">🫧 Bulles</button>
+        <button type="button" class="acc-tab-btn" data-tab="boost">✨ Boost</button>
+        <button type="button" class="acc-tab-btn" data-tab="comptes">🔗 Comptes</button>
+        <button type="button" class="acc-tab-btn" data-tab="infos">🌐 Infos</button>
+      </div>
+
+      <div class="acc-tab-body">
+
       <!-- 🪪 Profil -->
-      <div class="acc-section">
+      <div class="acc-section acc-tab" data-tab="profil">
         <h3>🪪 Profil <span class="pill">LIVE</span></h3>
         <div class="preview-card" id="accPreview">
           <div class="pb"></div>
@@ -1648,7 +1733,7 @@
       </div>
 
       <!-- 🫧 Mes Bulles -->
-      <div class="acc-section">
+      <div class="acc-section acc-tab" data-tab="bulles" hidden>
         <h3>🫧 Mes Bulles <span class="pill" id="orbCounterPill">0/5</span></h3>
         <div class="acc-orb-cats" id="accOrbCats">
           <button type="button" class="acc-orb-cat active" data-kind="music">🎵 Musique</button>
@@ -1667,7 +1752,7 @@
       </div>
 
       <!-- ✨ Boost-only options -->
-      <div class="acc-section boost-only" id="boostSection" hidden>
+      <div class="acc-section boost-only acc-tab" data-tab="boost" id="boostSection" hidden>
         <h3>✨ Tindord Boost</h3>
 
         <div class="acc-field">
@@ -1714,7 +1799,7 @@
       </div>
 
       <!-- Social connections -->
-      <div class="acc-section">
+      <div class="acc-section acc-tab" data-tab="comptes" hidden>
         <h3 data-i18n="acc_socials">Comptes liés</h3>
         <div class="acc-social">
           <div class="acc-social-row" data-kind="instagram">
@@ -1738,21 +1823,20 @@
         </div>
       </div>
 
-      <!-- Language -->
-      <div class="acc-section">
-        <h3 data-i18n="acc_lang">Langue</h3>
+      <!-- Infos + Langue (merged) -->
+      <div class="acc-section acc-tab" data-tab="infos" hidden>
+        <h3 data-i18n="acc_lang">Langue & infos</h3>
         <div class="acc-langs" id="accLangs">
           <button type="button" data-val="FR">🇫🇷 Français</button>
           <button type="button" data-val="EN">🇬🇧 English</button>
         </div>
+        <div class="acc-grid2" style="margin-top:14px">
+          <div class="acc-field"><label data-i18n="acc_gender">Genre</label><div class="val" id="accGender">—</div></div>
+          <div class="acc-field"><label data-i18n="acc_age">Âge</label><div class="val" id="accAge">—</div></div>
+        </div>
       </div>
 
-      <!-- Display-only -->
-      <div class="acc-section">
-        <h3 data-i18n="acc_account">Infos compte</h3>
-        <div class="acc-field"><label data-i18n="acc_gender">Genre</label><div class="val" id="accGender">—</div></div>
-        <div class="acc-field"><label data-i18n="acc_age">Âge</label><div class="val" id="accAge">—</div></div>
-      </div>
+      </div><!-- /acc-tab-body -->
 
       <div class="acc-actions">
         <button type="button" class="acc-btn acc-btn--primary" id="accSave" data-i18n="save">Enregistrer</button>
@@ -2704,7 +2788,7 @@
     function setScreen(name){
       document.body.setAttribute('data-screen', name);
       if (name === 'account') renderAccount();
-      if (name === 'swipe')   { ensureDeck(); refreshMyStatusUI(); startSwipeMusic(); }
+      if (name === 'swipe')   { ensureDeck(); refreshMyStatusUI(); startSwipeMusic(); refreshSwipeTools(); }
       if (name !== 'swipe')   stopSwipeMusic();
     }
     function setAuth(on){
@@ -3307,8 +3391,60 @@
       cardEl.style.opacity = '0';
       const actions = document.querySelector('#screen-swipe .swipe-actions');
       if (actions) actions.classList.remove('dir-right', 'dir-left');
+      state.user = state.user || {};
+      state.user.stats = state.user.stats || { viewed:0, liked:0 };
+      state.user.stats.viewed++;
+      if (dir === 'yes') state.user.stats.liked++;
+      save();
+      refreshSwipeTools();
       setTimeout(() => { deckIdx++; ensureDeck(); }, 320);
     }
+
+    /* Swipe toolbar : update counts + filter / music labels */
+    function refreshSwipeTools(){
+      const u = state.user || {};
+      const stats = u.stats || { viewed:0, liked:0 };
+      document.getElementById('stoolViewed').textContent = stats.viewed;
+      document.getElementById('stoolLikesGiven').textContent = stats.liked;
+      const rate = stats.viewed > 0 ? Math.round((stats.liked / stats.viewed) * 100) : null;
+      document.getElementById('stoolRate').textContent = rate != null ? rate + '%' : '—';
+      document.getElementById('stoolLikesCount').textContent = LIKED_ME.length;
+      const filt = (u.boost && u.genderFilter) || 'all';
+      document.getElementById('stoolFilterLbl').textContent = ({all:'Tous', il:'Il', elle:'Elle'}[filt] || 'Tous');
+      const sm = u.swipeMusic;
+      document.getElementById('stoolMusicLbl').textContent = sm ? (sm.title.length>14 ? sm.title.slice(0,13)+'…' : sm.title) : 'Off';
+    }
+    document.getElementById('stoolLikes').addEventListener('click', () => {
+      renderLikedMe();
+      document.getElementById('likedPanel').setAttribute('data-open','true');
+    });
+    document.getElementById('stoolFilter').addEventListener('click', () => {
+      if (!state.user || !state.user.boost) { openBoostModal(); return; }
+      const order = ['all','il','elle'];
+      const cur = state.user.genderFilter || 'all';
+      const next = order[(order.indexOf(cur)+1) % order.length];
+      state.user.genderFilter = next;
+      save();
+      deckIdx = 0;
+      ensureDeck();
+      refreshSwipeTools();
+      showToast('🔍', 'Filtre', {all:'Tous', il:'Hommes (Il)', elle:'Femmes (Elle)'}[next]);
+    });
+    document.getElementById('stoolMusic').addEventListener('click', () => {
+      if (!state.user || !state.user.boost) { openBoostModal(); return; }
+      if (!state.user.swipeMusic) {
+        showToast('🎵', 'Aucune musique', 'Définis-la depuis Mon compte');
+        return;
+      }
+      // Toggle play/pause
+      if (_swipeMusicAudio && !_swipeMusicAudio.paused) {
+        document.getElementById('smToggle').click();
+      } else if (_swipeMusicAudio) {
+        document.getElementById('smToggle').click();
+      } else {
+        startSwipeMusic();
+      }
+    });
     function topCard(){ return document.querySelector('#swipeWrap .swipe-card:last-child'); }
     document.getElementById('swipeYes').addEventListener('click', () => { const t = topCard(); if (t) commitSwipe('yes', t); });
     document.getElementById('swipeNo').addEventListener('click',  () => { const t = topCard(); if (t) commitSwipe('no',  t); });
@@ -3691,6 +3827,18 @@
     bindSocial('socSpBtn', 'socSp', 'spotify');
 
     /* ===== Boost: Fake Nitro toggle ===== */
+    /* Account tabs */
+    document.querySelectorAll('#accTabs .acc-tab-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('#accTabs .acc-tab-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        const t = b.dataset.tab;
+        document.querySelectorAll('#screen-account .acc-tab').forEach(p => {
+          p.hidden = (p.dataset.tab !== t);
+        });
+      });
+    });
+
     document.getElementById('boostFakeNitro').addEventListener('change', e => {
       if (!state.user || !state.user.boost) { e.target.checked = false; openBoostModal(); return; }
       state.user.fakeNitro = e.target.checked;
