@@ -1146,6 +1146,27 @@
   .bm-feats li{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:11px;background:rgba(255,255,255,.04);font-size:13px}
   .bm-feats li span{font-size:18px;flex:0 0 auto}
   .bm-feats li b{font-weight:700;color:#fff;margin-right:4px}
+  /* Comparison columns */
+  .bm-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+  .bm-col{position:relative;padding:14px 12px;border-radius:14px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02)}
+  .bm-col--basic{opacity:.82}
+  .bm-col--boost{border-color:rgba(255,193,84,.55);background:linear-gradient(180deg,rgba(255,193,84,.10),rgba(145,70,255,.12));box-shadow:0 8px 24px rgba(255,193,84,.10)}
+  .bm-col-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);padding:3px 10px;border-radius:999px;font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(90deg,#FFD080,#FFB347);color:#3d1e00;white-space:nowrap}
+  .bm-col-head{text-align:center;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:10px}
+  .bm-col-name{font-family:"Clash Display",sans-serif;font-weight:700;font-size:13px;color:#b9bbbe;letter-spacing:.02em}
+  .bm-col-sub{display:block;font-family:"Clash Display",sans-serif;font-weight:700;font-size:20px;color:#fff;margin-top:2px}
+  .bm-col--boost .bm-col-sub{background:linear-gradient(90deg,#FFD080,#FF7EB6);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .bm-col-price{margin-top:6px;font-size:10.5px;color:#b9bbbe;line-height:1.5}
+  .bm-col-price b{font-family:"Clash Display",sans-serif;font-weight:700;font-size:15px;color:#fff;display:inline}
+  .bm-col-price small{font-size:10px;margin-left:1px}
+  .bm-col-feats{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px}
+  .bm-col-feats li{display:flex;align-items:center;gap:8px;font-size:12px;line-height:1.35}
+  .bm-col-feats li span{font-size:13px;flex:0 0 auto;width:18px;text-align:center;font-weight:700}
+  .bm-col-feats li.off{color:#72767d}
+  .bm-col-feats li.off span{color:#ff4f80}
+  .bm-col-feats li.on{color:#fff}
+  .bm-col-feats li.on span{color:#3BD17C}
+  .bm-col--boost .bm-col-feats li.on span{color:inherit;font-size:14px;font-weight:400}
   .bm-plans{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .bm-plan{
     position:relative;padding:18px 12px 14px;border-radius:14px;border:1.5px solid rgba(255,255,255,.10);
@@ -1808,16 +1829,42 @@
       </button>
       <div class="bm-head">
         <span class="bm-sparkle">✨</span>
-        <h2 id="bmTitle">Tindord <span class="bm-grad">Boost</span></h2>
-        <p>Débloque toutes les options premium.</p>
+        <h2 id="bmTitle">Compare <span class="bm-grad">les offres</span></h2>
+        <p>Choisis ce qui te correspond.</p>
       </div>
-      <ul class="bm-feats">
-        <li><span>👑</span><b>Fake Nitro</b> — apparence Discord Nitro sur ton profil</li>
-        <li><span>🫧</span><b>18 bulles</b> au lieu de 6</li>
-        <li><span>🎵</span><b>Musique d'ambiance</b> pendant le swipe</li>
-        <li><span>🔍</span><b>Recherche précise</b> (homme / femme)</li>
-        <li><span>👀</span><b>Vois qui t'a liké</b> sans match</li>
-      </ul>
+      <div class="bm-compare">
+        <div class="bm-col bm-col--basic">
+          <div class="bm-col-head">
+            <span class="bm-col-name">Tindord</span>
+            <span class="bm-col-sub">Basic</span>
+            <div class="bm-col-price"><b>Gratuit</b></div>
+          </div>
+          <ul class="bm-col-feats">
+            <li class="off"><span>✕</span>Fake Nitro</li>
+            <li class="on"><span>✓</span>6 bulles max</li>
+            <li class="off"><span>✕</span>Musique d'ambiance</li>
+            <li class="off"><span>✕</span>Filtre H/F</li>
+            <li class="off"><span>✕</span>Likes secrets</li>
+            <li class="off"><span>✕</span>GIFs personnalisables</li>
+          </ul>
+        </div>
+        <div class="bm-col bm-col--boost">
+          <span class="bm-col-tag">✨ Recommandé</span>
+          <div class="bm-col-head">
+            <span class="bm-col-name">Tindord</span>
+            <span class="bm-col-sub">Boost</span>
+            <div class="bm-col-price"><b>4,39€</b><small>/mois</small> · <b>15€</b><small>à vie</small></div>
+          </div>
+          <ul class="bm-col-feats">
+            <li class="on"><span>👑</span>Fake Nitro</li>
+            <li class="on"><span>🫧</span>18 bulles</li>
+            <li class="on"><span>🎵</span>Musique d'ambiance</li>
+            <li class="on"><span>🔍</span>Filtre H/F</li>
+            <li class="on"><span>👀</span>Likes secrets</li>
+            <li class="on"><span>🎞️</span>GIFs personnalisables</li>
+          </ul>
+        </div>
+      </div>
       <div class="bm-plans">
         <button type="button" class="bm-plan" data-plan="monthly">
           <span class="bm-plan-tag">Sans engagement</span>
