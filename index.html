@@ -1002,6 +1002,51 @@
   .acc-msg{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;display:none;background:rgba(59,209,124,.12);border:1px solid rgba(59,209,124,.35);color:#9CF0BD}
   .acc-msg[data-show="true"]{display:block;animation:authViewIn .22s ease-out}
 
+  /* ===== Orb manager ===== */
+  .acc-orb-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .acc-orb-cat{
+    padding:7px 13px;border-radius:999px;border:1.5px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);color:#b9bbbe;font-size:12.5px;font-weight:600;
+    cursor:pointer;transition:.15s ease;font-family:inherit;
+  }
+  .acc-orb-cat.active{border-color:#9146FF;background:rgba(145,70,255,.18);color:#fff}
+  .acc-orb-cat:hover:not(.active){background:rgba(255,255,255,.08);color:#fff}
+  .acc-orb-form{display:flex;gap:8px;margin-bottom:16px}
+  .acc-orb-form .acc-input{flex:1;margin:0}
+  .acc-orb-add{
+    width:44px;height:44px;border-radius:12px;border:none;flex:0 0 auto;
+    background:linear-gradient(180deg,#A65BFF,#6B2BFF);color:#fff;
+    font-size:24px;font-weight:300;cursor:pointer;display:grid;place-items:center;
+    box-shadow:0 4px 14px rgba(107,43,255,.4);transition:.15s ease;
+  }
+  .acc-orb-add:hover{transform:scale(1.07)}
+  .acc-orb-grid{display:flex;flex-wrap:wrap;gap:14px;min-height:20px}
+  .acc-orb-item{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+  .acc-orb-circle{
+    width:68px;height:68px;border-radius:50%;display:grid;place-items:center;
+    position:relative;overflow:visible;
+  }
+  .acc-orb-circle::before{
+    content:"";position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.30) 0%,transparent 56%);
+    pointer-events:none;z-index:1;
+  }
+  .acc-orb-circle svg{width:28px;height:28px;color:#fff;position:relative;z-index:2}
+  .acc-orb-circle[data-kind="music"]{background:linear-gradient(145deg,#1ed760,#1DB954,#0e7a38);box-shadow:0 8px 24px rgba(29,185,84,.5)}
+  .acc-orb-circle[data-kind="game"] {background:linear-gradient(145deg,#FFD080,#FFB66E,#FF4FA0);box-shadow:0 8px 24px rgba(255,79,160,.5)}
+  .acc-orb-circle[data-kind="anime"]{background:linear-gradient(145deg,#FF9CC0,#FF7EB6,#b020b8);box-shadow:0 8px 24px rgba(192,38,211,.5)}
+  .acc-orb-circle[data-kind="film"] {background:linear-gradient(145deg,#a78bfa,#7c3aed,#4c1d95);box-shadow:0 8px 24px rgba(124,58,237,.5)}
+  .acc-orb-lbl{font-size:10px;font-weight:700;color:#fff;max-width:72px;text-align:center;line-height:1.25;word-break:break-word}
+  .acc-orb-del{
+    position:absolute;top:-3px;right:-3px;width:18px;height:18px;border-radius:50%;
+    background:#2f3136;border:1.5px solid rgba(255,255,255,.2);color:#dcddde;
+    font-size:11px;line-height:1;cursor:pointer;display:grid;place-items:center;
+    transition:.15s ease;z-index:3;padding:0;
+  }
+  .acc-orb-del:hover{background:#ff4f80;border-color:#ff4f80;color:#fff}
+  /* film kind for swipe orbit */
+  .swipe-stage .orbit .orb[data-kind="film"]{background:linear-gradient(145deg,#a78bfa,#7c3aed,#4c1d95);border-color:rgba(124,58,237,.55);box-shadow:0 20px 48px rgba(124,58,237,.52), 0 0 0 1px rgba(255,255,255,.07) inset}
+
   /* Auth modal */
   .auth-backdrop{
     position:fixed;inset:0;z-index:60;display:none;
@@ -1354,99 +1399,9 @@
         </div>
       </div>
 
-      <!-- Editable fields -->
+      <!-- 🪪 Profil -->
       <div class="acc-section">
-        <h3 data-i18n="acc_edit">Modifier mon profil</h3>
-        <div class="acc-grid2">
-          <div class="acc-field">
-            <label data-i18n="acc_pseudo">Pseudo</label>
-            <input class="acc-input" id="accPseudo" type="text" maxlength="32" placeholder="Tindord_user" />
-          </div>
-          <div class="acc-field">
-            <label data-i18n="acc_looking">Je cherche</label>
-            <select class="acc-select" id="accLookSel">
-              <option value="chill">🛋️ Chill</option>
-              <option value="game">🎮 Une game</option>
-              <option value="now">⌨️ Mate maintenant</option>
-              <option value="sleep">💤 Sleepcall</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="acc-field" style="margin-top:12px">
-          <label data-i18n="acc_bio">Bio</label>
-          <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
-        </div>
-
-        <div class="acc-grid2" style="margin-top:12px">
-          <div class="acc-field">
-            <label data-i18n="acc_music">🎵 Musique (tape n'importe quelle)</label>
-            <input class="acc-input" id="accMusic" type="text" list="musicSuggestions" placeholder="ex: Sicko Mode · Travis Scott" autocomplete="off" />
-            <datalist id="musicSuggestions">
-              <option>Sicko Mode · Travis Scott</option>
-              <option>Sweater Weather · The Neighbourhood</option>
-              <option>Bad Habits · Ed Sheeran</option>
-              <option>Industry Baby · Lil Nas X</option>
-              <option>Lover · Taylor Swift</option>
-              <option>Drown · Cuco</option>
-              <option>lofi beats · ChilledCow</option>
-              <option>Mo Bamba · Sheck Wes</option>
-              <option>Mind Mischief · Tame Impala</option>
-              <option>Bury a Friend · Billie Eilish</option>
-              <option>Blinding Lights · The Weeknd</option>
-              <option>Heat Waves · Glass Animals</option>
-              <option>As It Was · Harry Styles</option>
-              <option>Levitating · Dua Lipa</option>
-              <option>Starboy · The Weeknd</option>
-            </datalist>
-          </div>
-          <div class="acc-field">
-            <label data-i18n="acc_game">🎮 Jeu préféré</label>
-            <select class="acc-select" id="accGame">
-              <option value="">— aucun —</option>
-              <option>Counter-Strike 2</option>
-              <option>Valorant</option>
-              <option>League of Legends</option>
-              <option>Apex Legends</option>
-              <option>Minecraft</option>
-              <option>Stardew Valley</option>
-              <option>Elden Ring</option>
-              <option>Phasmophobia</option>
-              <option>Rocket League</option>
-              <option>Overwatch 2</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="acc-field" style="margin-top:12px">
-          <label data-i18n="acc_anime">📺 Anime / Série préférée</label>
-          <input class="acc-input" id="accAnime" type="text" list="animeSuggestions" placeholder="ex: One Piece, Attack on Titan…" autocomplete="off" />
-          <datalist id="animeSuggestions">
-            <option>One Piece</option>
-            <option>Demon Slayer</option>
-            <option>Jujutsu Kaisen</option>
-            <option>Attack on Titan</option>
-            <option>Cowboy Bebop</option>
-            <option>Your Name</option>
-            <option>Mushishi</option>
-            <option>Berserk</option>
-            <option>Studio Ghibli</option>
-            <option>Junji Ito</option>
-            <option>Hunter x Hunter</option>
-            <option>Fullmetal Alchemist</option>
-            <option>Naruto</option>
-            <option>Dragon Ball Z</option>
-            <option>Chainsaw Man</option>
-            <option>Spy x Family</option>
-            <option>Blue Lock</option>
-            <option>Vinland Saga</option>
-          </datalist>
-        </div>
-      </div>
-
-      <!-- Profile preview -->
-      <div class="acc-section">
-        <h3 data-i18n="acc_preview">Aperçu de ton profil <span class="pill">LIVE</span></h3>
+        <h3>🪪 Profil <span class="pill">LIVE</span></h3>
         <div class="preview-card" id="accPreview">
           <div class="pb"></div>
           <div class="pa"><div class="av" id="prevAv">?</div></div>
@@ -1457,6 +1412,41 @@
             <div class="pchips" id="prevChips"></div>
           </div>
         </div>
+        <div class="acc-grid2" style="margin-top:16px">
+          <div class="acc-field">
+            <label>Pseudo</label>
+            <input class="acc-input" id="accPseudo" type="text" maxlength="32" placeholder="Tindord_user" />
+          </div>
+          <div class="acc-field">
+            <label>Je cherche</label>
+            <select class="acc-select" id="accLookSel">
+              <option value="chill">🛋️ Chill</option>
+              <option value="game">🎮 Une game</option>
+              <option value="now">⌨️ Mate maintenant</option>
+              <option value="sleep">💤 Sleepcall</option>
+            </select>
+          </div>
+        </div>
+        <div class="acc-field" style="margin-top:12px">
+          <label>Bio</label>
+          <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
+        </div>
+      </div>
+
+      <!-- 🫧 Mes Bulles -->
+      <div class="acc-section">
+        <h3>🫧 Mes Bulles <span class="pill" id="orbCounterPill">0/5</span></h3>
+        <div class="acc-orb-cats" id="accOrbCats">
+          <button type="button" class="acc-orb-cat active" data-kind="music">🎵 Musique</button>
+          <button type="button" class="acc-orb-cat" data-kind="game">🎮 Jeu vidéo</button>
+          <button type="button" class="acc-orb-cat" data-kind="anime">📺 Anime</button>
+          <button type="button" class="acc-orb-cat" data-kind="film">🎬 Film·Série</button>
+        </div>
+        <div class="acc-orb-form">
+          <input class="acc-input" id="accOrbInput" type="text" placeholder="ex: Sicko Mode · Travis Scott" autocomplete="off" />
+          <button type="button" class="acc-orb-add" id="accOrbAdd">+</button>
+        </div>
+        <div class="acc-orb-grid" id="accOrbGrid"></div>
       </div>
 
       <!-- Social connections -->
@@ -2552,10 +2542,12 @@
       const u = state.user || {};
       const p = state.profile || {};
       if (!u.displayName && !u.email && !u.discordTag) return null;
-      const orbs = [];
-      if (p.music) orbs.push({kind:'music', title:p.music, sub:'Ta musique', emoji:'🎵'});
-      if (p.game)  orbs.push({kind:'game',  title:p.game,  sub:'Ton jeu', emoji:'🎮'});
-      if (p.anime) orbs.push({kind:'anime', title:p.anime, sub:'Ton anime', emoji:'📺'});
+      const subByKind  = {music:'Ta musique', game:'Ton jeu', anime:'Ton anime', film:'Ton film'};
+      const emoByKind  = {music:'🎵', game:'🎮', anime:'📺', film:'🎬'};
+      const orbs = (p.userOrbs || []).map(o => ({
+        kind: o.kind, title: o.title,
+        sub: subByKind[o.kind] || '', emoji: emoByKind[o.kind] || '✨',
+      }));
       return {
         name: u.displayName || u.email?.split('@')[0] || 'Moi',
         tag: u.discordTag || 'moi',
@@ -2671,6 +2663,8 @@
       anime: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.6-5.1 4.5 1.6 6.8L12 17l-6.3 3.2 1.6-6.8L2.2 8.9l6.9-.6L12 2z"/></svg>',
       /* Gamepad */
       game:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18c-2.5 0-4-1.7-4-4 0-3 1.5-7 4-7h12c2.5 0 4 4 4 7 0 2.3-1.5 4-4 4-1.8 0-2.6-2-4-2h-4c-1.4 0-2.2 2-4 2Z"/><circle cx="15.5" cy="12" r="1" fill="currentColor"/><circle cx="17.5" cy="14" r="1" fill="currentColor"/><path d="M8 11h4M10 9v4"/></svg>',
+      /* Film strip */
+      film:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M17 7h5M2 17h5M17 17h5"/></svg>',
     };
     /* Render the orb constellation around the top card */
     function renderOrbs(p){
@@ -2953,6 +2947,73 @@
     });
     renderMsgList();
 
+    // ---------- Orb manager ----------
+    let selectedOrbKind = 'music';
+    const orbPlaceholders = {
+      music:'ex: Sicko Mode · Travis Scott',
+      game: 'ex: Valorant, Minecraft…',
+      anime:'ex: One Piece, Demon Slayer…',
+      film: 'ex: Inception, Breaking Bad…',
+    };
+
+    function renderUserOrbs(){
+      const p = state.profile || {};
+      const orbs = p.userOrbs || [];
+      const maxOrbs = (state.user && state.user.boost) ? 15 : 5;
+      const grid = document.getElementById('accOrbGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      orbs.forEach((o, i) => {
+        const item = document.createElement('div');
+        item.className = 'acc-orb-item';
+        const circle = document.createElement('div');
+        circle.className = 'acc-orb-circle';
+        circle.dataset.kind = o.kind;
+        circle.innerHTML = ORB_SVG[o.kind] || ORB_SVG.music;
+        const lbl = document.createElement('span');
+        lbl.className = 'acc-orb-lbl';
+        lbl.textContent = o.title;
+        const del = document.createElement('button');
+        del.className = 'acc-orb-del';
+        del.type = 'button';
+        del.textContent = '×';
+        del.addEventListener('click', () => {
+          (state.profile.userOrbs || []).splice(i, 1);
+          renderUserOrbs();
+          refreshAccountPreview();
+        });
+        item.append(circle, lbl, del);
+        grid.appendChild(item);
+      });
+      const pill = document.getElementById('orbCounterPill');
+      if (pill) pill.textContent = orbs.length + '/' + maxOrbs;
+    }
+
+    document.querySelectorAll('.acc-orb-cat').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.acc-orb-cat').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedOrbKind = btn.dataset.kind;
+        document.getElementById('accOrbInput').placeholder = orbPlaceholders[selectedOrbKind] || 'Tape ici…';
+      });
+    });
+
+    function addOrb(){
+      const input = document.getElementById('accOrbInput');
+      const val = input.value.trim();
+      if (!val) return;
+      state.profile = state.profile || {};
+      state.profile.userOrbs = state.profile.userOrbs || [];
+      const maxOrbs = (state.user && state.user.boost) ? 15 : 5;
+      if (state.profile.userOrbs.length >= maxOrbs) return;
+      state.profile.userOrbs.push({kind: selectedOrbKind, title: val});
+      input.value = '';
+      renderUserOrbs();
+      refreshAccountPreview();
+    }
+    document.getElementById('accOrbAdd').addEventListener('click', addOrb);
+    document.getElementById('accOrbInput').addEventListener('keydown', e => { if (e.key === 'Enter') addOrb(); });
+
     // ---------- Account screen ----------
     function renderAccount(){
       const u = state.user || {};
@@ -2974,12 +3035,10 @@
       }
       document.getElementById('accGender').textContent  = ({ il:'Il', elle:'Elle', autre:'Préciser / Autre', male:'Il', female:'Elle', nonbinary:'Iel', other:'Autre' }[p.gender] || '—');
       document.getElementById('accAge').textContent     = p.age || '—';
-      document.getElementById('accPseudo').value = u.displayName || '';
-      document.getElementById('accBio').value    = p.bio || '';
+      document.getElementById('accPseudo').value  = u.displayName || '';
+      document.getElementById('accBio').value     = p.bio || '';
       document.getElementById('accLookSel').value = p.looking || 'game';
-      document.getElementById('accMusic').value   = p.music || '';
-      document.getElementById('accGame').value    = p.game  || '';
-      document.getElementById('accAnime').value   = p.anime || '';
+      renderUserOrbs();
       const s = u.socials || {};
       document.getElementById('socIg').value = s.instagram || '';
       document.getElementById('socTt').value = s.tiktok    || '';
@@ -3000,9 +3059,6 @@
       const pseudo = (document.getElementById('accPseudo').value || u.displayName || 'Tindord_user').trim();
       const bio    = (document.getElementById('accBio').value || '').trim() || '—';
       const look   = document.getElementById('accLookSel').value;
-      const music  = document.getElementById('accMusic').value;
-      const game   = document.getElementById('accGame').value;
-      const anime  = document.getElementById('accAnime').value;
       const av = document.getElementById('prevAv');
       if (u.avatarUrl) { av.innerHTML = `<img src="${u.avatarUrl}">`; av.style.background = 'none'; }
       else { av.textContent = (pseudo || 'T').charAt(0).toUpperCase(); av.style.background = 'linear-gradient(135deg,#FF7EB6,#9146FF)'; }
@@ -3013,12 +3069,11 @@
       const chips = [];
       const lookLabel = { chill:'🛋️ ' + tx('look_chill'), game:'🎮 ' + tx('look_game'), now:'⌨️ ' + tx('look_now'), sleep:'💤 ' + tx('look_sleep') }[look];
       if (lookLabel) chips.push(lookLabel);
-      if (music) chips.push('🎵 ' + music);
-      if (game)  chips.push('🎮 ' + game);
-      if (anime) chips.push('📺 ' + anime);
+      const emoByKind = {music:'🎵', game:'🎮', anime:'📺', film:'🎬'};
+      (p.userOrbs || []).forEach(o => chips.push((emoByKind[o.kind] || '✨') + ' ' + o.title));
       document.getElementById('prevChips').innerHTML = chips.map(c => `<span>${escapeHtmlMini(c)}</span>`).join('');
     }
-    ['accPseudo','accBio','accLookSel','accMusic','accGame','accAnime'].forEach(id => {
+    ['accPseudo','accBio','accLookSel'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('input',  refreshAccountPreview);
@@ -3068,9 +3123,6 @@
       state.profile = state.profile || { gender:null, age:null, looking:null };
       state.profile.bio     = document.getElementById('accBio').value.trim();
       state.profile.looking = document.getElementById('accLookSel').value;
-      state.profile.music   = document.getElementById('accMusic').value || null;
-      state.profile.game    = document.getElementById('accGame').value  || null;
-      state.profile.anime   = document.getElementById('accAnime').value || null;
       const pseudo = document.getElementById('accPseudo').value.trim();
       if (pseudo) { state.user = state.user || {}; state.user.displayName = pseudo; }
       save();
