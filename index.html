@@ -2900,6 +2900,7 @@
       const orbs = (p.userOrbs || []).map(o => ({
         kind: o.kind, title: o.title,
         sub: subByKind[o.kind] || '', emoji: emoByKind[o.kind] || '✨',
+        cover: o.cover || null, previewUrl: o.previewUrl || null,
       }));
       return {
         name: u.displayName || u.email?.split('@')[0] || 'Moi',
@@ -4045,10 +4046,43 @@
       setScreen('landing');
     });
 
+    /* Backfill covers for orbs created before the cover feature existed.
+       Runs in background, updates state.profile.userOrbs and re-renders. */
+    async function backfillCovers(){
+      const orbs = state.profile && state.profile.userOrbs;
+      if (!Array.isArray(orbs) || !orbs.length) return false;
+      let dirty = false;
+      for (const o of orbs) {
+        if (o.cover) continue;
+        try {
+          if (o.kind === 'music') {
+            const r = (await searchSpotifyTracks(o.title, 1))[0];
+            if (r) {
+              if (r.cover) { o.cover = r.cover; dirty = true; }
+              if (!o.previewUrl && r.previewUrl) { o.previewUrl = r.previewUrl; dirty = true; }
+            }
+          } else if (o.kind === 'anime') {
+            const r = (await searchAnime(o.title))[0];
+            if (r && r.cover) { o.cover = r.cover; dirty = true; }
+          } else if (o.kind === 'game' || o.kind === 'film') {
+            const r = (await searchWiki(o.title, o.kind))[0];
+            if (r && r.cover) { o.cover = r.cover; dirty = true; }
+          }
+        } catch(_){}
+      }
+      if (dirty) {
+        save();
+        if (document.body.getAttribute('data-screen') === 'account') renderUserOrbs();
+        if (document.body.getAttribute('data-screen') === 'swipe')   ensureDeck();
+      }
+      return dirty;
+    }
+
     // ---------- Init from persisted state ----------
     if (state.user) {
       setAuth(true);
       setScreen(state.profile ? 'swipe' : 'onboarding');
+      backfillCovers();
     }
 
     // ---------- Supabase: hydrate from session (after OAuth redirect) ----------
