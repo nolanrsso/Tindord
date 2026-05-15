@@ -1002,6 +1002,133 @@
   .acc-msg{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;display:none;background:rgba(59,209,124,.12);border:1px solid rgba(59,209,124,.35);color:#9CF0BD}
   .acc-msg[data-show="true"]{display:block;animation:authViewIn .22s ease-out}
 
+  /* ===== Toggle switch ===== */
+  .toggle{display:inline-flex;align-items:center;cursor:pointer;user-select:none}
+  .toggle input{display:none}
+  .toggle-track{
+    width:44px;height:24px;border-radius:999px;background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.14);position:relative;transition:.18s ease;
+  }
+  .toggle-thumb{
+    position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+    background:#fff;transition:.2s ease;box-shadow:0 2px 6px rgba(0,0,0,.4);
+  }
+  .toggle input:checked + .toggle-track{background:linear-gradient(90deg,#A65BFF,#6B2BFF);border-color:rgba(145,70,255,.6)}
+  .toggle input:checked + .toggle-track .toggle-thumb{transform:translateX(20px)}
+
+  /* ===== Swipe-music chip (boost) ===== */
+  .swipe-music-current{
+    display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:11px;
+    background:rgba(29,185,84,.10);border:1px solid rgba(29,185,84,.35);margin-bottom:10px;
+  }
+  .swipe-music-current img{width:36px;height:36px;border-radius:6px;flex:0 0 auto}
+  .swipe-music-current .smc-info{flex:1;min-width:0;line-height:1.25}
+  .swipe-music-current .smc-info b{display:block;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .swipe-music-current .smc-info small{color:#9CF0BD;font-size:11px}
+  .swipe-music-current button{background:rgba(255,79,160,.18);color:#FF7EB6;border:1px solid rgba(255,79,160,.4);border-radius:8px;padding:6px 10px;font-size:11.5px;cursor:pointer;flex:0 0 auto}
+
+  /* ===== Floating swipe music player ===== */
+  .swipe-music{
+    position:fixed;bottom:18px;left:18px;z-index:90;display:flex;align-items:center;gap:10px;
+    padding:8px 12px 8px 8px;border-radius:999px;background:rgba(28,29,34,.94);
+    border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 28px rgba(0,0,0,.5);
+    transform:translateY(140%);transition:transform .25s ease,opacity .2s;opacity:0;pointer-events:none;
+  }
+  .swipe-music[data-show="true"]{transform:none;opacity:1;pointer-events:auto}
+  body[data-screen="swipe"] .swipe-music[data-show="true"]{display:flex}
+  body:not([data-screen="swipe"]) .swipe-music{display:none}
+  .sm-cover{width:36px;height:36px;border-radius:50%;background-size:cover;background-position:center;background-color:#1DB954;animation:sm-spin 8s linear infinite;flex:0 0 auto}
+  .sm-cover.is-paused{animation-play-state:paused}
+  @keyframes sm-spin{to{transform:rotate(360deg)}}
+  .sm-info{line-height:1.2;max-width:140px;min-width:0}
+  .sm-info b{display:block;font-size:12.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sm-info small{font-size:10.5px;color:#b9bbbe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  .sm-btn{width:32px;height:32px;border-radius:50%;border:none;background:linear-gradient(180deg,#1DB954,#15803d);color:#fff;cursor:pointer;display:grid;place-items:center;flex:0 0 auto}
+
+  /* ===== Liked-me panel ===== */
+  .liked-panel{
+    position:fixed;top:0;right:0;height:100vh;width:min(92vw,360px);z-index:200;
+    background:#1c1d22;border-left:1px solid rgba(255,255,255,.08);
+    transform:translateX(100%);transition:.25s ease;display:flex;flex-direction:column;
+  }
+  .liked-panel[data-open="true"]{transform:none}
+  .liked-list{flex:1;overflow:auto;padding:6px}
+  .liked-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;cursor:pointer;transition:.12s}
+  .liked-item:hover{background:rgba(255,255,255,.05)}
+  .liked-item .lavi{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:"Clash Display",sans-serif;font-weight:800;font-size:18px;color:#fff;flex:0 0 auto}
+  .liked-item .li-info{flex:1;min-width:0}
+  .liked-item .li-info b{display:block;font-size:14px;color:#fff}
+  .liked-item .li-info small{font-size:11.5px;color:#b9bbbe}
+  .liked-item .li-blur{filter:blur(6px);transition:.2s}
+  .liked-item:hover .li-blur{filter:none}
+
+  /* ===== Boost banner (account) ===== */
+  .boost-banner{
+    width:100%;display:flex;align-items:center;gap:14px;
+    padding:14px 16px;border-radius:16px;border:1.5px solid rgba(255,193,84,.4);
+    background:linear-gradient(120deg,rgba(255,193,84,.10),rgba(145,70,255,.18));
+    color:#fff;font-family:inherit;cursor:pointer;margin-bottom:14px;
+    position:relative;overflow:hidden;transition:.16s ease;text-align:left;
+  }
+  .boost-banner:hover{transform:translateY(-1px);border-color:rgba(255,193,84,.7)}
+  .boost-banner.is-active{border-color:rgba(59,209,124,.55);background:linear-gradient(120deg,rgba(59,209,124,.10),rgba(145,70,255,.18))}
+  .bb-glow{position:absolute;inset:0;background:radial-gradient(circle at 18% 50%,rgba(255,193,84,.30),transparent 55%);pointer-events:none}
+  .bb-emoji{font-size:24px;flex:0 0 auto;filter:drop-shadow(0 2px 8px rgba(255,193,84,.6))}
+  .bb-text{flex:1;min-width:0;line-height:1.3}
+  .bb-text b{font-family:"Clash Display",sans-serif;font-weight:700;font-size:15px;display:block}
+  .bb-text small{color:#dcddde;font-size:11.5px;display:block;margin-top:2px}
+  .bb-cta{
+    padding:7px 14px;border-radius:999px;background:linear-gradient(180deg,#FFD080,#FFB347);
+    color:#3d1e00;font-weight:800;font-size:12px;letter-spacing:.04em;flex:0 0 auto;text-transform:uppercase;
+  }
+  .boost-banner.is-active .bb-cta{background:rgba(59,209,124,.18);color:#9CF0BD;border:1px solid rgba(59,209,124,.4)}
+
+  /* ===== Boost modal ===== */
+  .boost-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:18px}
+  .boost-modal[data-open="true"]{display:flex}
+  .bm-backdrop{position:absolute;inset:0;background:rgba(8,9,14,.78);backdrop-filter:blur(8px)}
+  .bm-card{
+    position:relative;z-index:1;width:min(96vw,460px);max-height:92vh;overflow:auto;
+    background:#1c1d22;border:1px solid rgba(255,255,255,.08);border-radius:22px;
+    padding:26px 22px 22px;color:#fff;box-shadow:0 30px 80px rgba(0,0,0,.6);
+    animation:authViewIn .22s ease-out;
+  }
+  .bm-close{
+    position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:none;
+    background:rgba(255,255,255,.06);color:#fff;cursor:pointer;display:grid;place-items:center;
+  }
+  .bm-close:hover{background:rgba(255,255,255,.14)}
+  .bm-head{text-align:center;margin-bottom:16px}
+  .bm-sparkle{font-size:34px;display:block;margin-bottom:4px;filter:drop-shadow(0 4px 12px rgba(255,193,84,.6))}
+  .bm-head h2{margin:0;font-family:"Clash Display",sans-serif;font-weight:700;font-size:26px}
+  .bm-grad{background:linear-gradient(90deg,#FFD080,#FF7EB6,#9146FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .bm-head p{color:#b9bbbe;font-size:13px;margin:6px 0 0}
+  .bm-feats{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:8px}
+  .bm-feats li{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:11px;background:rgba(255,255,255,.04);font-size:13px}
+  .bm-feats li span{font-size:18px;flex:0 0 auto}
+  .bm-feats li b{font-weight:700;color:#fff;margin-right:4px}
+  .bm-plans{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .bm-plan{
+    position:relative;padding:18px 12px 14px;border-radius:14px;border:1.5px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.03);color:#fff;cursor:pointer;text-align:center;font-family:inherit;
+    transition:.16s ease;display:flex;flex-direction:column;align-items:center;gap:8px;
+  }
+  .bm-plan:hover{transform:translateY(-2px);border-color:rgba(145,70,255,.6);background:rgba(145,70,255,.10)}
+  .bm-plan--best{border-color:rgba(255,193,84,.6);background:linear-gradient(180deg,rgba(255,193,84,.10),rgba(255,126,182,.10))}
+  .bm-plan--best:hover{border-color:rgba(255,193,84,.9)}
+  .bm-plan-tag{
+    position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+    padding:3px 10px;border-radius:999px;font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    background:#2f3136;color:#b9bbbe;white-space:nowrap;
+  }
+  .bm-plan--best .bm-plan-tag{background:linear-gradient(90deg,#FFD080,#FFB347);color:#3d1e00}
+  .bm-plan-price b{font-family:"Clash Display",sans-serif;font-weight:700;font-size:28px;display:block}
+  .bm-plan-price small{font-size:11.5px;color:#b9bbbe}
+  .bm-plan-cta{padding:7px 16px;border-radius:999px;background:linear-gradient(180deg,#A65BFF,#6B2BFF);font-weight:700;font-size:12.5px}
+  .bm-plan--best .bm-plan-cta{background:linear-gradient(180deg,#FFD080,#FFB347);color:#3d1e00}
+  .bm-active{margin-top:14px;padding:12px;border-radius:12px;background:rgba(59,209,124,.10);border:1px solid rgba(59,209,124,.35);text-align:center}
+  .bm-active p{margin:0 0 8px;color:#9CF0BD;font-size:13px}
+
   /* ===== Orb manager ===== */
   .acc-orb-cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
   .acc-orb-cat{
@@ -1414,6 +1541,17 @@
         </div>
       </div>
 
+      <!-- ✨ Boost banner -->
+      <button type="button" class="boost-banner" id="boostBanner">
+        <div class="bb-glow"></div>
+        <span class="bb-emoji">✨</span>
+        <div class="bb-text">
+          <b id="boostBannerTitle">Passer en Tindord Boost</b>
+          <small id="boostBannerSub">18 bulles, Fake Nitro, filtre H/F, likes secrets…</small>
+        </div>
+        <span class="bb-cta" id="boostBannerCta">Découvrir</span>
+      </button>
+
       <!-- 🪪 Profil -->
       <div class="acc-section">
         <h3>🪪 Profil <span class="pill">LIVE</span></h3>
@@ -1465,6 +1603,39 @@
           <button type="button" class="acc-orb-add" id="accOrbAdd">+</button>
         </div>
         <div class="acc-orb-grid" id="accOrbGrid"></div>
+      </div>
+
+      <!-- ✨ Boost-only options -->
+      <div class="acc-section boost-only" id="boostSection" hidden>
+        <h3>✨ Tindord Boost</h3>
+
+        <div class="acc-field">
+          <label>👑 Fake Nitro <small style="color:#b9bbbe;font-weight:400">(décoration sur ton profil)</small></label>
+          <label class="toggle"><input type="checkbox" id="boostFakeNitro" /><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+        </div>
+
+        <div class="acc-field" style="margin-top:14px">
+          <label>🎵 Musique d'ambiance pendant le swipe</label>
+          <div id="swipeMusicCurrent" class="swipe-music-current" hidden></div>
+          <div class="acc-orb-form" id="swipeMusicForm">
+            <div class="acc-orb-input-wrap">
+              <input class="acc-input" id="swipeMusicInput" type="text" placeholder="Recherche un son Spotify…" autocomplete="off" />
+              <div class="spotify-sugg" id="swipeMusicSugg"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="acc-field" style="margin-top:14px">
+          <label>🔍 Recherche par genre</label>
+          <div class="acc-grid2">
+            <select class="acc-select" id="boostGenderFilter">
+              <option value="all">Tous</option>
+              <option value="il">🙋‍♂️ Hommes (Il)</option>
+              <option value="elle">🙋‍♀️ Femmes (Elle)</option>
+            </select>
+            <button type="button" class="acc-btn acc-btn--ghost" id="openLikedMe" style="margin:0">👀 Voir qui m'a liké</button>
+          </div>
+        </div>
       </div>
 
       <!-- Social connections -->
@@ -1523,6 +1694,27 @@
     <div class="t-body"><b id="toastTitle">—</b><span id="toastSub">—</span></div>
   </div>
 
+  <!-- ✨ Boost ambient music player (swipe screen only) -->
+  <div class="swipe-music" id="swipeMusic" data-show="false">
+    <div class="sm-cover" id="smCover"></div>
+    <div class="sm-info"><b id="smTitle">—</b><small id="smArtist">—</small></div>
+    <button class="sm-btn" id="smToggle" type="button" aria-label="Lecture / Pause">
+      <svg id="smIcoPlay" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
+      <svg id="smIcoPause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+  </div>
+
+  <!-- ✨ Liked-me panel -->
+  <aside class="liked-panel" id="likedPanel" data-open="false" aria-label="Likes secrets">
+    <div class="msg-head">
+      <h3>👀 Likes secrets</h3>
+      <button class="msg-close" id="likedClose" type="button" aria-label="Fermer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="liked-list" id="likedList"></div>
+  </aside>
+
   <!-- Messages floating button + slide-out panel (auth=in only) -->
   <button class="msg-fab" id="msgFab" type="button" aria-label="Messages">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
@@ -1552,6 +1744,44 @@
       </form>
     </div>
   </aside>
+
+  <!-- ✨ Boost pricing modal -->
+  <div class="boost-modal" id="boostModal" data-open="false" aria-hidden="true">
+    <div class="bm-backdrop" id="boostModalBackdrop"></div>
+    <div class="bm-card" role="dialog" aria-labelledby="bmTitle">
+      <button class="bm-close" id="boostModalClose" type="button" aria-label="Fermer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <div class="bm-head">
+        <span class="bm-sparkle">✨</span>
+        <h2 id="bmTitle">Tindord <span class="bm-grad">Boost</span></h2>
+        <p>Débloque toutes les options premium.</p>
+      </div>
+      <ul class="bm-feats">
+        <li><span>👑</span><b>Fake Nitro</b> — apparence Discord Nitro sur ton profil</li>
+        <li><span>🫧</span><b>18 bulles</b> au lieu de 6</li>
+        <li><span>🎵</span><b>Musique d'ambiance</b> pendant le swipe</li>
+        <li><span>🔍</span><b>Recherche précise</b> (homme / femme)</li>
+        <li><span>👀</span><b>Vois qui t'a liké</b> sans match</li>
+      </ul>
+      <div class="bm-plans">
+        <button type="button" class="bm-plan" data-plan="monthly">
+          <span class="bm-plan-tag">Sans engagement</span>
+          <div class="bm-plan-price"><b>4,39€</b><small>/mois</small></div>
+          <span class="bm-plan-cta">Choisir</span>
+        </button>
+        <button type="button" class="bm-plan bm-plan--best" data-plan="lifetime">
+          <span class="bm-plan-tag">Meilleur deal</span>
+          <div class="bm-plan-price"><b>15€</b><small>à vie</small></div>
+          <span class="bm-plan-cta">Choisir</span>
+        </button>
+      </div>
+      <div class="bm-active" id="bmActive" hidden>
+        <p><b>🎉 Boost actif</b> <span id="bmActivePlan"></span></p>
+        <button type="button" class="acc-btn acc-btn--danger" id="bmCancel" style="margin:0">Annuler le Boost</button>
+      </div>
+    </div>
+  </div>
 </main>
 
 <script>
@@ -2373,7 +2603,8 @@
     function setScreen(name){
       document.body.setAttribute('data-screen', name);
       if (name === 'account') renderAccount();
-      if (name === 'swipe')   { ensureDeck(); refreshMyStatusUI(); }
+      if (name === 'swipe')   { ensureDeck(); refreshMyStatusUI(); startSwipeMusic(); }
+      if (name !== 'swipe')   stopSwipeMusic();
     }
     function setAuth(on){
       document.body.setAttribute('data-auth', on ? 'in' : 'out');
@@ -2575,7 +2806,7 @@
         age: p.age || '',
         looking: p.looking || 'game',
         status: 'online',
-        nitro: !!u.decorationUrl,
+        nitro: !!u.decorationUrl || !!(u.boost && u.fakeNitro),
         joinedOn: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'}),
         activity: {type:'game', title:'Tindord', sub:'Swipe en cours…'},
         games: [p.game].filter(Boolean),
@@ -2591,18 +2822,26 @@
       };
     }
 
+    function genderFilteredProfiles(){
+      const f = state.user && state.user.boost && state.user.genderFilter;
+      if (!f || f === 'all') return PROFILES;
+      const map = { il:['male','il'], elle:['female','elle'] };
+      const accept = map[f] || [];
+      return PROFILES.filter(p => accept.includes(p.gender));
+    }
     function ensureDeck(){
       const wrap = document.getElementById('swipeWrap');
       wrap.innerHTML = '';
       const myP = buildUserProfile();
       const offset = myP ? 1 : 0;
-      const total = PROFILES.length + offset;
+      const pool = genderFilteredProfiles();
+      const total = pool.length + offset;
       if (deckIdx >= total) {
         wrap.innerHTML = `<div class="swipe-empty"><h3>${tx('no_more')}</h3><p>${tx('no_more_sub')}</p></div>`;
         renderOrbs(null);
         return;
       }
-      const p = (myP && deckIdx === 0) ? myP : PROFILES[deckIdx - offset];
+      const p = (myP && deckIdx === 0) ? myP : pool[deckIdx - offset];
       wrap.appendChild(buildCard(p, true));
       renderOrbs(p);
     }
@@ -2674,6 +2913,17 @@
       return c;
     }
 
+    /* Bubble budget: connected socials count against the same limit */
+    function orbBudget(){ return (state.user && state.user.boost) ? 18 : 6; }
+    function socialsCount(){
+      const s = (state.user && state.user.socials) || {};
+      return ['instagram','tiktok','spotify'].filter(k => s[k]).length;
+    }
+    function orbsUsed(){
+      const o = (state.profile && state.profile.userOrbs) || [];
+      return o.length + socialsCount();
+    }
+
     /* SVG icons used inside each orb (so all orbs of the same kind look identical) */
     const ORB_SVG = {
       /* Spotify logo */
@@ -2692,7 +2942,7 @@
       const orbit = document.getElementById('swipeOrbit');
       orbit.innerHTML = '';
       if (!p || !p.orbs) return;
-      const maxOrbs = (state.user && state.user.boost) ? 15 : 5;
+      const maxOrbs = orbBudget();
       p.orbs.slice(0, maxOrbs).forEach((o) => {
         const wrap = document.createElement('div');
         wrap.className = 'orb-wrap';
@@ -3020,7 +3270,6 @@
     function renderUserOrbs(){
       const p = state.profile || {};
       const orbs = p.userOrbs || [];
-      const maxOrbs = (state.user && state.user.boost) ? 15 : 5;
       const grid = document.getElementById('accOrbGrid');
       if (!grid) return;
       grid.innerHTML = '';
@@ -3047,7 +3296,12 @@
         grid.appendChild(item);
       });
       const pill = document.getElementById('orbCounterPill');
-      if (pill) pill.textContent = orbs.length + '/' + maxOrbs;
+      if (pill) {
+        const used = orbsUsed();
+        const max = orbBudget();
+        const sc = socialsCount();
+        pill.textContent = used + '/' + max + (sc ? ' (' + sc + ' social' + (sc>1?'s':'') + ')' : '');
+      }
     }
 
     document.querySelectorAll('.acc-orb-cat').forEach(btn => {
@@ -3073,8 +3327,7 @@
       if (!val) return;
       state.profile = state.profile || {};
       state.profile.userOrbs = state.profile.userOrbs || [];
-      const maxOrbs = (state.user && state.user.boost) ? 15 : 5;
-      if (state.profile.userOrbs.length >= maxOrbs) return;
+      if (orbsUsed() >= orbBudget()) { showToast('🫧', 'Limite atteinte', orbBudget() + ' bulles max — Boost pour +12'); return; }
       const orb = orbOverride || _pendingSpotifyOrb || {kind: selectedOrbKind, title: val};
       state.profile.userOrbs.push(orb);
       _pendingSpotifyOrb = null;
@@ -3148,6 +3401,7 @@
       document.getElementById('accBio').value     = p.bio || '';
       document.getElementById('accLookSel').value = p.looking || 'game';
       renderUserOrbs();
+      refreshBoostUI();
       const s = u.socials || {};
       document.getElementById('socIg').value = s.instagram || '';
       document.getElementById('socTt').value = s.tiktok    || '';
@@ -3206,16 +3460,212 @@
           btn.textContent = tx('connect');
           btn.classList.remove('connected');
         } else if (v) {
+          if (orbsUsed() >= orbBudget()) { showToast('🫧', 'Limite atteinte', orbBudget() + ' bulles max — Boost pour +12'); return; }
           state.user.socials[key] = v;
           btn.textContent = tx('connected');
           btn.classList.add('connected');
         }
         save();
+        renderUserOrbs();
       });
     }
     bindSocial('socIgBtn', 'socIg', 'instagram');
     bindSocial('socTtBtn', 'socTt', 'tiktok');
     bindSocial('socSpBtn', 'socSp', 'spotify');
+
+    /* ===== Boost: Fake Nitro toggle ===== */
+    document.getElementById('boostFakeNitro').addEventListener('change', e => {
+      if (!state.user || !state.user.boost) { e.target.checked = false; openBoostModal(); return; }
+      state.user.fakeNitro = e.target.checked;
+      save();
+      showToast('👑', e.target.checked ? 'Fake Nitro activé' : 'Fake Nitro désactivé', 'Apparence sur ton profil');
+    });
+
+    /* ===== Boost: Gender filter ===== */
+    document.getElementById('boostGenderFilter').addEventListener('change', e => {
+      if (!state.user || !state.user.boost) { e.target.value = 'all'; openBoostModal(); return; }
+      state.user.genderFilter = e.target.value;
+      save();
+      deckIdx = 0;
+    });
+
+    /* ===== Boost: Liked-me list (mock) ===== */
+    const LIKED_ME = [
+      { name:'Camille', tag:'cami_xo', age:21, c1:'#FF7EB6', c2:'#9146FF', initial:'C' },
+      { name:'Yuki',    tag:'yuki.dev', age:24, c1:'#5BE9FF', c2:'#9146FF', initial:'Y' },
+      { name:'Romane',  tag:'romromm', age:22, c1:'#A65BFF', c2:'#FF7EB6', initial:'R' },
+      { name:'Inès',    tag:'ineslalala', age:20, c1:'#FFB66E', c2:'#FF4FA0', initial:'I' },
+      { name:'Lucas',   tag:'lucazz', age:23, c1:'#3BD17C', c2:'#5BE9FF', initial:'L' },
+    ];
+    function renderLikedMe(){
+      const list = document.getElementById('likedList');
+      list.innerHTML = '';
+      const unlocked = !!(state.user && state.user.boost);
+      LIKED_ME.forEach(p => {
+        const it = document.createElement('div');
+        it.className = 'liked-item';
+        it.innerHTML =
+          `<div class="lavi ${unlocked ? '' : 'li-blur'}" style="background:linear-gradient(135deg,${p.c1},${p.c2})">${p.initial}</div>` +
+          `<div class="li-info"><b class="${unlocked ? '' : 'li-blur'}">${escapeHtmlMini(p.name)} · ${p.age}</b><small class="${unlocked ? '' : 'li-blur'}">@${escapeHtmlMini(p.tag)}</small></div>`;
+        list.appendChild(it);
+      });
+    }
+    document.getElementById('openLikedMe').addEventListener('click', () => {
+      if (!state.user || !state.user.boost) { openBoostModal(); return; }
+      renderLikedMe();
+      document.getElementById('likedPanel').setAttribute('data-open','true');
+    });
+    document.getElementById('likedClose').addEventListener('click', () => {
+      document.getElementById('likedPanel').setAttribute('data-open','false');
+    });
+
+    /* ===== Boost: Swipe ambient music ===== */
+    let _smDebounce = null;
+    let _swipeMusicAudio = null;
+    function renderSwipeMusicCurrent(){
+      const box = document.getElementById('swipeMusicCurrent');
+      const sm = state.user && state.user.swipeMusic;
+      if (!sm) { box.hidden = true; box.innerHTML = ''; return; }
+      box.hidden = false;
+      box.innerHTML =
+        (sm.cover ? `<img src="${sm.cover}" alt="">` : '') +
+        `<div class="smc-info"><b>${escapeHtmlMini(sm.title)}</b><small>${escapeHtmlMini(sm.artist || '')}</small></div>` +
+        `<button type="button" id="smcRemove">Retirer</button>`;
+      document.getElementById('smcRemove').addEventListener('click', () => {
+        state.user.swipeMusic = null;
+        save();
+        renderSwipeMusicCurrent();
+        stopSwipeMusic();
+      });
+    }
+    document.getElementById('swipeMusicInput').addEventListener('input', e => {
+      const val = e.target.value.trim();
+      const sugg = document.getElementById('swipeMusicSugg');
+      if (val.length < 2) { sugg.innerHTML=''; sugg.classList.remove('open'); return; }
+      clearTimeout(_smDebounce);
+      _smDebounce = setTimeout(async () => {
+        try {
+          const results = await searchSpotifyTracks(val);
+          if (!results.length) { sugg.innerHTML=''; sugg.classList.remove('open'); return; }
+          sugg.innerHTML = '';
+          results.forEach(r => {
+            const it = document.createElement('div');
+            it.className = 'sp-item';
+            it.innerHTML =
+              (r.cover ? `<img src="${r.cover}" alt="">` : '<div class="sp-no-cover">🎵</div>') +
+              `<div class="sp-info"><div class="sp-title">${escapeHtmlMini(r.name)}</div>` +
+              `<div class="sp-artist">${escapeHtmlMini(r.artist)}</div></div>`;
+            it.addEventListener('mousedown', ev => {
+              ev.preventDefault();
+              if (!state.user || !state.user.boost) { openBoostModal(); return; }
+              if (!r.previewUrl) { showToast('🎵', r.name, 'Pas de preview disponible'); return; }
+              state.user.swipeMusic = { title: r.name+' · '+r.artist, artist: r.artist, previewUrl: r.previewUrl, cover: r.cover };
+              save();
+              document.getElementById('swipeMusicInput').value = '';
+              sugg.innerHTML=''; sugg.classList.remove('open');
+              renderSwipeMusicCurrent();
+              showToast('🎵', 'Musique d\'ambiance définie', r.name);
+            });
+            sugg.appendChild(it);
+          });
+          sugg.classList.add('open');
+        } catch(_){}
+      }, 320);
+    });
+    document.getElementById('swipeMusicInput').addEventListener('blur', () => setTimeout(() => {
+      const s = document.getElementById('swipeMusicSugg');
+      s.innerHTML=''; s.classList.remove('open');
+    }, 200));
+
+    function startSwipeMusic(){
+      const sm = state.user && state.user.swipeMusic;
+      if (!sm || !sm.previewUrl) return;
+      if (_swipeMusicAudio) return;
+      _swipeMusicAudio = new Audio(sm.previewUrl);
+      _swipeMusicAudio.loop = true;
+      _swipeMusicAudio.volume = 0.35;
+      _swipeMusicAudio.play().catch(() => {});
+      const box = document.getElementById('swipeMusic');
+      document.getElementById('smTitle').textContent = sm.title;
+      document.getElementById('smArtist').textContent = sm.artist || '';
+      document.getElementById('smCover').style.backgroundImage = sm.cover ? `url('${sm.cover}')` : '';
+      document.getElementById('smCover').classList.remove('is-paused');
+      document.getElementById('smIcoPlay').style.display = 'none';
+      document.getElementById('smIcoPause').style.display = '';
+      box.setAttribute('data-show', 'true');
+    }
+    function stopSwipeMusic(){
+      if (_swipeMusicAudio) { _swipeMusicAudio.pause(); _swipeMusicAudio = null; }
+      document.getElementById('swipeMusic').setAttribute('data-show', 'false');
+    }
+    document.getElementById('smToggle').addEventListener('click', () => {
+      if (!_swipeMusicAudio) return;
+      if (_swipeMusicAudio.paused) {
+        _swipeMusicAudio.play().catch(()=>{});
+        document.getElementById('smCover').classList.remove('is-paused');
+        document.getElementById('smIcoPlay').style.display = 'none';
+        document.getElementById('smIcoPause').style.display = '';
+      } else {
+        _swipeMusicAudio.pause();
+        document.getElementById('smCover').classList.add('is-paused');
+        document.getElementById('smIcoPlay').style.display = '';
+        document.getElementById('smIcoPause').style.display = 'none';
+      }
+    });
+
+    /* ===== Boost banner + pricing modal ===== */
+    function refreshBoostUI(){
+      const banner = document.getElementById('boostBanner');
+      const title  = document.getElementById('boostBannerTitle');
+      const sub    = document.getElementById('boostBannerSub');
+      const cta    = document.getElementById('boostBannerCta');
+      const active = !!(state.user && state.user.boost);
+      banner.classList.toggle('is-active', active);
+      if (active) {
+        const plan = state.user.boostPlan === 'lifetime' ? 'À vie' : 'Mensuel';
+        title.textContent = '✨ Tindord Boost actif';
+        sub.textContent   = plan + ' · 18 bulles, Fake Nitro, filtre H/F…';
+        cta.textContent   = 'Gérer';
+      } else {
+        title.textContent = 'Passer en Tindord Boost';
+        sub.textContent   = '18 bulles, Fake Nitro, filtre H/F, likes secrets…';
+        cta.textContent   = 'Découvrir';
+      }
+      const bmActive = document.getElementById('bmActive');
+      document.querySelectorAll('.bm-plan').forEach(b => b.style.opacity = active ? '.45' : '1');
+      bmActive.hidden = !active;
+      if (active) document.getElementById('bmActivePlan').textContent =
+        '· ' + (state.user.boostPlan === 'lifetime' ? '15€ à vie' : '4,39€/mois');
+      document.getElementById('boostSection').hidden = !active;
+      document.getElementById('boostFakeNitro').checked = !!(state.user && state.user.fakeNitro);
+      document.getElementById('boostGenderFilter').value = (state.user && state.user.genderFilter) || 'all';
+      renderSwipeMusicCurrent();
+      renderUserOrbs();
+    }
+    function openBoostModal(){ document.getElementById('boostModal').setAttribute('data-open','true'); refreshBoostUI(); }
+    function closeBoostModal(){ document.getElementById('boostModal').setAttribute('data-open','false'); }
+    document.getElementById('boostBanner').addEventListener('click', openBoostModal);
+    document.getElementById('boostModalClose').addEventListener('click', closeBoostModal);
+    document.getElementById('boostModalBackdrop').addEventListener('click', closeBoostModal);
+    document.querySelectorAll('.bm-plan').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (state.user && state.user.boost) return;
+        state.user = state.user || {};
+        state.user.boost = true;
+        state.user.boostPlan = btn.dataset.plan;
+        save();
+        refreshBoostUI();
+        showToast('✨', 'Bienvenue dans Boost !', btn.dataset.plan === 'lifetime' ? '15€ à vie' : '4,39€/mois');
+      });
+    });
+    document.getElementById('bmCancel').addEventListener('click', () => {
+      if (!state.user) return;
+      state.user.boost = false;
+      state.user.boostPlan = null;
+      save();
+      refreshBoostUI();
+      showToast('💔', 'Boost annulé', 'Retour à la version gratuite');
+    });
     // Language toggle in account
     document.getElementById('accLangs').addEventListener('click', (e) => {
       const b = e.target.closest('button[data-val]');
