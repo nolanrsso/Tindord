@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700,800&display=swap" />
+<!-- Supabase JS SDK (UMD) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:        #0D0B1E;
@@ -1292,6 +1294,50 @@
 </main>
 
 <script>
+  /* ====== Supabase client (real Discord OAuth) ====== */
+  const SUPABASE_URL = 'https://kspyqwqudnvjvfdsybam.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzcHlxd3F1ZG52anZmZHN5YmFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjkwMTQsImV4cCI6MjA5NDQwNTAxNH0.D1jTiRBpn9Z59XRgLlvPiP9N6ataIYGQJH1ECihbuHk';
+  const supa = (window.supabase && window.supabase.createClient)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+  window.__supa = supa;
+
+  /* Build the user payload Tindord expects from a Supabase session. */
+  function userFromSupabaseSession(session){
+    if (!session || !session.user) return null;
+    const u = session.user;
+    const m = u.user_metadata || {};
+    const id = m.provider_id || m.sub || u.id;
+    const avatar_url = m.avatar_url || null; // Supabase pre-formats Discord avatar URL
+    const banner_hash = m.banner || null;
+    const banner_url  = banner_hash && id ? `https://cdn.discordapp.com/banners/${id}/${banner_hash}.${banner_hash.startsWith('a_') ? 'gif' : 'png'}?size=600` : null;
+    const deco = m.avatar_decoration_data || m.custom_claims?.avatar_decoration_data;
+    const decoration_url = deco?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${deco.asset}.png?passthrough=false` : null;
+    return {
+      displayName: m.global_name || m.full_name || m.name || m.user_name || 'Discord user',
+      discordTag:  m.user_name || m.preferred_username || m.name || null,
+      discordId:   id,
+      email:       u.email || m.email || null,
+      avatarUrl:   avatar_url,
+      bannerUrl:   banner_url,
+      decorationUrl: decoration_url,
+      mode:        'discord',
+    };
+  }
+
+  /* Kick off Discord OAuth through Supabase. */
+  function signInWithDiscord(){
+    if (!supa) { alert('Supabase non chargé.'); return; }
+    return supa.auth.signInWithOAuth({
+      provider: 'discord',
+      options: {
+        scopes: 'identify email connections guilds',
+        redirectTo: window.location.origin + window.location.pathname,
+      },
+    });
+  }
+  window.signInWithDiscord = signInWithDiscord;
+
   /* ====== Animated bubble field with mouse repulsion + click explosion ====== */
   const layer = document.getElementById('bubbles');
 
@@ -1890,7 +1936,7 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) setOpen(false); });
   })();
 
-  // CTA click — feedback + fake Discord login (real OAuth comes once Supabase is wired)
+  // CTA click — feedback + real Discord OAuth via Supabase
   document.getElementById('join').addEventListener('click', (e) => {
     e.preventDefault();
     const b = e.currentTarget;
@@ -1898,11 +1944,7 @@
       [{ transform: 'translateY(-2px) scale(1)' }, { transform: 'translateY(-2px) scale(0.97)' }, { transform: 'translateY(-2px) scale(1)' }],
       { duration: 220, easing: 'ease-out' }
     );
-    const names = ['NolanGG','PixelChamp','LunaBlade','TacoCat','MidLaner','xX_Dragon_Xx'];
-    const name = names[Math.floor(Math.random()*names.length)];
-    setTimeout(() => {
-      window.__tindord && window.__tindord.onLogin({ displayName: name, discordTag: name.toLowerCase(), mode:'discord' });
-    }, 220);
+    setTimeout(() => { window.signInWithDiscord && window.signInWithDiscord(); }, 220);
   });
 
   // ===== Auth modal =====
@@ -1936,12 +1978,9 @@
     });
 
     document.getElementById('authDiscord').addEventListener('click', () => {
-      // TODO: real Discord OAuth needs a backend (or Supabase) to exchange the code.
-      // For now, fake a Discord-style user so the swipe demo can run end-to-end.
-      const names = ['NolanGG','PixelChamp','LunaBlade','TacoCat','MidLaner','xX_Dragon_Xx'];
-      const name = names[Math.floor(Math.random()*names.length)];
+      // Real Discord OAuth via Supabase. Will redirect to Discord, then back here.
       close();
-      window.__tindord && window.__tindord.onLogin({ displayName: name, discordTag: name.toLowerCase(), mode:'discord' });
+      window.signInWithDiscord && window.signInWithDiscord();
     });
 
     // ----- Email view -----
@@ -2055,8 +2094,13 @@
     function updateChip(){
       const u = state.user || {};
       const avi = document.getElementById('accountChipAvatar');
-      if (u.avatarUrl) avi.innerHTML = `<img src="${u.avatarUrl}" alt="">`;
-      else avi.textContent = (u.displayName || u.email || 'U').charAt(0).toUpperCase();
+      if (u.avatarUrl) {
+        avi.innerHTML = `<img src="${u.avatarUrl}" alt="${u.displayName || ''}">`;
+        avi.style.background = 'none';
+      } else {
+        avi.textContent = (u.displayName || u.email || 'U').charAt(0).toUpperCase();
+        avi.style.background = 'linear-gradient(135deg,#FF7EB6,#9146FF)';
+      }
     }
 
     // Hand-off used by login/signup handlers
@@ -2581,8 +2625,15 @@
       document.getElementById('accName').textContent = u.displayName || u.email || 'Tindord user';
       document.getElementById('accHandle').textContent = u.discordTag ? '@' + u.discordTag : (u.email || '—');
       const avi = document.getElementById('accAvatar');
-      if (u.avatarUrl) avi.innerHTML = `<img src="${u.avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
-      else { avi.textContent = (u.displayName || u.email || 'T').charAt(0).toUpperCase(); avi.style.background = 'linear-gradient(135deg,#FF7EB6,#9146FF)'; }
+      if (u.avatarUrl) {
+        avi.innerHTML = `<img src="${u.avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`
+                      + (u.decorationUrl ? `<img src="${u.decorationUrl}" style="position:absolute;inset:-14%;width:128%;height:128%;pointer-events:none">` : '');
+        avi.style.background = 'none';
+        avi.style.position = 'relative';
+      } else {
+        avi.textContent = (u.displayName || u.email || 'T').charAt(0).toUpperCase();
+        avi.style.background = 'linear-gradient(135deg,#FF7EB6,#9146FF)';
+      }
       document.getElementById('accGender').textContent  = ({ male:tx('gender_male'), female:tx('gender_female'), nonbinary:tx('gender_nb'), trans_m:tx('gender_trans_m'), trans_f:tx('gender_trans_f'), fluid:tx('gender_fluid'), agender:tx('gender_agender'), other:tx('gender_other') }[p.gender] || '—');
       document.getElementById('accAge').textContent     = p.age || '—';
       document.getElementById('accLooking').textContent = ({ chill:tx('look_chill'), game:tx('look_game'), sleep:tx('look_sleep') }[p.looking] || '—');
@@ -2611,7 +2662,36 @@
       setAuth(true);
       setScreen(state.profile ? 'swipe' : 'onboarding');
     }
+
+    // ---------- Supabase: hydrate from session (after OAuth redirect) ----------
+    (async () => {
+      if (!window.__supa) return;
+      try {
+        const { data: { session } } = await window.__supa.auth.getSession();
+        if (session) {
+          const u = userFromSupabaseSession(session);
+          if (u) window.__tindord.onLogin(u);
+        }
+        // Keep state in sync if user signs in/out in another tab
+        window.__supa.auth.onAuthStateChange((_event, s) => {
+          if (s) {
+            const u = userFromSupabaseSession(s);
+            if (u) window.__tindord.onLogin(u);
+          }
+        });
+      } catch (e) { console.warn('Supabase session error', e); }
+    })();
   })();
+
+  // Sign-out wrapper: call Supabase sign-out alongside our local reset.
+  // (The original accLogout listener runs first and clears local state; this just
+  // makes sure the Supabase session is also invalidated so the next reload
+  // doesn't re-hydrate it.)
+  document.addEventListener('click', (e) => {
+    if (e.target.closest && e.target.closest('#accLogout') && window.__supa) {
+      window.__supa.auth.signOut().catch(() => {});
+    }
+  });
 </script>
 </body>
 </html>
