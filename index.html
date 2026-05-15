@@ -1012,7 +1012,22 @@
   .acc-orb-cat.active{border-color:#9146FF;background:rgba(145,70,255,.18);color:#fff}
   .acc-orb-cat:hover:not(.active){background:rgba(255,255,255,.08);color:#fff}
   .acc-orb-form{display:flex;gap:8px;margin-bottom:16px}
-  .acc-orb-form .acc-input{flex:1;margin:0}
+  .acc-orb-input-wrap{flex:1;position:relative}
+  .acc-orb-input-wrap .acc-input{width:100%;margin:0;box-sizing:border-box}
+  .spotify-sugg{
+    position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:120;
+    background:#1c1d22;border:1px solid rgba(255,255,255,.12);border-radius:12px;
+    overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.6);display:none;
+  }
+  .spotify-sugg.open{display:block}
+  .sp-item{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;transition:.12s}
+  .sp-item:hover{background:rgba(255,255,255,.06)}
+  .sp-item img,.sp-no-cover{width:36px;height:36px;border-radius:6px;object-fit:cover;flex:0 0 auto}
+  .sp-no-cover{background:#1DB954;display:grid;place-items:center;font-size:18px}
+  .sp-info{flex:1;min-width:0}
+  .sp-title{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sp-artist{font-size:11px;color:#b9bbbe;margin-top:1px}
+  .sp-dur{font-size:10px;color:#72767d;flex:0 0 auto}
   .acc-orb-add{
     width:44px;height:44px;border-radius:12px;border:none;flex:0 0 auto;
     background:linear-gradient(180deg,#A65BFF,#6B2BFF);color:#fff;
@@ -1443,7 +1458,10 @@
           <button type="button" class="acc-orb-cat" data-kind="film">🎬 Film·Série</button>
         </div>
         <div class="acc-orb-form">
-          <input class="acc-input" id="accOrbInput" type="text" placeholder="ex: Sicko Mode · Travis Scott" autocomplete="off" />
+          <div class="acc-orb-input-wrap">
+            <input class="acc-input" id="accOrbInput" type="text" placeholder="Recherche un son Spotify…" autocomplete="off" />
+            <div class="spotify-sugg" id="spotifySugg"></div>
+          </div>
           <button type="button" class="acc-orb-add" id="accOrbAdd">+</button>
         </div>
         <div class="acc-orb-grid" id="accOrbGrid"></div>
@@ -2712,21 +2730,20 @@
       _spotifyTokenExp = Date.now() + (d.expires_in - 60) * 1000;
       return _spotifyToken;
     }
-    async function searchSpotifyPreview(query){
+    async function searchSpotifyTracks(query, limit=6){
       const token = await getSpotifyToken();
       const resp = await fetch(
-        'https://api.spotify.com/v1/search?q=' + encodeURIComponent(query) + '&type=track&limit=1',
+        'https://api.spotify.com/v1/search?q=' + encodeURIComponent(query) + '&type=track&limit=' + limit,
         { headers:{ Authorization:'Bearer ' + token } }
       );
       const d = await resp.json();
-      const track = d.tracks?.items?.[0];
-      if (!track) return null;
-      return {
-        previewUrl: track.preview_url,
-        name:   track.name,
-        artist: track.artists?.[0]?.name || '',
-        cover:  track.album?.images?.[1]?.url || track.album?.images?.[0]?.url || null,
-      };
+      return (d.tracks?.items || []).map(t => ({
+        name:       t.name,
+        artist:     t.artists?.[0]?.name || '',
+        cover:      t.album?.images?.[2]?.url || t.album?.images?.[0]?.url || null,
+        previewUrl: t.preview_url,
+        durationMs: t.duration_ms,
+      }));
     }
     let _spotifyAudio = null;
 
@@ -2764,16 +2781,24 @@
       } else if (o.kind === 'music') {
         if (_spotifyAudio) { _spotifyAudio.pause(); _spotifyAudio = null; }
         el.classList.add('playing');
-        showToast('⏳', o.title, 'Chargement…');
-        searchSpotifyPreview(o.title).then(info => {
-          if (!info) { showToast('🎵', o.title, o.sub || ''); el.classList.remove('playing'); return; }
-          if (!info.previewUrl) { showToast('🎵', info.name, info.artist + ' · pas de preview'); el.classList.remove('playing'); return; }
-          _spotifyAudio = new Audio(info.previewUrl);
+        const playUrl = url => {
+          _spotifyAudio = new Audio(url);
           _spotifyAudio.volume = 0.75;
           _spotifyAudio.play().catch(() => {});
           _spotifyAudio.addEventListener('ended', () => { el.classList.remove('playing'); _spotifyAudio = null; });
-          showToast('▶️', info.name, info.artist);
-        }).catch(() => { showToast('🎵', o.title, o.sub || ''); el.classList.remove('playing'); });
+        };
+        if (o.previewUrl) {
+          playUrl(o.previewUrl);
+          showToast('▶️', o.title, '30s preview');
+        } else {
+          showToast('⏳', o.title, 'Chargement…');
+          searchSpotifyTracks(o.title, 1).then(results => {
+            const r = results[0];
+            if (!r?.previewUrl) { showToast('🎵', o.title, o.sub || 'Pas de preview'); el.classList.remove('playing'); return; }
+            playUrl(r.previewUrl);
+            showToast('▶️', r.name, r.artist);
+          }).catch(() => { showToast('🎵', o.title, o.sub || ''); el.classList.remove('playing'); });
+        }
       }
     }
     function attachDrag(card){
@@ -2986,7 +3011,7 @@
     // ---------- Orb manager ----------
     let selectedOrbKind = 'music';
     const orbPlaceholders = {
-      music:'ex: Sicko Mode · Travis Scott',
+      music:'Recherche un son Spotify…',
       game: 'ex: Valorant, Minecraft…',
       anime:'ex: One Piece, Demon Slayer…',
       film: 'ex: Inception, Breaking Bad…',
@@ -3034,7 +3059,15 @@
       });
     });
 
-    function addOrb(){
+    let _pendingSpotifyOrb = null;
+    let _suggDebounce = null;
+
+    function closeSugg(){
+      const s = document.getElementById('spotifySugg');
+      s.innerHTML = ''; s.classList.remove('open');
+    }
+
+    function addOrb(orbOverride){
       const input = document.getElementById('accOrbInput');
       const val = input.value.trim();
       if (!val) return;
@@ -3042,13 +3075,53 @@
       state.profile.userOrbs = state.profile.userOrbs || [];
       const maxOrbs = (state.user && state.user.boost) ? 15 : 5;
       if (state.profile.userOrbs.length >= maxOrbs) return;
-      state.profile.userOrbs.push({kind: selectedOrbKind, title: val});
+      const orb = orbOverride || _pendingSpotifyOrb || {kind: selectedOrbKind, title: val};
+      state.profile.userOrbs.push(orb);
+      _pendingSpotifyOrb = null;
       input.value = '';
+      closeSugg();
       renderUserOrbs();
       refreshAccountPreview();
     }
-    document.getElementById('accOrbAdd').addEventListener('click', addOrb);
-    document.getElementById('accOrbInput').addEventListener('keydown', e => { if (e.key === 'Enter') addOrb(); });
+
+    document.getElementById('accOrbAdd').addEventListener('click', () => addOrb());
+    document.getElementById('accOrbInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); addOrb(); } });
+
+    /* Live Spotify search when category = music */
+    document.getElementById('accOrbInput').addEventListener('input', e => {
+      _pendingSpotifyOrb = null;
+      const val = e.target.value.trim();
+      const sugg = document.getElementById('spotifySugg');
+      if (selectedOrbKind !== 'music' || val.length < 2){ closeSugg(); return; }
+      clearTimeout(_suggDebounce);
+      _suggDebounce = setTimeout(async () => {
+        try {
+          const results = await searchSpotifyTracks(val);
+          if (!results.length){ closeSugg(); return; }
+          sugg.innerHTML = '';
+          results.forEach(r => {
+            const item = document.createElement('div');
+            item.className = 'sp-item';
+            const ms = r.durationMs;
+            const dur = ms ? Math.floor(ms/60000)+':'+String(Math.floor((ms%60000)/1000)).padStart(2,'0') : '';
+            item.innerHTML =
+              (r.cover ? `<img src="${r.cover}" alt="">` : '<div class="sp-no-cover">🎵</div>') +
+              `<div class="sp-info"><div class="sp-title">${escapeHtmlMini(r.name)}</div>` +
+              `<div class="sp-artist">${escapeHtmlMini(r.artist)}</div></div>` +
+              (dur ? `<span class="sp-dur">${dur}</span>` : '');
+            item.addEventListener('mousedown', ev => {
+              ev.preventDefault();
+              const orb = {kind:'music', title:r.name+' · '+r.artist, previewUrl:r.previewUrl, cover:r.cover};
+              document.getElementById('accOrbInput').value = orb.title;
+              addOrb(orb);
+            });
+            sugg.appendChild(item);
+          });
+          sugg.classList.add('open');
+        } catch(_){}
+      }, 320);
+    });
+    document.getElementById('accOrbInput').addEventListener('blur', () => setTimeout(closeSugg, 200));
 
     // ---------- Account screen ----------
     function renderAccount(){
