@@ -547,7 +547,7 @@
   .swipe-stage{
     position:relative;
     width:min(98vw,920px);
-    height:min(70vh,640px);flex:1 1 auto;min-height:0;
+    flex:1 1 auto;min-height:0;overflow:hidden;
     display:grid;place-items:center;
     pointer-events:none;
   }
@@ -636,7 +636,7 @@
   .swipe-toast .t-body b{display:block;font-weight:700;font-size:14px}
   .swipe-toast .t-body span{color:var(--ink-dim);font-size:12.5px}
 
-  .swipe-wrap{position:relative;width:min(92vw,380px);height:min(72vh,600px)}
+  .swipe-wrap{position:relative;width:min(92vw,380px);height:min(calc(100vh - 295px),580px)}
 
   /* Discord-style profile card */
   .swipe-card{
@@ -771,9 +771,10 @@
 
   /* Swipe toolbar — quick access to likes, filter, music + stats */
   .swipe-tools{
-    display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;
+    display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:nowrap;
     padding:8px 14px;border-radius:18px;background:rgba(28,29,34,.78);
     border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(8px);
+    flex:0 0 auto;overflow:hidden;
   }
   .stool-btn{
     display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:12px;
@@ -794,7 +795,10 @@
     .swipe-tools{padding:6px 8px;gap:6px}
     .stool-btn{padding:6px 10px}
     .stool-lbl b{font-size:12px}
-    .stool-stats{padding-left:8px;flex-direction:column;align-items:flex-start;gap:2px;font-size:10.5px}
+    .stool-stats{display:none}
+  }
+  @media (max-height:700px){
+    .stool-stats{display:none}
   }
 
   /* Action buttons — blended with the "draggable gradient icon" aesthetic */
