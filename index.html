@@ -2340,6 +2340,9 @@
      APP STATE MACHINE — landing → onboarding → swipe → account
      ============================================================ */
   (() => {
+    const SPOTIFY_CLIENT_ID     = '97ee507ff2694d9c916f2cd930afcb4c';
+    const SPOTIFY_CLIENT_SECRET = '1775eb6d41204c489c9e0ed9cf72f2bb';
+
     const KEY = 'tindord_state';
     let state = { user:null, profile:null };
     try { const raw = localStorage.getItem(KEY); if (raw) state = JSON.parse(raw); } catch(_){}
@@ -2692,6 +2695,41 @@
     }
     function escapeHtmlMini(s){ return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
 
+    /* Spotify Client Credentials */
+    let _spotifyToken = null, _spotifyTokenExp = 0;
+    async function getSpotifyToken(){
+      if (_spotifyToken && _spotifyTokenExp > Date.now()) return _spotifyToken;
+      const resp = await fetch('https://accounts.spotify.com/api/token', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/x-www-form-urlencoded',
+          'Authorization':'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET),
+        },
+        body:'grant_type=client_credentials',
+      });
+      const d = await resp.json();
+      _spotifyToken = d.access_token;
+      _spotifyTokenExp = Date.now() + (d.expires_in - 60) * 1000;
+      return _spotifyToken;
+    }
+    async function searchSpotifyPreview(query){
+      const token = await getSpotifyToken();
+      const resp = await fetch(
+        'https://api.spotify.com/v1/search?q=' + encodeURIComponent(query) + '&type=track&limit=1',
+        { headers:{ Authorization:'Bearer ' + token } }
+      );
+      const d = await resp.json();
+      const track = d.tracks?.items?.[0];
+      if (!track) return null;
+      return {
+        previewUrl: track.preview_url,
+        name:   track.name,
+        artist: track.artists?.[0]?.name || '',
+        cover:  track.album?.images?.[1]?.url || track.album?.images?.[0]?.url || null,
+      };
+    }
+    let _spotifyAudio = null;
+
     /* Toast + media playback for an orb */
     let _voice = null;
     function showToast(ico, title, sub){
@@ -2709,6 +2747,7 @@
         voice: '🎤 ' + o.title,
         anime: '📺 ' + o.title,
         game:  '🎮 ' + o.title,
+        film:  '🎬 ' + o.title,
       };
       showToast(o.emoji || '🎵', titleByKind[o.kind] || o.title, o.sub || '');
       if (o.kind === 'voice' && 'speechSynthesis' in window) {
@@ -2723,21 +2762,18 @@
           window.speechSynthesis.speak(u);
         } catch(_){}
       } else if (o.kind === 'music') {
-        try {
-          const ctx = (playOrb._ac ||= new (window.AudioContext || window.webkitAudioContext)());
-          const now = ctx.currentTime;
-          const notes = [523.25, 659.25, 783.99, 659.25, 587.33]; // C5 E5 G5 E5 D5
-          notes.forEach((f, i) => {
-            const osc = ctx.createOscillator();
-            const g = ctx.createGain();
-            osc.type = 'sine'; osc.frequency.value = f;
-            g.gain.setValueAtTime(0, now + i * 0.2);
-            g.gain.linearRampToValueAtTime(0.12, now + i * 0.2 + 0.02);
-            g.gain.linearRampToValueAtTime(0, now + i * 0.2 + 0.18);
-            osc.connect(g); g.connect(ctx.destination);
-            osc.start(now + i * 0.2); osc.stop(now + i * 0.2 + 0.2);
-          });
-        } catch(_){}
+        if (_spotifyAudio) { _spotifyAudio.pause(); _spotifyAudio = null; }
+        el.classList.add('playing');
+        showToast('⏳', o.title, 'Chargement…');
+        searchSpotifyPreview(o.title).then(info => {
+          if (!info) { showToast('🎵', o.title, o.sub || ''); el.classList.remove('playing'); return; }
+          if (!info.previewUrl) { showToast('🎵', info.name, info.artist + ' · pas de preview'); el.classList.remove('playing'); return; }
+          _spotifyAudio = new Audio(info.previewUrl);
+          _spotifyAudio.volume = 0.75;
+          _spotifyAudio.play().catch(() => {});
+          _spotifyAudio.addEventListener('ended', () => { el.classList.remove('playing'); _spotifyAudio = null; });
+          showToast('▶️', info.name, info.artist);
+        }).catch(() => { showToast('🎵', o.title, o.sub || ''); el.classList.remove('playing'); });
       }
     }
     function attachDrag(card){
