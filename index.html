@@ -3080,6 +3080,34 @@
     }
     let _spotifyAudio = null;
 
+    /* Audio fade helpers */
+    function fadeIn(audio, target=0.75, dur=700){
+      if (!audio) return;
+      const step = 40, n = Math.max(1, Math.round(dur/step));
+      let i = 0;
+      audio.volume = 0;
+      const tick = () => {
+        if (!audio || audio.paused) return;
+        i++;
+        audio.volume = Math.min(target, (i/n) * target);
+        if (i < n) setTimeout(tick, step);
+      };
+      tick();
+    }
+    function fadeOutAndStop(audio, dur=250){
+      if (!audio) return;
+      const start = audio.volume, step = 40, n = Math.max(1, Math.round(dur/step));
+      let i = 0;
+      const tick = () => {
+        if (!audio) return;
+        i++;
+        audio.volume = Math.max(0, start * (1 - i/n));
+        if (i < n) setTimeout(tick, step);
+        else audio.pause();
+      };
+      tick();
+    }
+
     /* Jikan API for anime covers (free, no auth) */
     async function searchAnime(query){
       try {
@@ -3146,24 +3174,35 @@
           window.speechSynthesis.speak(u);
         } catch(_){}
       } else if (o.kind === 'music') {
-        if (_spotifyAudio) { _spotifyAudio.pause(); _spotifyAudio = null; }
+        // Toggle: re-click on the same playing orb stops it
+        if (_spotifyAudio && _spotifyAudio._orbEl === el) {
+          fadeOutAndStop(_spotifyAudio);
+          _spotifyAudio = null;
+          el.classList.remove('playing');
+          showToast('⏸', o.title, 'Arrêté');
+          return;
+        }
+        // Different orb: stop previous, start new
+        if (_spotifyAudio) { fadeOutAndStop(_spotifyAudio); _spotifyAudio = null; }
         el.classList.add('playing');
-        const playUrl = url => {
-          _spotifyAudio = new Audio(url);
-          _spotifyAudio.volume = 0.75;
-          _spotifyAudio.play().catch(() => {});
-          _spotifyAudio.addEventListener('ended', () => { el.classList.remove('playing'); _spotifyAudio = null; });
+        const playUrl = (url, name, sub) => {
+          const a = new Audio(url);
+          a._orbEl = el;
+          a.volume = 0;
+          a.play().catch(() => {});
+          fadeIn(a, 0.75, 700);
+          a.addEventListener('ended', () => { el.classList.remove('playing'); if (_spotifyAudio === a) _spotifyAudio = null; });
+          _spotifyAudio = a;
+          showToast('▶️', name, sub);
         };
         if (o.previewUrl) {
-          playUrl(o.previewUrl);
-          showToast('▶️', o.title, '30s preview');
+          playUrl(o.previewUrl, o.title, '30s preview');
         } else {
           showToast('⏳', o.title, 'Chargement…');
           searchSpotifyTracks(o.title, 1).then(results => {
             const r = results[0];
             if (!r?.previewUrl) { showToast('🎵', o.title, o.sub || 'Pas de preview'); el.classList.remove('playing'); return; }
-            playUrl(r.previewUrl);
-            showToast('▶️', r.name, r.artist);
+            playUrl(r.previewUrl, r.name, r.artist);
           }).catch(() => { showToast('🎵', o.title, o.sub || ''); el.classList.remove('playing'); });
         }
       }
