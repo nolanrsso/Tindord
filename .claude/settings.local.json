@@ -4,7 +4,9 @@
       "Bash(ls \"C:\\\\Users\\\\nolan\\\\OneDrive\\\\Documents\\\\claude\\\\Tindord\\\\.clone\\\\worktrees\\\\vibrant-rubin-690909\\\\v2\\\\\" 2>&1 | head -20)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(git -C \"C:/Users/nolan/OneDrive/Documents/claude/Tindord\" pull origin master)",
+      "Bash(mv \"C:/Users/nolan/OneDrive/Documents/claude/Tindord/.claude/settings.local.json\" \"C:/Users/nolan/OneDrive/Documents/claude/Tindord/.claude/settings.local.json.bak\" && git -C \"C:/Users/nolan/OneDrive/Documents/claude/Tindord\" pull origin master)"
     ]
   }
 }

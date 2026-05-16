@@ -328,9 +328,9 @@
   body[data-auth="out"] #msgFab,
   body[data-screen="landing"] #msgFab{display:none}
 
-  /* Floating Messages FAB (bottom-right when logged-in) */
+  /* Floating Messages FAB (bottom-left when logged-in) */
   .msg-fab{
-    position:fixed;right:18px;bottom:18px;z-index:24;
+    position:fixed;left:18px;bottom:18px;z-index:24;
     width:60px;height:60px;border-radius:20px;border:none;
     display:grid;place-items:center;cursor:pointer;color:#fff;
     background:linear-gradient(140deg, #5865F2 0%, #404EED 100%);
@@ -345,18 +345,17 @@
     display:grid;place-items:center;border:2px solid #0D0B1E;
   }
 
-  /* Messages slide-out panel */
+  /* Messages panel — full page */
   .msg-panel{
-    position:fixed;top:0;right:0;bottom:0;width:min(92vw,400px);z-index:60;
-    background:rgba(20,20,25,.95);
-    border-left:1px solid rgba(255,255,255,.08);
-    backdrop-filter:blur(24px) saturate(150%);
-    -webkit-backdrop-filter:blur(24px) saturate(150%);
-    box-shadow:-30px 0 80px rgba(0,0,0,.55);
-    transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.7,.3,1);
+    position:fixed;inset:0;width:100%;z-index:60;
+    background:rgba(15,15,20,.96);
+    backdrop-filter:blur(28px) saturate(160%);
+    -webkit-backdrop-filter:blur(28px) saturate(160%);
+    opacity:0;transform:translateY(12px);pointer-events:none;
+    transition:opacity .25s ease, transform .3s cubic-bezier(.2,.7,.3,1);
     display:flex;flex-direction:column;color:#fff;
   }
-  .msg-panel[data-open="true"]{transform:translateX(0)}
+  .msg-panel[data-open="true"]{opacity:1;transform:translateY(0);pointer-events:auto}
   .msg-head{
     display:flex;align-items:center;justify-content:space-between;
     padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,.06);
@@ -770,7 +769,7 @@
 
   /* Swipe toolbar — floating right side, stacked above msgFab, hover reveals details */
   .swipe-tools{
-    position:fixed;right:18px;bottom:88px;z-index:22;
+    position:fixed;right:18px;bottom:18px;z-index:22;
     display:none;flex-direction:column-reverse;gap:10px;align-items:flex-end;
     pointer-events:none;
   }
@@ -847,7 +846,7 @@
 
   /* My-status floating control — bottom-LEFT, neutral aesthetic */
   .my-status{
-    position:fixed;right:18px;bottom:284px;z-index:23;
+    position:fixed;right:18px;bottom:142px;z-index:23;
     display:none;align-items:center;justify-content:center;
     width:48px;height:48px;padding:0;border-radius:50%;
     background:rgba(22,22,28,.85);
@@ -875,7 +874,7 @@
 
   /* Popover — clean dark, no violet */
   .ms-pop{
-    position:fixed;right:78px;bottom:284px;z-index:24;
+    position:fixed;right:78px;bottom:142px;z-index:24;
     padding:8px;border-radius:16px;min-width:240px;
     background:rgba(22,22,28,.92);
     border:1px solid rgba(255,255,255,.10);
@@ -1657,10 +1656,6 @@
         <span class="stool-ico">🔍</span>
         <span class="stool-lbl"><b id="stoolFilterLbl">Tous</b><small>filtre</small></span>
       </button>
-      <button class="stool-btn" id="stoolMusic" type="button" aria-label="Musique d'ambiance">
-        <span class="stool-ico" id="stoolMusicIco">🎵</span>
-        <span class="stool-lbl"><b id="stoolMusicLbl">Off</b><small>musique</small></span>
-      </button>
       <div class="stool-stats" id="stoolStats">
         <span>👁️ <b id="stoolViewed">0</b> vu</span>
         <span>💚 <b id="stoolLikesGiven">0</b> liké</span>
@@ -1850,6 +1845,10 @@
         <div class="acc-grid2" style="margin-top:14px">
           <div class="acc-field"><label data-i18n="acc_gender">Genre</label><div class="val" id="accGender">—</div></div>
           <div class="acc-field"><label data-i18n="acc_age">Âge</label><div class="val" id="accAge">—</div></div>
+        </div>
+        <div class="acc-field" style="margin-top:14px">
+          <label>🎵 Volume musique d'ambiance <span id="musicVolVal" style="color:#b9bbbe;font-weight:400;margin-left:6px">35%</span></label>
+          <input type="range" id="musicVolume" min="0" max="100" value="35" style="width:100%;accent-color:#9146FF;margin-top:6px" />
         </div>
       </div>
 
@@ -3124,7 +3123,6 @@
             <div class="icon">${activityIcon(p.activity.type)}</div>
             <div class="lbl"><b>${p.activity.title}</b><span>${p.activity.sub}</span></div>
           </div>
-          ${p.games.length ? `<div class="meta">${p.games.map(g => `<span class="chip">🎮 ${g}</span>`).join('')}</div>` : ''}
           <div class="bio"><b>Bio</b>${p.bio}</div>
           <div class="common">
             <span>👥 <b>${p.common.friends}</b> ami${p.common.friends > 1 ? 's' : ''} en commun</span>
@@ -3452,8 +3450,6 @@
       document.getElementById('stoolLikesCount').textContent = LIKED_ME.length;
       const filt = (u.boost && u.genderFilter) || 'all';
       document.getElementById('stoolFilterLbl').textContent = ({all:'Tous', il:'Il', elle:'Elle'}[filt] || 'Tous');
-      const sm = u.swipeMusic;
-      document.getElementById('stoolMusicLbl').textContent = sm ? (sm.title.length>14 ? sm.title.slice(0,13)+'…' : sm.title) : 'Off';
     }
     document.getElementById('stoolLikes').addEventListener('click', () => {
       renderLikedMe();
@@ -3470,21 +3466,6 @@
       ensureDeck();
       refreshSwipeTools();
       showToast('🔍', 'Filtre', {all:'Tous', il:'Hommes (Il)', elle:'Femmes (Elle)'}[next]);
-    });
-    document.getElementById('stoolMusic').addEventListener('click', () => {
-      if (!state.user || !state.user.boost) { openBoostModal(); return; }
-      if (!state.user.swipeMusic) {
-        showToast('🎵', 'Aucune musique', 'Définis-la depuis Mon compte');
-        return;
-      }
-      // Toggle play/pause
-      if (_swipeMusicAudio && !_swipeMusicAudio.paused) {
-        document.getElementById('smToggle').click();
-      } else if (_swipeMusicAudio) {
-        document.getElementById('smToggle').click();
-      } else {
-        startSwipeMusic();
-      }
     });
     function topCard(){ return document.querySelector('#swipeWrap .swipe-card:last-child'); }
     document.getElementById('swipeYes').addEventListener('click', () => { const t = topCard(); if (t) commitSwipe('yes', t); });
@@ -3791,6 +3772,9 @@
       }
       document.getElementById('accGender').textContent  = ({ il:'Il', elle:'Elle', autre:'Préciser / Autre', male:'Il', female:'Elle', nonbinary:'Iel', other:'Autre' }[p.gender] || '—');
       document.getElementById('accAge').textContent     = p.age || '—';
+      const vol = typeof u.musicVolume === 'number' ? u.musicVolume : 0.35;
+      const volSlider = document.getElementById('musicVolume');
+      if (volSlider) { volSlider.value = Math.round(vol * 100); document.getElementById('musicVolVal').textContent = Math.round(vol * 100) + '%'; }
       document.getElementById('accPseudo').value  = u.displayName || '';
       document.getElementById('accBio').value     = p.bio || '';
       document.getElementById('accLookSel').value = p.looking || 'game';
@@ -3983,13 +3967,19 @@
       s.innerHTML=''; s.classList.remove('open');
     }, 200));
 
-    function startSwipeMusic(){
+    async function startSwipeMusic(){
       const sm = state.user && state.user.swipeMusic;
-      if (!sm || !sm.previewUrl) return;
+      if (!sm) return;
       if (_swipeMusicAudio) return;
+      if (!sm.previewUrl) {
+        const parts = (sm.title || '').split(' · ');
+        const itu = await itunesPreview(sm.artist || parts[1] || '', parts[0] || sm.title || '');
+        if (!itu) { showToast('🎵', sm.title || 'Musique', 'Pas de preview disponible'); return; }
+        sm.previewUrl = itu; save();
+      }
       _swipeMusicAudio = new Audio(sm.previewUrl);
       _swipeMusicAudio.loop = true;
-      _swipeMusicAudio.volume = 0.35;
+      _swipeMusicAudio.volume = (state.user && typeof state.user.musicVolume === 'number') ? state.user.musicVolume : 0.35;
       _swipeMusicAudio.play().catch(() => {});
       const box = document.getElementById('swipeMusic');
       document.getElementById('smTitle').textContent = sm.title;
@@ -4211,6 +4201,20 @@
       document.querySelectorAll('#accLangs button').forEach(x => x.classList.toggle('active', x.dataset.val === b.dataset.val));
       refreshAccountPreview();
     });
+
+    // Music volume slider — live update + persistence
+    (function bindMusicVolume(){
+      const sl = document.getElementById('musicVolume');
+      if (!sl) return;
+      sl.addEventListener('input', () => {
+        const v = parseInt(sl.value, 10) / 100;
+        document.getElementById('musicVolVal').textContent = Math.round(v * 100) + '%';
+        if (_swipeMusicAudio) _swipeMusicAudio.volume = v;
+        state.user = state.user || {};
+        state.user.musicVolume = v;
+        save();
+      });
+    })();
 
     document.getElementById('accountChip').addEventListener('click', (e) => { e.preventDefault(); setScreen('account'); });
     document.getElementById('accSave').addEventListener('click', () => {
