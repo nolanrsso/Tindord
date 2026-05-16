@@ -1026,7 +1026,7 @@
     body[data-screen="onboarding"], body[data-screen="swipe"], body[data-screen="account"]{overflow:auto !important}
   }
   .acc-card{
-    width:min(92vw,640px);max-height:calc(100vh - 110px);
+    width:min(96vw,1180px);max-height:calc(100vh - 110px);
     padding:18px 22px;border-radius:24px;display:flex;flex-direction:column;min-height:0;
     background:linear-gradient(180deg, rgba(28,22,58,.78), rgba(18,12,42,.78));
     border:1px solid var(--stroke-2);
@@ -1035,13 +1035,48 @@
     box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
     color:#fff;
   }
-  .acc-head{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-  .acc-avatar{
-    width:84px;height:84px;border-radius:50%;display:grid;place-items:center;
-    font-family:"Clash Display",sans-serif;font-weight:800;font-size:34px;color:#fff;
-    box-shadow:0 0 0 3px rgba(255,255,255,.10) inset, 0 12px 30px rgba(145,70,255,.35);
-    overflow:hidden;flex:0 0 auto;
+  /* 2-column main area: identity left, tab content right */
+  .acc-main{
+    flex:1 1 auto;min-height:0;display:grid;
+    grid-template-columns:300px 1fr;gap:22px;
   }
+  .acc-identity{
+    display:flex;flex-direction:column;gap:14px;
+    padding:18px;border-radius:18px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+    overflow:auto;min-height:0;
+  }
+  .acc-identity .acc-avatar-wrap{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+  }
+  .acc-identity .acc-avatar{
+    width:140px;height:140px;border-radius:50%;display:grid;place-items:center;
+    font-family:"Clash Display",sans-serif;font-weight:800;font-size:54px;color:#fff;
+    box-shadow:0 0 0 3px rgba(255,255,255,.12) inset, 0 14px 40px rgba(145,70,255,.45);
+    overflow:hidden;flex:0 0 auto;cursor:pointer;
+    transition:transform .2s ease;position:relative;
+  }
+  .acc-identity .acc-avatar:hover{transform:scale(1.04)}
+  .acc-identity .acc-avatar::after{
+    content:"📷 Changer";position:absolute;inset:auto 0 0 0;
+    background:linear-gradient(180deg, transparent, rgba(0,0,0,.7));
+    color:#fff;font-size:11px;font-weight:700;padding:18px 6px 8px;
+    text-align:center;opacity:0;transition:opacity .2s ease;
+  }
+  .acc-identity .acc-avatar:hover::after{opacity:1}
+  .acc-identity .acc-name{
+    font-family:"Clash Display",sans-serif;font-weight:700;font-size:20px;text-align:center;margin:0;
+  }
+  .acc-identity .acc-handle{color:var(--ink-dim);font-size:13px;text-align:center;margin:0}
+  .acc-tab-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+  .acc-tab{overflow:auto;padding-right:8px}
+  @media (max-width:900px){
+    .acc-main{grid-template-columns:1fr;gap:14px}
+    .acc-identity{order:0}
+    .acc-identity .acc-avatar{width:96px;height:96px;font-size:38px}
+  }
+  /* Legacy avatar override - used in some non-account contexts */
   .acc-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
   .acc-name{font-family:"Clash Display",sans-serif;font-weight:700;font-size:24px;letter-spacing:-.01em;margin:0}
   .acc-handle{color:var(--ink-dim);font-size:14px;margin:2px 0 0}
@@ -1683,14 +1718,6 @@
        ============================================================ -->
   <section id="screen-account" class="screen">
     <div class="acc-card">
-      <div class="acc-head">
-        <div class="acc-avatar" id="accAvatar">?</div>
-        <div>
-          <h2 class="acc-name" id="accName">—</h2>
-          <p class="acc-handle" id="accHandle">@—</p>
-        </div>
-      </div>
-
       <!-- ✨ Boost banner -->
       <button type="button" class="boost-banner" id="boostBanner">
         <div class="bb-glow"></div>
@@ -1710,11 +1737,32 @@
         <button type="button" class="acc-tab-btn" data-tab="infos">🌐 Infos</button>
       </div>
 
-      <div class="acc-tab-body">
+      <!-- 2-column main: identity (left) + tab content (right) -->
+      <div class="acc-main">
+        <!-- LEFT: identity (avatar, pseudo, bio) — permanent across tabs -->
+        <aside class="acc-identity">
+          <div class="acc-avatar-wrap">
+            <div class="acc-avatar" id="accAvatar" title="Cliquer pour changer">?</div>
+            <input type="file" id="accAvatarFile" accept="image/*" style="display:none" />
+            <h2 class="acc-name" id="accName">—</h2>
+            <p class="acc-handle" id="accHandle">@—</p>
+          </div>
+          <div class="acc-field">
+            <label>Pseudo</label>
+            <input class="acc-input" id="accPseudo" type="text" maxlength="32" placeholder="Tindord_user" />
+          </div>
+          <div class="acc-field">
+            <label>Bio</label>
+            <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
+          </div>
+        </aside>
+
+        <!-- RIGHT: tab content -->
+        <div class="acc-tab-body">
 
       <!-- 🪪 Profil -->
       <div class="acc-section acc-tab" data-tab="profil">
-        <h3>🪪 Profil <span class="pill">LIVE</span></h3>
+        <h3>🪪 Aperçu profil <span class="pill">LIVE</span></h3>
         <div class="preview-card" id="accPreview">
           <div class="pb"></div>
           <div class="pa"><div class="av" id="prevAv">?</div></div>
@@ -1725,24 +1773,14 @@
             <div class="pchips" id="prevChips"></div>
           </div>
         </div>
-        <div class="acc-grid2" style="margin-top:16px">
-          <div class="acc-field">
-            <label>Pseudo</label>
-            <input class="acc-input" id="accPseudo" type="text" maxlength="32" placeholder="Tindord_user" />
-          </div>
-          <div class="acc-field">
-            <label>Je cherche</label>
-            <select class="acc-select" id="accLookSel">
-              <option value="chill">🛋️ Chill</option>
-              <option value="game">🎮 Une game</option>
-              <option value="now">⌨️ Mate maintenant</option>
-              <option value="sleep">💤 Sleepcall</option>
-            </select>
-          </div>
-        </div>
-        <div class="acc-field" style="margin-top:12px">
-          <label>Bio</label>
-          <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
+        <div class="acc-field" style="margin-top:16px">
+          <label>Je cherche</label>
+          <select class="acc-select" id="accLookSel">
+            <option value="chill">🛋️ Chill</option>
+            <option value="game">🎮 Une game</option>
+            <option value="now">⌨️ Mate maintenant</option>
+            <option value="sleep">💤 Sleepcall</option>
+          </select>
         </div>
       </div>
 
@@ -1852,7 +1890,8 @@
         </div>
       </div>
 
-      </div><!-- /acc-tab-body -->
+        </div><!-- /acc-tab-body -->
+      </div><!-- /acc-main -->
 
       <div class="acc-actions">
         <button type="button" class="acc-btn acc-btn--primary" id="accSave" data-i18n="save">Enregistrer</button>
@@ -4201,6 +4240,29 @@
       document.querySelectorAll('#accLangs button').forEach(x => x.classList.toggle('active', x.dataset.val === b.dataset.val));
       refreshAccountPreview();
     });
+
+    // Avatar upload — click avatar to pick a file
+    (function bindAvatarUpload(){
+      const av = document.getElementById('accAvatar');
+      const fi = document.getElementById('accAvatarFile');
+      if (!av || !fi) return;
+      av.addEventListener('click', () => fi.click());
+      fi.addEventListener('change', (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = () => {
+          state.user = state.user || {};
+          state.user.avatarUrl = r.result;
+          save();
+          renderAccount();
+          refreshAccountPreview();
+          showToast('📷', 'Photo de profil', 'Mise à jour');
+        };
+        r.readAsDataURL(f);
+        fi.value = '';
+      });
+    })();
 
     // Music volume slider — live update + persistence
     (function bindMusicVolume(){
