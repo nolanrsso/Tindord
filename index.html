@@ -566,28 +566,13 @@
   .swipe-stage .orbit .orb{
     width:92px;height:92px;border-radius:50%;
     display:grid;place-items:center;
-    border:1.5px solid rgba(255,255,255,.22);
-    backdrop-filter:blur(18px) saturate(150%);
-    -webkit-backdrop-filter:blur(18px) saturate(150%);
-    box-shadow:0 0 30px 6px rgba(255,255,255,.18), 0 18px 40px rgba(13,11,30,.65), 0 0 0 1px rgba(255,255,255,.08) inset;
+    border:1.5px solid rgba(255,255,255,.28);
     cursor:pointer;pointer-events:auto;
-    transition:transform .22s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease, border-color .22s ease;
+    transition:transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s ease, border-color .25s ease;
     color:#fff;position:relative;overflow:visible;
   }
-  /* Soft outer halo glow — drawn behind the orb */
-  .swipe-stage .orbit .orb::after{
-    content:"";position:absolute;inset:-22px;border-radius:50%;
-    background:radial-gradient(circle, var(--orb-glow,rgba(255,255,255,.35)) 0%, transparent 62%);
-    filter:blur(8px);
-    z-index:-1;pointer-events:none;opacity:.85;
-    animation:orbGlowPulse 3.2s ease-in-out infinite;
-  }
-  @keyframes orbGlowPulse{
-    0%,100%{opacity:.7;transform:scale(1)}
-    50%    {opacity:1;transform:scale(1.08)}
-  }
-  /* Need a clipping wrapper for the cover image since orb is now overflow:visible */
-  .swipe-stage .orbit .orb > .orb-cover{clip-path:circle(50%)}
+  /* Cover image must clip to the circle (orb is overflow:visible for glow) */
+  .swipe-stage .orbit .orb > .orb-cover{clip-path:circle(50%);-webkit-clip-path:circle(50%)}
   /* Inner specular shimmer */
   .swipe-stage .orbit .orb::before{
     content:"";position:absolute;inset:0;border-radius:50%;
@@ -599,10 +584,10 @@
   .swipe-stage .orbit .orb svg{width:38px;height:38px;position:relative;z-index:2;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
   .swipe-stage .orbit .orb .orb-cover{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:2}
   /* Kind-specific vibrant gradients */
-  .swipe-stage .orbit .orb[data-kind="voice"]{--orb-glow:rgba(88,101,242,.75);background:linear-gradient(145deg,#7289DA,#5865F2,#9146FF);border-color:rgba(145,70,255,.58);box-shadow:0 0 36px 8px rgba(88,101,242,.55), 0 18px 40px rgba(88,101,242,.5), 0 0 0 1px rgba(255,255,255,.07) inset}
-  .swipe-stage .orbit .orb[data-kind="music"]{--orb-glow:rgba(29,185,84,.7);background:linear-gradient(145deg,#1ed760,#1DB954,#0e7a38);border-color:rgba(29,185,84,.55);box-shadow:0 0 36px 8px rgba(29,185,84,.5), 0 18px 40px rgba(29,185,84,.45), 0 0 0 1px rgba(255,255,255,.07) inset}
-  .swipe-stage .orbit .orb[data-kind="anime"]{--orb-glow:rgba(192,38,211,.7);background:linear-gradient(145deg,#FF9CC0,#FF7EB6,#b020b8);border-color:rgba(192,38,211,.55);box-shadow:0 0 36px 8px rgba(192,38,211,.5), 0 18px 40px rgba(192,38,211,.45), 0 0 0 1px rgba(255,255,255,.07) inset}
-  .swipe-stage .orbit .orb[data-kind="game"] {--orb-glow:rgba(255,79,160,.7);background:linear-gradient(145deg,#FFD080,#FFB66E,#FF4FA0);border-color:rgba(255,79,160,.55);box-shadow:0 0 36px 8px rgba(255,79,160,.5), 0 18px 40px rgba(255,79,160,.45), 0 0 0 1px rgba(255,255,255,.07) inset}
+  .swipe-stage .orbit .orb[data-kind="voice"]{background:linear-gradient(145deg,#7289DA,#5865F2,#9146FF);border-color:rgba(173,140,255,.85);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 -10px 22px rgba(0,0,0,.28), 0 0 0 2px rgba(88,101,242,.30), 0 0 18px 2px rgba(88,101,242,.75), 0 0 48px 10px rgba(88,101,242,.32), 0 14px 30px rgba(0,0,0,.45)}
+  .swipe-stage .orbit .orb[data-kind="music"]{background:linear-gradient(145deg,#1ed760,#1DB954,#0e7a38);border-color:rgba(110,255,160,.85);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 -10px 22px rgba(0,0,0,.28), 0 0 0 2px rgba(29,185,84,.30), 0 0 18px 2px rgba(29,185,84,.75), 0 0 48px 10px rgba(29,185,84,.32), 0 14px 30px rgba(0,0,0,.45)}
+  .swipe-stage .orbit .orb[data-kind="anime"]{background:linear-gradient(145deg,#FF9CC0,#FF7EB6,#b020b8);border-color:rgba(255,180,220,.9);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 -10px 22px rgba(0,0,0,.28), 0 0 0 2px rgba(192,38,211,.30), 0 0 18px 2px rgba(255,126,182,.75), 0 0 48px 10px rgba(192,38,211,.32), 0 14px 30px rgba(0,0,0,.45)}
+  .swipe-stage .orbit .orb[data-kind="game"] {background:linear-gradient(145deg,#FFD080,#FFB66E,#FF4FA0);border-color:rgba(255,200,150,.9);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 -10px 22px rgba(0,0,0,.28), 0 0 0 2px rgba(255,79,160,.30), 0 0 18px 2px rgba(255,182,110,.75), 0 0 48px 10px rgba(255,79,160,.32), 0 14px 30px rgba(0,0,0,.45)}
   .swipe-stage .orbit .orb[data-kind="voice"].playing{animation:voicePulse 1s ease-in-out infinite}
   @keyframes voicePulse{
     0%,100%{box-shadow:0 0 0 4px rgba(145,70,255,.5), 0 0 32px rgba(145,70,255,.75)}
@@ -783,27 +768,52 @@
   .swipe-card .badge-stamp.like {right:18px;color:#03d100;border-color:#03d100;transform:rotate(-12deg);text-shadow:0 0 14px rgba(3,209,0,.6)}
   .swipe-card .badge-stamp.nope {left:18px;color:#ff008c;border-color:#ff008c;transform:rotate(12deg);text-shadow:0 0 14px rgba(255,0,140,.6)}
 
-  /* Swipe toolbar — floating bottom-left, vertical stack */
+  /* Swipe toolbar — floating right side, stacked above msgFab, hover reveals details */
   .swipe-tools{
-    position:fixed;left:18px;bottom:18px;z-index:22;
-    display:none;flex-direction:column;gap:8px;align-items:flex-start;
-    padding:10px;border-radius:18px;background:rgba(22,22,28,.78);
-    border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px) saturate(140%);
-    -webkit-backdrop-filter:blur(20px) saturate(140%);
-    box-shadow:0 10px 28px rgba(0,0,0,.45);
+    position:fixed;right:18px;bottom:88px;z-index:22;
+    display:none;flex-direction:column-reverse;gap:10px;align-items:flex-end;
+    pointer-events:none;
   }
   body[data-screen="swipe"] .swipe-tools{display:flex}
   .stool-btn{
-    display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:14px;
-    border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);
-    color:#fff;font-family:inherit;cursor:pointer;transition:.16s ease;
-    width:100%;justify-content:flex-start;
+    position:relative;
+    display:flex;align-items:center;justify-content:center;
+    width:48px;height:48px;padding:0;border-radius:50%;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(22,22,28,.85);
+    backdrop-filter:blur(20px) saturate(140%);
+    -webkit-backdrop-filter:blur(20px) saturate(140%);
+    box-shadow:0 10px 28px rgba(0,0,0,.45);
+    color:#fff;font-family:inherit;cursor:pointer;
+    pointer-events:auto;
+    transition:transform .22s cubic-bezier(.2,.7,.3,1), border-color .22s ease, background .22s ease;
   }
-  .stool-btn:hover{background:rgba(255,255,255,.07);border-color:rgba(145,70,255,.5);transform:translateX(2px)}
-  .stool-ico{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:15px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);flex:0 0 auto}
-  .stool-lbl{display:flex;flex-direction:column;line-height:1.1;text-align:left}
-  .stool-lbl b{font-family:"Clash Display",sans-serif;font-weight:700;font-size:13px}
-  .stool-lbl small{font-size:9.5px;color:#b9bbbe;text-transform:uppercase;letter-spacing:.06em}
+  .stool-btn:hover{
+    transform:translateX(-3px) scale(1.06);
+    border-color:rgba(145,70,255,.55);
+    background:rgba(28,28,36,.95);
+  }
+  .stool-ico{font-size:18px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+  /* Detail panel slides in from right on hover/active */
+  .stool-lbl{
+    position:absolute;right:calc(100% + 10px);top:50%;
+    transform:translateY(-50%) translateX(10px);
+    display:flex;flex-direction:column;line-height:1.15;
+    background:rgba(22,22,28,.92);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;padding:6px 12px;
+    white-space:nowrap;color:#fff;
+    box-shadow:0 8px 24px rgba(0,0,0,.45);
+    opacity:0;pointer-events:none;
+    transition:opacity .22s ease, transform .22s cubic-bezier(.2,.7,.3,1);
+    backdrop-filter:blur(20px) saturate(140%);
+    -webkit-backdrop-filter:blur(20px) saturate(140%);
+  }
+  .stool-btn:hover .stool-lbl,
+  .stool-btn:focus-visible .stool-lbl,
+  .stool-btn.is-open .stool-lbl{opacity:1;transform:translateY(-50%) translateX(0);pointer-events:auto}
+  .stool-lbl b{font-family:"Clash Display",sans-serif;font-weight:700;font-size:13px;color:#fff}
+  .stool-lbl small{font-size:10px;color:#b9bbbe;text-transform:uppercase;letter-spacing:.06em}
   .stool-stats{display:none}
 
   /* Action buttons — blended with the "draggable gradient icon" aesthetic */
@@ -837,7 +847,7 @@
 
   /* My-status floating control — bottom-LEFT, neutral aesthetic */
   .my-status{
-    position:fixed;right:18px;bottom:88px;z-index:23;
+    position:fixed;right:18px;bottom:284px;z-index:23;
     display:none;align-items:center;justify-content:center;
     width:48px;height:48px;padding:0;border-radius:50%;
     background:rgba(22,22,28,.85);
@@ -865,7 +875,7 @@
 
   /* Popover — clean dark, no violet */
   .ms-pop{
-    position:fixed;right:18px;bottom:148px;z-index:24;
+    position:fixed;right:78px;bottom:284px;z-index:24;
     padding:8px;border-radius:16px;min-width:240px;
     background:rgba(22,22,28,.92);
     border:1px solid rgba(255,255,255,.10);
@@ -1311,7 +1321,7 @@
   }
   .acc-orb-del:hover{background:#ff4f80;border-color:#ff4f80;color:#fff}
   /* film kind for swipe orbit */
-  .swipe-stage .orbit .orb[data-kind="film"]{--orb-glow:rgba(124,58,237,.7);background:linear-gradient(145deg,#a78bfa,#7c3aed,#4c1d95);border-color:rgba(124,58,237,.55);box-shadow:0 0 36px 8px rgba(124,58,237,.5), 0 18px 40px rgba(124,58,237,.45), 0 0 0 1px rgba(255,255,255,.07) inset}
+  .swipe-stage .orbit .orb[data-kind="film"]{background:linear-gradient(145deg,#a78bfa,#7c3aed,#4c1d95);border-color:rgba(196,165,255,.85);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 -10px 22px rgba(0,0,0,.28), 0 0 0 2px rgba(124,58,237,.30), 0 0 18px 2px rgba(167,139,250,.75), 0 0 48px 10px rgba(124,58,237,.32), 0 14px 30px rgba(0,0,0,.45)}
 
   /* Auth modal */
   .auth-backdrop{
