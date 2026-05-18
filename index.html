@@ -668,8 +668,8 @@
     pointer-events:none;
   }
   .swipe-card .avatar-wrap{
-    position:absolute;left:20px;top:56px;width:108px;height:108px;border-radius:50%;
-    padding:7px;background:#1c1d22;display:grid;place-items:center;
+    position:absolute;left:20px;top:30px;width:108px;height:108px;border-radius:50%;
+    padding:7px;background:#1c1d22;display:grid;place-items:center;z-index:5;
   }
   .swipe-card .avatar-wrap .avi{
     width:100%;height:100%;border-radius:50%;display:grid;place-items:center;
@@ -785,14 +785,17 @@
   }
   .card-badge img{width:14px;height:14px;object-fit:contain;image-rendering:crisp-edges}
 
-  /* Social connections on card */
-  .card-socials{display:flex;flex-direction:column;gap:4px;margin-top:-4px}
+  /* Social connections on card (clickable links) */
+  .card-socials{display:flex;flex-direction:column;gap:4px;margin-top:-4px;position:relative;z-index:6}
   .card-social{
     display:flex;align-items:center;gap:6px;
     font-size:11.5px;color:#b9bbbe;font-weight:500;
-    padding:3px 0;
+    padding:3px 4px;border-radius:6px;
+    text-decoration:none;transition:background .15s, color .15s, transform .15s;
+    cursor:pointer;
   }
-  .card-social svg{flex:0 0 auto;opacity:.8}
+  .card-social:hover{background:rgba(255,255,255,.08);color:#fff;transform:translateX(2px)}
+  .card-social svg{flex:0 0 auto;opacity:.85}
   .card-social[data-kind="instagram"] svg{color:#e1306c}
   .card-social[data-kind="tiktok"] svg{color:#fff}
   .card-social[data-kind="spotify"] svg{color:#1DB954}
@@ -1228,11 +1231,10 @@
   .acc-actions{display:flex;align-items:center;gap:12px}
   .boost-banner--inline{flex:1 1 auto;margin-bottom:0 !important;min-width:0}
 
-  /* 2-column Profil (left preview, right settings) */
-  .acc-tab--2col:not([hidden]){display:grid !important;grid-template-columns:minmax(280px,360px) 1fr;gap:16px;align-content:start;height:100%;overflow:hidden}
-  .acc-tab--2col .acc-col-left,
-  .acc-tab--2col .acc-col-right{min-width:0;display:flex;flex-direction:column;gap:6px;overflow:hidden}
-  @media (max-width:820px){ .acc-tab--2col:not([hidden]){grid-template-columns:1fr;overflow:auto} }
+  /* 2-column Profil tab: Pseudo/Bio left, Couleur right */
+  .acc-profil-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  .acc-profil-col{display:flex;flex-direction:column;gap:6px;min-width:0}
+  @media (max-width:780px){ .acc-profil-grid{grid-template-columns:1fr} }
 
   /* 2-column Boost */
   .acc-tab[data-tab="boost"]:not([hidden]){display:grid !important;grid-template-columns:1fr 1fr;gap:8px 18px;align-content:start;height:100%}
@@ -1999,31 +2001,19 @@
         <button type="button" class="acc-tab-btn" data-tab="infos">Paramètres</button>
       </div>
 
-      <!-- 2-column main: profile card preview (left, all tabs) + tab content (right) -->
+      <!-- Main: profile card preview (left, all tabs) + tab content (right) -->
       <div class="acc-main">
         <!-- LEFT: profile card preview — visible on all tabs -->
         <aside class="acc-identity">
           <h3 style="margin:0 0 8px;text-align:left">Aperçu du profil</h3>
-          <!-- Real swipe-card mini clone, rebuilt by refreshAccountPreview() -->
           <div class="acc-preview-wrap" id="accPreview" aria-label="Aperçu de ta carte"></div>
-          <!-- Hidden fields populated by previous logic to avoid null-refs -->
+          <!-- Hidden DOM placeholders (some legacy code reads these IDs) -->
           <div style="display:none">
             <div id="prevBanner"></div><div id="prevAv">?</div>
             <img id="prevDeco" src=""><div id="prevBadgeRow"></div>
             <span id="prevName"></span><span id="prevAge"></span>
             <span id="prevHandle"></span><span id="prevBio"></span>
             <div id="prevSocials"></div><div id="prevChips"></div>
-          </div>
-          <div class="acc-field" style="margin-top:8px">
-            <label>Pseudo</label>
-            <input class="acc-input" id="accPseudo" type="text" maxlength="32" placeholder="Tindord_user" />
-          </div>
-          <div class="acc-field">
-            <label>Bio</label>
-            <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
-          </div>
-          <!-- Hidden originals (avoid duplicate IDs) -->
-          <div style="display:none">
             <span id="accAvatar"></span><span id="accName"></span><span id="accHandle"></span>
             <input type="file" id="accAvatarFile" accept="image/*" />
           </div>
@@ -2033,8 +2023,19 @@
         <div class="acc-tab-body">
 
       <!-- 🪪 Profil -->
-      <div class="acc-section acc-tab" data-tab="profil">
-        <div class="acc-field">
+      <div class="acc-section acc-tab acc-tab--profil" data-tab="profil">
+        <div class="acc-profil-grid">
+        <div class="acc-profil-col">
+          <div class="acc-field">
+            <label>Pseudo</label>
+            <input class="acc-input" id="accPseudo" type="text" maxlength="32" placeholder="Tindord_user" />
+          </div>
+          <div class="acc-field">
+            <label>Bio</label>
+            <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
+          </div>
+        </div>
+        <div class="acc-profil-col">
           <label style="display:block">Couleur de profil <small style="color:#b9bbbe;font-weight:400">(corps de la carte, sous la bannière)</small></label>
           <div class="acc-color-section">
             <div class="acc-color-pair">
@@ -2073,13 +2074,15 @@
             </div>
           </div>
         </div>
-        <div class="acc-field" style="margin-top:16px">
-          <label style="margin-top:10px;display:block">Synchronisation Discord</label>
+        </div><!-- /right col -->
+        </div><!-- /acc-profil-grid -->
+
+        <div class="acc-field" style="margin-top:14px">
           <button type="button" class="acc-btn acc-btn--ghost acc-resync-btn" id="accResyncDiscord" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="accResyncIco"><path d="M3 12a9 9 0 0 1 15.5-6.4L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.4L3 16"/><path d="M3 21v-5h5"/></svg>
             <span id="accResyncLabel">Remettre à jour mon compte Discord</span>
           </button>
-          <small id="accResyncHint" style="color:#b9bbbe;font-weight:400;font-size:11.5px;display:block;margin-top:6px">Récupère ton avatar, bannière, décoration et badges depuis Discord</small>
+          <small id="accResyncHint" style="color:#b9bbbe;font-weight:400;font-size:11.5px;display:block;margin-top:4px">Récupère ton avatar, bannière, décoration et badges depuis Discord</small>
         </div>
         <select class="acc-select" id="accLookSel" style="display:none">
           <option value="chill">🛋️ Chill</option>
@@ -3633,10 +3636,15 @@
       const decoHtml = p.decorationUrl ? `<img class="avi-deco" src="${p.decorationUrl}" alt="">` : '';
       const badgeRowHtml = renderBadgeRow(p.publicFlags, p.premiumType);
       const s = p.socials || {};
-      const socialHtml = (s.instagram || s.tiktok || s.spotify) ? `<div class="card-socials">
-        ${s.instagram ? `<div class="card-social" data-kind="instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg><span>@${escapeHtmlMini(s.instagram)}</span></div>` : ''}
-        ${s.tiktok ? `<div class="card-social" data-kind="tiktok"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.5a6.5 6.5 0 0 1-3.8-1.2v8.3a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v3.1a2.9 2.9 0 1 0 2 2.7V2h3a3.5 3.5 0 0 0 3.8 3.5v2z"/></svg><span>@${escapeHtmlMini(s.tiktok)}</span></div>` : ''}
-        ${s.spotify ? `<div class="card-social" data-kind="spotify"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Z"/></svg><span>${escapeHtmlMini(s.spotify)}</span></div>` : ''}
+      const cleanHandle = (h) => (h || '').replace(/^@+/, '').trim();
+      const igH = cleanHandle(s.instagram), ttH = cleanHandle(s.tiktok), spH = cleanHandle(s.spotify);
+      const igUrl = igH ? `https://instagram.com/${encodeURIComponent(igH)}` : null;
+      const ttUrl = ttH ? `https://www.tiktok.com/@${encodeURIComponent(ttH)}` : null;
+      const spUrl = spH ? `https://open.spotify.com/user/${encodeURIComponent(spH)}` : null;
+      const socialHtml = (igUrl || ttUrl || spUrl) ? `<div class="card-socials">
+        ${igUrl ? `<a href="${igUrl}" target="_blank" rel="noopener" class="card-social" data-kind="instagram" title="Voir le profil Instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg><span>@${escapeHtmlMini(igH)}</span></a>` : ''}
+        ${ttUrl ? `<a href="${ttUrl}" target="_blank" rel="noopener" class="card-social" data-kind="tiktok" title="Voir le profil TikTok"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.5a6.5 6.5 0 0 1-3.8-1.2v8.3a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v3.1a2.9 2.9 0 1 0 2 2.7V2h3a3.5 3.5 0 0 0 3.8 3.5v2z"/></svg><span>@${escapeHtmlMini(ttH)}</span></a>` : ''}
+        ${spUrl ? `<a href="${spUrl}" target="_blank" rel="noopener" class="card-social" data-kind="spotify" title="Voir le profil Spotify"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Z"/></svg><span>${escapeHtmlMini(spH)}</span></a>` : ''}
       </div>` : '';
       c.innerHTML = `
         <div class="badge-stamp like">LIKE</div>
@@ -3931,6 +3939,9 @@
       const like = card.querySelector('.badge-stamp.like');
       const nope = card.querySelector('.badge-stamp.nope');
       function onDown(e){
+        // Don't start a drag if user is clicking an interactive element (links, buttons)
+        const tgt = e.target;
+        if (tgt && (tgt.closest('a') || tgt.closest('button'))) return;
         dragging = true;
         const p = e.touches ? e.touches[0] : e;
         sx = p.clientX; sy = p.clientY; dx = 0; dy = 0;
