@@ -668,15 +668,14 @@
     pointer-events:none;
   }
   .swipe-card .avatar-wrap{
-    /* Discord style 50/50: avatar centered on the banner bottom edge.
-       Banner 120px, avatar 108px → top:66 puts center at y=120 = banner edge. */
-    position:absolute;left:20px;top:66px;width:108px;height:108px;border-radius:50%;
-    padding:7px;background:#1c1d22;display:grid;place-items:center;z-index:5;
+    /* Avatar 1.3x (108 → 140px), positioned slightly lower than 50/50 */
+    position:absolute;left:20px;top:74px;width:140px;height:140px;border-radius:50%;
+    padding:8px;background:#1c1d22;display:grid;place-items:center;z-index:5;
     transform:none;
   }
   .swipe-card .avatar-wrap .avi{
     width:100%;height:100%;border-radius:50%;display:grid;place-items:center;
-    font-family:"Clash Display",sans-serif;font-weight:800;font-size:40px;color:#fff;
+    font-family:"Clash Display",sans-serif;font-weight:800;font-size:52px;color:#fff;
     position:relative;z-index:2;
   }
   /* Nitro decoration — animated rainbow conic ring on top of the avatar */
@@ -708,7 +707,7 @@
   .swipe-card .status-dot.offline{background:#747f8d}
 
   .swipe-card .body{
-    flex:1 1 auto;padding:64px 18px 60px;display:flex;flex-direction:column;gap:12px;
+    flex:1 1 auto;padding:108px 18px 60px;display:flex;flex-direction:column;gap:12px;
     overflow:hidden;position:relative;
   }
   .swipe-card .joined{color:#7c7e8c;font-size:11.5px;display:flex;align-items:center;gap:6px;margin-top:2px}
