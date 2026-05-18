@@ -998,9 +998,26 @@
   .acc-tab-btn.active .tab-count{background:rgba(255,255,255,.30)}
 
   /* Identity panel (now profile card preview) — visible on ALL tabs */
-  body[data-screen="account"] .acc-identity{display:flex !important;flex-direction:column;gap:8px}
+  body[data-screen="account"] .acc-identity{display:flex !important;flex-direction:column;gap:8px;min-height:0}
   .acc-identity > h3{font-size:14px !important}
-  .acc-identity .preview-card{margin:0 !important;max-width:none !important}
+  .acc-preview-wrap{
+    width:100%;flex:1 1 auto;min-height:0;
+    position:relative;border-radius:16px;overflow:hidden;
+  }
+  .acc-preview-wrap .swipe-card.preview-mode{
+    position:relative !important;inset:auto !important;width:100%;height:100%;
+    transform:none !important;cursor:default !important;animation:none !important;
+  }
+  .acc-preview-wrap .swipe-card .badge-stamp,
+  .acc-preview-wrap .swipe-card .badge-picker-btn{display:none !important}
+  /* Animated avatar decoration (Discord APNG) */
+  .swipe-card .avi-deco{animation:none}
+  /* Animated profile decoration ring — when no real Discord deco, gentle glow */
+  .swipe-card .avatar-wrap.has-deco::before{
+    content:'';position:absolute;inset:-3px;border-radius:50%;
+    background:conic-gradient(from 0deg, rgba(255,255,255,0), rgba(145,70,255,.55), rgba(91,233,255,.55), rgba(255,126,182,.55), rgba(255,255,255,0));
+    filter:blur(4px);opacity:.55;animation:nitroSpin 8s linear infinite;z-index:0;pointer-events:none;
+  }
 
   /* Danger zone in Paramètres */
   .acc-danger-zone{display:flex;flex-direction:column;gap:8px;margin-top:8px}
@@ -1967,20 +1984,15 @@
         <!-- LEFT: profile card preview — visible on all tabs -->
         <aside class="acc-identity">
           <h3 style="margin:0 0 8px;text-align:left">Aperçu du profil</h3>
-          <div class="preview-card" id="accPreview">
-            <div class="pb" id="prevBanner"></div>
-            <div class="pa">
-              <div class="av" id="prevAv">?</div>
-              <img class="prev-deco" id="prevDeco" src="" alt="" style="display:none">
-            </div>
-            <div class="pbody">
-              <div class="prev-badge-row" id="prevBadgeRow" style="display:none"></div>
-              <div class="pn"><b id="prevName">—</b><span id="prevAge"></span></div>
-              <div class="ph" id="prevHandle">@—</div>
-              <div class="pbio" id="prevBio">—</div>
-              <div class="prev-socials" id="prevSocials"></div>
-              <div class="pchips" id="prevChips"></div>
-            </div>
+          <!-- Real swipe-card mini clone, rebuilt by refreshAccountPreview() -->
+          <div class="acc-preview-wrap" id="accPreview" aria-label="Aperçu de ta carte"></div>
+          <!-- Hidden fields populated by previous logic to avoid null-refs -->
+          <div style="display:none">
+            <div id="prevBanner"></div><div id="prevAv">?</div>
+            <img id="prevDeco" src=""><div id="prevBadgeRow"></div>
+            <span id="prevName"></span><span id="prevAge"></span>
+            <span id="prevHandle"></span><span id="prevBio"></span>
+            <div id="prevSocials"></div><div id="prevChips"></div>
           </div>
           <div class="acc-field" style="margin-top:8px">
             <label>Pseudo</label>
@@ -4298,51 +4310,24 @@
       if (typeof window.__resetSaveSnapshot === 'function') window.__resetSaveSnapshot();
     }
     function refreshAccountPreview(){
-      const u = state.user || {};
-      const p = state.profile || {};
-      const pseudo = (document.getElementById('accPseudo').value || u.displayName || 'Tindord_user').trim();
-      const bio    = (document.getElementById('accBio').value || '').trim() || '—';
-      const look   = document.getElementById('accLookSel').value;
-      // Banner — profileColor (user choice) overrides everything
-      const banner = document.getElementById('prevBanner');
-      if (banner) {
-        const cc = u.profileColor;
-        if (cc && cc !== 'discord') { banner.style.backgroundImage = ''; banner.style.background = cc; }
-        else if (u.bannerUrl) { banner.style.backgroundImage = `url('${u.bannerUrl}')`; banner.style.backgroundSize = 'cover'; banner.style.backgroundPosition = 'center'; banner.style.background = ''; }
-        else if (u.accentColor) { banner.style.background = `#${u.accentColor.toString(16).padStart(6,'0')}`; banner.style.backgroundImage = ''; }
-        else { banner.style.backgroundImage = ''; banner.style.background = 'linear-gradient(135deg,#5865F2,#9146FF)'; }
-      }
-      // Avatar
-      const av = document.getElementById('prevAv');
-      if (u.avatarUrl) { av.innerHTML = `<img src="${u.avatarUrl}">`; av.style.background = 'none'; }
-      else { av.textContent = (pseudo || 'T').charAt(0).toUpperCase(); av.style.background = 'linear-gradient(135deg,#FF7EB6,#9146FF)'; }
-      // Decoration
-      const deco = document.getElementById('prevDeco');
-      if (deco) { if (u.decorationUrl) { deco.src = u.decorationUrl; deco.style.display = ''; } else { deco.style.display = 'none'; } }
-      // Badges
-      const badgeRow = document.getElementById('prevBadgeRow');
-      if (badgeRow) { badgeRow.innerHTML = renderBadgeRow(u.publicFlags, u.premiumType); }
-      // Name + handle + bio
-      document.getElementById('prevName').textContent = pseudo;
-      document.getElementById('prevAge').textContent  = p.age ? ' · ' + p.age : '';
-      document.getElementById('prevHandle').textContent = u.discordTag ? '@' + u.discordTag : (u.email || '');
-      document.getElementById('prevBio').textContent = bio;
-      // Social connections
-      const prevSoc = document.getElementById('prevSocials');
-      if (prevSoc) {
-        const s = u.socials || {};
-        prevSoc.innerHTML = [
-          s.instagram ? `<div class="prev-social" data-kind="instagram"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg><span>@${escapeHtmlMini(s.instagram)}</span></div>` : '',
-          s.tiktok ? `<div class="prev-social" data-kind="tiktok"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.5a6.5 6.5 0 0 1-3.8-1.2v8.3a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v3.1a2.9 2.9 0 1 0 2 2.7V2h3a3.5 3.5 0 0 0 3.8 3.5v2z"/></svg><span>@${escapeHtmlMini(s.tiktok)}</span></div>` : '',
-          s.spotify ? `<div class="prev-social" data-kind="spotify"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Z"/></svg><span>${escapeHtmlMini(s.spotify)}</span></div>` : '',
-        ].join('');
-      }
-      // Orb chips
-      const chips = [];
-      const lookLabel = { chill:tx('look_chill'), game:tx('look_game'), now:tx('look_now'), sleep:tx('look_sleep') }[look];
-      if (lookLabel) chips.push(lookLabel);
-      (p.userOrbs || []).forEach(o => chips.push(o.title));
-      document.getElementById('prevChips').innerHTML = chips.map(c => `<span>${escapeHtmlMini(c)}</span>`).join('');
+      const wrap = document.getElementById('accPreview');
+      if (!wrap) return;
+      // Sync transient form values into state so buildUserProfile picks them up
+      const pseudoEl = document.getElementById('accPseudo');
+      const bioEl    = document.getElementById('accBio');
+      state.user = state.user || {};
+      state.profile = state.profile || {};
+      if (pseudoEl && pseudoEl.value.trim()) state.user.displayName = pseudoEl.value.trim();
+      if (bioEl) state.profile.bio = bioEl.value.trim();
+      const myP = (typeof buildUserProfile === 'function') ? buildUserProfile() : null;
+      if (!myP) return;
+      // Render a non-draggable mini swipe-card
+      wrap.innerHTML = '';
+      const card = buildCard(myP, false);
+      // Strip the "background card" styling (opacity, scale, etc.)
+      card.style.cssText += ';position:relative !important;inset:auto !important;opacity:1 !important;transform:none !important;cursor:default !important;pointer-events:auto';
+      card.classList.add('preview-mode');
+      wrap.appendChild(card);
     }
     ['accPseudo','accBio','accLookSel'].forEach(id => {
       const el = document.getElementById(id);
