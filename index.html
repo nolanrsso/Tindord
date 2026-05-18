@@ -2204,23 +2204,73 @@
     : null;
   window.__supa = supa;
 
-  /* Build the user payload Tindord expects from a Supabase session. */
-  function userFromSupabaseSession(session){
+  /* Fetch full Discord profile (banner, badges, decoration) via provider token.
+     Supabase only mirrors a subset of fields into user_metadata, so we hit
+     Discord directly with the OAuth access token to get the rest. */
+  async function fetchDiscordProfile(accessToken){
+    if (!accessToken) return null;
+    try {
+      const r = await fetch('https://discord.com/api/v10/users/@me', {
+        headers: { Authorization: 'Bearer ' + accessToken },
+      });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch { return null; }
+  }
+  function discordBannerUrl(id, hash){
+    if (!id || !hash) return null;
+    const ext = hash.startsWith('a_') ? 'gif' : 'png';
+    return `https://cdn.discordapp.com/banners/${id}/${hash}.${ext}?size=600`;
+  }
+  function discordAvatarUrl(id, hash){
+    if (!id || !hash) return null;
+    const ext = hash.startsWith('a_') ? 'gif' : 'png';
+    return `https://cdn.discordapp.com/avatars/${id}/${hash}.${ext}?size=256`;
+  }
+  function discordDecorationUrl(asset){
+    return asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${asset}.png?passthrough=false` : null;
+  }
+
+  /* Build the user payload Tindord expects from a Supabase session.
+     If we have a provider_token, we enrich with a direct Discord API call so
+     we always get banner / decoration / public_flags / premium_type / accent_color. */
+  async function userFromSupabaseSession(session){
     if (!session || !session.user) return null;
     const u = session.user;
     const m = u.user_metadata || {};
-    const id = m.provider_id || m.sub || u.id;
-    const avatar_url = m.avatar_url || null;
-    const banner_hash = m.banner || null;
-    const banner_url  = banner_hash && id ? `https://cdn.discordapp.com/banners/${id}/${banner_hash}.${banner_hash.startsWith('a_') ? 'gif' : 'png'}?size=600` : null;
-    const deco = m.avatar_decoration_data || m.custom_claims?.avatar_decoration_data;
-    const decoration_url = deco?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${deco.asset}.png?passthrough=false` : null;
-    const public_flags = m.public_flags || 0;
-    const premium_type = m.premium_type || 0;
-    const accent_color = m.accent_color || null;
+    let id = m.provider_id || m.sub || u.id;
+
+    // Defaults from Supabase metadata (always present)
+    let avatar_url = m.avatar_url || null;
+    let banner_url = discordBannerUrl(id, m.banner);
+    let deco = m.avatar_decoration_data || m.custom_claims?.avatar_decoration_data;
+    let decoration_url = discordDecorationUrl(deco?.asset);
+    let public_flags = m.public_flags || 0;
+    let premium_type = m.premium_type || 0;
+    let accent_color = m.accent_color || null;
+    let displayName = m.global_name || m.full_name || m.name || m.user_name || 'Discord user';
+    let discordTag  = (m.user_name || m.preferred_username || m.name || '').replace(/#0$/, '') || null;
+
+    // Enrich from Discord API if provider_token is available
+    const token = session.provider_token;
+    if (token) {
+      const d = await fetchDiscordProfile(token);
+      if (d) {
+        id = d.id || id;
+        if (d.avatar) avatar_url = discordAvatarUrl(d.id, d.avatar);
+        if (d.banner) banner_url = discordBannerUrl(d.id, d.banner);
+        if (d.avatar_decoration_data?.asset) decoration_url = discordDecorationUrl(d.avatar_decoration_data.asset);
+        public_flags = (typeof d.public_flags === 'number') ? d.public_flags : public_flags;
+        premium_type = (typeof d.premium_type === 'number') ? d.premium_type : premium_type;
+        accent_color = (typeof d.accent_color === 'number') ? d.accent_color : accent_color;
+        displayName  = d.global_name || d.username || displayName;
+        discordTag   = (d.username || '').replace(/#0$/, '') || discordTag;
+      }
+    }
+
     return {
-      displayName: m.global_name || m.full_name || m.name || m.user_name || 'Discord user',
-      discordTag:  (m.user_name || m.preferred_username || m.name || '').replace(/#0$/, '') || null,
+      displayName,
+      discordTag,
       discordId:   id,
       email:       u.email || m.email || null,
       avatarUrl:   avatar_url,
@@ -4697,13 +4747,13 @@
       try {
         const { data: { session } } = await window.__supa.auth.getSession();
         if (session) {
-          const u = userFromSupabaseSession(session);
+          const u = await userFromSupabaseSession(session);
           if (u) window.__tindord.onLogin(u);
         }
         // Keep state in sync if user signs in/out in another tab
-        window.__supa.auth.onAuthStateChange((_event, s) => {
+        window.__supa.auth.onAuthStateChange(async (_event, s) => {
           if (s) {
-            const u = userFromSupabaseSession(s);
+            const u = await userFromSupabaseSession(s);
             if (u) window.__tindord.onLogin(u);
           }
         });
