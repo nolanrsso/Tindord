@@ -754,6 +754,50 @@
     background:#2b2d31;border-radius:10px;padding:10px 12px;
   }
   .swipe-card .bio b{color:#fff;display:block;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+  /* Avatar decoration overlay */
+  .swipe-card .avatar-wrap{position:relative}
+  .swipe-card .avi-deco{
+    position:absolute;inset:-12px;width:calc(100% + 24px);height:calc(100% + 24px);
+    object-fit:contain;pointer-events:none;z-index:3;
+  }
+
+  /* Discord badges row on card */
+  .card-badge-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+  .card-badge{
+    width:20px;height:20px;border-radius:4px;
+    background:#111;display:grid;place-items:center;
+    box-shadow:0 2px 6px rgba(0,0,0,.5);
+  }
+  .card-badge img{width:14px;height:14px;object-fit:contain;image-rendering:crisp-edges}
+
+  /* Social connections on card */
+  .card-socials{display:flex;flex-direction:column;gap:4px;margin-top:-4px}
+  .card-social{
+    display:flex;align-items:center;gap:6px;
+    font-size:11.5px;color:#b9bbbe;font-weight:500;
+    padding:3px 0;
+  }
+  .card-social svg{flex:0 0 auto;opacity:.8}
+  .card-social[data-kind="instagram"] svg{color:#e1306c}
+  .card-social[data-kind="tiktok"] svg{color:#fff}
+  .card-social[data-kind="spotify"] svg{color:#1DB954}
+
+  /* Badge picker button — bottom-left of card */
+  .badge-picker-btn{
+    position:absolute;left:14px;bottom:14px;
+    width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;
+    display:grid;place-items:center;
+    background:#111;
+    box-shadow:0 8px 22px rgba(0,0,0,.5), 0 0 0 3px #1c1d22, 0 0 0 4px rgba(255,255,255,.08);
+    z-index:4;transition:transform .18s ease, background .18s ease;
+  }
+  .badge-picker-btn::after{
+    content:'';display:block;width:18px;height:18px;
+    background:url('https://cdn.discordapp.com/badge-icons/nitro.png') center/contain no-repeat;
+    opacity:.85;
+  }
+  .badge-picker-btn:hover{transform:scale(1.08);background:#1a1a1a}
+
   .swipe-card .common{display:flex;gap:14px;color:#b9bbbe;font-size:12px;margin-top:auto}
   .swipe-card .common b{color:#fff;font-weight:700}
 
@@ -986,24 +1030,36 @@
   .acc-social-row button:hover{background:rgba(255,255,255,.12)}
   .acc-social-row button.connected{background:rgba(59,209,124,.18);border-color:rgba(59,209,124,.4);color:#9CF0BD}
 
-  /* Mini profile preview (mirrors a swipe-card at smaller size) */
+  /* Mini profile preview — Discord-style */
   .preview-card{
-    width:100%;max-width:340px;margin:6px auto 0;border-radius:18px;overflow:hidden;
+    width:100%;max-width:340px;margin:6px auto 0;border-radius:18px;overflow:visible;
     background:#1c1d22;border:1px solid rgba(255,255,255,.06);
-    box-shadow:0 18px 40px rgba(0,0,0,.5);
+    box-shadow:0 18px 40px rgba(0,0,0,.5);position:relative;
   }
-  .preview-card .pb{height:64px;background:linear-gradient(135deg,#5865F2,#9146FF);position:relative}
+  .preview-card .pb{height:80px;background:linear-gradient(135deg,#5865F2,#9146FF);position:relative;background-size:cover;background-position:center;border-radius:18px 18px 0 0;overflow:hidden}
   .preview-card .pa{
-    position:absolute;left:14px;top:38px;width:64px;height:64px;border-radius:50%;padding:4px;
-    background:#1c1d22;display:grid;place-items:center;
+    position:absolute;left:14px;top:44px;width:72px;height:72px;border-radius:50%;padding:4px;
+    background:#1c1d22;display:grid;place-items:center;z-index:2;
   }
+  .preview-card .prev-deco{
+    position:absolute;inset:-14px;width:calc(100% + 28px);height:calc(100% + 28px);
+    object-fit:contain;pointer-events:none;z-index:3;
+  }
+  .preview-card .prev-badge-row{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px}
+  .preview-card .prev-badge-row .card-badge{width:18px;height:18px;border-radius:3px}
+  .preview-card .prev-badge-row .card-badge img{width:12px;height:12px}
+  .prev-socials{display:flex;flex-direction:column;gap:3px;margin:6px 0 0}
+  .prev-social{display:flex;align-items:center;gap:5px;font-size:10.5px;color:#b9bbbe}
+  .prev-social[data-kind="instagram"] svg{color:#e1306c}
+  .prev-social[data-kind="tiktok"] svg{color:#fff}
+  .prev-social[data-kind="spotify"] svg{color:#1DB954}
   .preview-card .pa .av{
     width:100%;height:100%;border-radius:50%;display:grid;place-items:center;
     font-family:"Clash Display",sans-serif;font-weight:800;font-size:22px;color:#fff;
     background:linear-gradient(135deg,#FF7EB6,#9146FF);
   }
   .preview-card .pa .av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
-  .preview-card .pbody{padding:30px 14px 14px;color:#fff}
+  .preview-card .pbody{padding:46px 14px 14px;color:#fff}
   .preview-card .pn{display:flex;align-items:baseline;gap:6px}
   .preview-card .pn b{font-family:"Clash Display",sans-serif;font-weight:700;font-size:18px}
   .preview-card .pn span{color:#b9bbbe;font-size:14px}
@@ -1105,6 +1161,12 @@
   .acc-btn--primary:hover{transform:translateY(-1px)}
   .acc-btn--ghost{background:rgba(255,255,255,.05);color:#fff;border:1px solid var(--stroke-2)}
   .acc-btn--ghost:hover{background:rgba(255,255,255,.10)}
+  .acc-btn--discord{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:11px 14px;border-radius:12px;border:1px solid rgba(88,101,242,.45);
+    background:rgba(88,101,242,.15);color:#fff;text-decoration:none;transition:.16s ease;flex:0 0 auto;
+  }
+  .acc-btn--discord:hover{background:rgba(88,101,242,.30);border-color:rgba(88,101,242,.75)}
   .acc-btn--danger{background:rgba(255,79,160,.12);color:#FF7EB6;border:1px solid rgba(255,79,160,.35);margin-left:auto}
   .acc-btn--danger:hover{background:rgba(255,79,160,.22)}
   .acc-msg{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;display:none;background:rgba(59,209,124,.12);border:1px solid rgba(59,209,124,.35);color:#9CF0BD}
@@ -1190,6 +1252,38 @@
   .sm-info b{display:block;font-size:12.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .sm-info small{font-size:10.5px;color:#b9bbbe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
   .sm-btn{width:32px;height:32px;border-radius:50%;border:none;background:linear-gradient(180deg,#1DB954,#15803d);color:#fff;cursor:pointer;display:grid;place-items:center;flex:0 0 auto}
+
+  /* ===== Badge picker panel ===== */
+  .badge-picker-panel{
+    position:fixed;inset:0;z-index:310;display:none;align-items:flex-end;justify-content:center;
+    padding:0 0 80px;
+  }
+  .badge-picker-panel[data-open="true"]{display:flex;animation:authIn .18s ease-out}
+  .bpp-backdrop{position:absolute;inset:0;background:rgba(8,9,14,.72);backdrop-filter:blur(6px)}
+  .bpp-card{
+    position:relative;z-index:1;
+    background:#1c1d22;border:1px solid rgba(255,255,255,.08);border-radius:18px;
+    padding:16px;width:min(92vw,420px);
+    box-shadow:0 24px 60px rgba(0,0,0,.6);
+    animation:authCardIn .22s cubic-bezier(.2,.7,.3,1);
+  }
+  .bpp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .bpp-close{
+    width:28px;height:28px;border-radius:50%;border:none;
+    background:rgba(255,255,255,.06);color:#fff;cursor:pointer;display:grid;place-items:center;
+  }
+  .bpp-close:hover{background:rgba(255,255,255,.14)}
+  .bpp-badges{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:48px}
+  .bpp-badge{
+    display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;
+    padding:8px 10px;border-radius:12px;border:1.5px solid rgba(255,255,255,.08);
+    background:#111;transition:.15s ease;min-width:60px;
+  }
+  .bpp-badge:hover{border-color:rgba(145,70,255,.5);background:#1a1520}
+  .bpp-badge.selected{border-color:#9146FF;background:rgba(145,70,255,.18)}
+  .bpp-badge img{width:28px;height:28px;object-fit:contain}
+  .bpp-badge span{font-size:9.5px;color:#b9bbbe;text-align:center;max-width:62px;line-height:1.25}
+  .bpp-hint{font-size:11px;color:#72767d;text-align:center;margin:10px 0 0}
 
   /* ===== Liked-me panel ===== */
   .liked-panel{
@@ -1731,10 +1825,10 @@
 
       <!-- Tabs bar -->
       <div class="acc-tabs" id="accTabs">
-        <button type="button" class="acc-tab-btn active" data-tab="profil">🪪 Profil</button>
-        <button type="button" class="acc-tab-btn" data-tab="bulles">🫧 Bulles & Comptes</button>
-        <button type="button" class="acc-tab-btn" data-tab="boost">✨ Boost</button>
-        <button type="button" class="acc-tab-btn" data-tab="infos">🌐 Infos</button>
+        <button type="button" class="acc-tab-btn active" data-tab="profil">Profil</button>
+        <button type="button" class="acc-tab-btn" data-tab="bulles">Bulles & Comptes</button>
+        <button type="button" class="acc-tab-btn" data-tab="boost">Boost</button>
+        <button type="button" class="acc-tab-btn" data-tab="infos">Infos</button>
       </div>
 
       <!-- 2-column main: identity (left) + tab content (right) -->
@@ -1762,19 +1856,24 @@
 
       <!-- 🪪 Profil -->
       <div class="acc-section acc-tab" data-tab="profil">
-        <h3>🪪 Aperçu profil <span class="pill">LIVE</span></h3>
+        <h3>Apercu profil <span class="pill">LIVE</span></h3>
         <div class="preview-card" id="accPreview">
-          <div class="pb"></div>
-          <div class="pa"><div class="av" id="prevAv">?</div></div>
+          <div class="pb" id="prevBanner"></div>
+          <div class="pa">
+            <div class="av" id="prevAv">?</div>
+            <img class="prev-deco" id="prevDeco" src="" alt="" style="display:none">
+          </div>
           <div class="pbody">
+            <div class="prev-badge-row" id="prevBadgeRow"></div>
             <div class="pn"><b id="prevName">—</b><span id="prevAge"></span></div>
             <div class="ph" id="prevHandle">@—</div>
             <div class="pbio" id="prevBio">—</div>
+            <div class="prev-socials" id="prevSocials"></div>
             <div class="pchips" id="prevChips"></div>
           </div>
         </div>
         <div class="acc-field" style="margin-top:16px">
-          <label>Je cherche</label>
+          <label style="margin-top:10px;display:block">Je cherche</label>
           <select class="acc-select" id="accLookSel">
             <option value="chill">🛋️ Chill</option>
             <option value="game">🎮 Une game</option>
@@ -1786,12 +1885,11 @@
 
       <!-- 🫧 Mes Bulles -->
       <div class="acc-section acc-tab" data-tab="bulles" hidden>
-        <h3>🫧 Mes Bulles <span class="pill" id="orbCounterPill">0/5</span></h3>
+        <h3>Mes Bulles <span class="pill" id="orbCounterPill">0/5</span></h3>
         <div class="acc-orb-cats" id="accOrbCats">
-          <button type="button" class="acc-orb-cat active" data-kind="music">🎵 Musique</button>
-          <button type="button" class="acc-orb-cat" data-kind="game">🎮 Jeu vidéo</button>
-          <button type="button" class="acc-orb-cat" data-kind="anime">📺 Anime</button>
-          <button type="button" class="acc-orb-cat" data-kind="film">🎬 Film·Série</button>
+          <button type="button" class="acc-orb-cat active" data-kind="music">Musique</button>
+          <button type="button" class="acc-orb-cat" data-kind="game">Jeu</button>
+          <button type="button" class="acc-orb-cat" data-kind="anime">Anime</button>
         </div>
         <div class="acc-orb-form">
           <div class="acc-orb-input-wrap">
@@ -1802,8 +1900,10 @@
         </div>
         <div class="acc-orb-grid" id="accOrbGrid"></div>
 
+        <button type="button" class="acc-btn acc-btn--ghost" id="orbPreviewBtn" style="margin-top:12px;width:100%">Apercu du profil</button>
+
         <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:18px 0 12px" />
-        <h3 style="margin-bottom:8px" data-i18n="acc_socials">🔗 Comptes liés <small style="color:#b9bbbe;font-weight:400;font-size:12px">(les bulles passent par ces connexions)</small></h3>
+        <h3 style="margin-bottom:8px" data-i18n="acc_socials">Comptes liés <small style="color:#b9bbbe;font-weight:400;font-size:12px">(apparaissent sur ta carte)</small></h3>
         <div class="acc-social">
           <div class="acc-social-row" data-kind="instagram">
             <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></span>
@@ -1828,15 +1928,15 @@
 
       <!-- ✨ Boost-only options -->
       <div class="acc-section boost-only acc-tab" data-tab="boost" id="boostSection" hidden>
-        <h3>✨ Tindord Boost</h3>
+        <h3>Tindord Boost</h3>
 
         <div class="acc-field">
-          <label>👑 Fake Nitro <small style="color:#b9bbbe;font-weight:400">(décoration sur ton profil)</small></label>
+          <label>Fake Nitro <small style="color:#b9bbbe;font-weight:400">(décoration sur ton profil)</small></label>
           <label class="toggle"><input type="checkbox" id="boostFakeNitro" /><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
         </div>
 
         <div class="acc-field" style="margin-top:14px">
-          <label>🎵 Musique d'ambiance pendant le swipe</label>
+          <label>Musique d'ambiance pendant le swipe</label>
           <div id="swipeMusicCurrent" class="swipe-music-current" hidden></div>
           <div class="acc-orb-form" id="swipeMusicForm">
             <div class="acc-orb-input-wrap">
@@ -1847,19 +1947,19 @@
         </div>
 
         <div class="acc-field" style="margin-top:14px">
-          <label>🔍 Recherche par genre</label>
+          <label>Recherche par genre</label>
           <div class="acc-grid2">
             <select class="acc-select" id="boostGenderFilter">
               <option value="all">Tous</option>
               <option value="il">🙋‍♂️ Hommes (Il)</option>
               <option value="elle">🙋‍♀️ Femmes (Elle)</option>
             </select>
-            <button type="button" class="acc-btn acc-btn--ghost" id="openLikedMe" style="margin:0">👀 Voir qui m'a liké</button>
+            <button type="button" class="acc-btn acc-btn--ghost" id="openLikedMe" style="margin:0">Voir qui m'a liké</button>
           </div>
         </div>
 
         <div class="acc-field" style="margin-top:14px">
-          <label>🎞️ Mes GIFs <span id="gifCounterPill" class="pill" style="margin-left:6px">0/5</span></label>
+          <label>Mes GIFs <span id="gifCounterPill" class="pill" style="margin-left:6px">0/5</span></label>
           <small style="color:#b9bbbe;font-weight:400;display:block;margin-bottom:8px">Cherche un GIF puis fais-le glisser autour de ta carte. Ils apparaissent sur ton profil de swipe.</small>
           <div class="acc-orb-form">
             <div class="acc-orb-input-wrap">
@@ -1885,8 +1985,12 @@
           <div class="acc-field"><label data-i18n="acc_age">Âge</label><div class="val" id="accAge">—</div></div>
         </div>
         <div class="acc-field" style="margin-top:14px">
-          <label>🎵 Volume musique d'ambiance <span id="musicVolVal" style="color:#b9bbbe;font-weight:400;margin-left:6px">35%</span></label>
-          <input type="range" id="musicVolume" min="0" max="100" value="35" style="width:100%;accent-color:#9146FF;margin-top:6px" />
+          <label>Volume bulles musique <span id="musicVolVal" style="color:#b9bbbe;font-weight:400;margin-left:6px">21%</span></label>
+          <input type="range" id="musicVolume" min="0" max="100" value="21" style="width:100%;accent-color:#9146FF;margin-top:6px" />
+        </div>
+        <div class="acc-field" style="margin-top:14px">
+          <label>Debut de la musique <span id="musicStartVal" style="color:#b9bbbe;font-weight:400;margin-left:6px">0s</span></label>
+          <input type="range" id="musicStartTime" min="0" max="28" value="0" style="width:100%;accent-color:#9146FF;margin-top:6px" />
         </div>
       </div>
 
@@ -1895,7 +1999,10 @@
 
       <div class="acc-actions">
         <button type="button" class="acc-btn acc-btn--primary" id="accSave" data-i18n="save">Enregistrer</button>
-        <button type="button" class="acc-btn acc-btn--ghost"   id="accBackSwipe" data-i18n="back_to_swipe">← Retour aux profils</button>
+        <button type="button" class="acc-btn acc-btn--ghost"   id="accBackSwipe" data-i18n="back_to_swipe">← Retour</button>
+        <a href="https://discord.gg/NkW4uMmQR" target="_blank" rel="noopener" class="acc-btn acc-btn--discord" title="Rejoindre le serveur Discord">
+          <svg width="18" height="14" viewBox="0 0 71 55" fill="currentColor"><path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978Z"/></svg>
+        </a>
         <button type="button" class="acc-btn acc-btn--danger"  id="accLogout" data-i18n="logout">Se déconnecter</button>
       </div>
       <div class="acc-msg" id="accMsg" data-show="false"></div>
@@ -1928,6 +2035,21 @@
     </div>
     <div class="liked-list" id="likedList"></div>
   </aside>
+
+  <!-- Badge picker panel -->
+  <div class="badge-picker-panel" id="badgePickerPanel" data-open="false">
+    <div class="bpp-backdrop" id="badgePickerBackdrop"></div>
+    <div class="bpp-card">
+      <div class="bpp-head">
+        <span style="font-size:13px;font-weight:700;color:#fff">Mes badges Discord</span>
+        <button class="bpp-close" id="badgePickerClose" type="button">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="bpp-badges" id="bppBadgeList"></div>
+      <p class="bpp-hint">Connecte-toi avec Discord pour voir tes vrais badges</p>
+    </div>
+  </div>
 
   <!-- Messages floating button + slide-out panel (auth=in only) -->
   <button class="msg-fab" id="msgFab" type="button" aria-label="Messages">
@@ -2039,11 +2161,14 @@
     const u = session.user;
     const m = u.user_metadata || {};
     const id = m.provider_id || m.sub || u.id;
-    const avatar_url = m.avatar_url || null; // Supabase pre-formats Discord avatar URL
+    const avatar_url = m.avatar_url || null;
     const banner_hash = m.banner || null;
     const banner_url  = banner_hash && id ? `https://cdn.discordapp.com/banners/${id}/${banner_hash}.${banner_hash.startsWith('a_') ? 'gif' : 'png'}?size=600` : null;
     const deco = m.avatar_decoration_data || m.custom_claims?.avatar_decoration_data;
     const decoration_url = deco?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${deco.asset}.png?passthrough=false` : null;
+    const public_flags = m.public_flags || 0;
+    const premium_type = m.premium_type || 0;
+    const accent_color = m.accent_color || null;
     return {
       displayName: m.global_name || m.full_name || m.name || m.user_name || 'Discord user',
       discordTag:  (m.user_name || m.preferred_username || m.name || '').replace(/#0$/, '') || null,
@@ -2052,6 +2177,9 @@
       avatarUrl:   avatar_url,
       bannerUrl:   banner_url,
       decorationUrl: decoration_url,
+      publicFlags: public_flags,
+      premiumType: premium_type,
+      accentColor: accent_color,
       mode:        'discord',
     };
   }
@@ -2843,7 +2971,7 @@
     function setScreen(name){
       document.body.setAttribute('data-screen', name);
       if (name === 'account') renderAccount();
-      if (name === 'swipe')   { ensureDeck(); refreshMyStatusUI(); startSwipeMusic(); refreshSwipeTools(); }
+      if (name === 'swipe')   { ensureDeck(); refreshMyStatusUI(); refreshSwipeTools(); }
       if (name !== 'swipe')   stopSwipeMusic();
     }
     function setAuth(on){
@@ -3030,6 +3158,34 @@
     ];
     let deckIdx = 0;
 
+    /* Discord badge flags → CDN image names */
+    const DISCORD_BADGES = [
+      { flag: 1 << 0,  img: 'discord_staff',              title: 'Staff Discord' },
+      { flag: 1 << 1,  img: 'partnered_server_owner',     title: 'Serveur partenaire' },
+      { flag: 1 << 2,  img: 'hypesquad',                  title: 'HypeSquad Events' },
+      { flag: 1 << 3,  img: 'bug_hunter_level_1',         title: 'Bug Hunter' },
+      { flag: 1 << 6,  img: 'hypesquad_house_1',          title: 'HypeSquad Bravery' },
+      { flag: 1 << 7,  img: 'hypesquad_house_2',          title: 'HypeSquad Brilliance' },
+      { flag: 1 << 8,  img: 'hypesquad_house_3',          title: 'HypeSquad Balance' },
+      { flag: 1 << 9,  img: 'early_supporter',            title: 'Early Supporter' },
+      { flag: 1 << 14, img: 'bug_hunter_level_2',         title: 'Bug Hunter Gold' },
+      { flag: 1 << 17, img: 'verified_bot_developer',     title: 'Early Verified Bot Dev' },
+      { flag: 1 << 22, img: 'active_developer',           title: 'Active Developer' },
+    ];
+    function getDiscordBadges(publicFlags, premiumType){
+      const badges = [];
+      if (premiumType > 0) badges.push({ img:'nitro', title:'Discord Nitro' });
+      DISCORD_BADGES.forEach(b => { if (publicFlags & b.flag) badges.push(b); });
+      return badges;
+    }
+    function renderBadgeRow(publicFlags, premiumType){
+      const badges = getDiscordBadges(publicFlags || 0, premiumType || 0);
+      if (!badges.length) return '';
+      return '<div class="card-badge-row">' + badges.map(b =>
+        `<div class="card-badge" title="${b.title}"><img src="https://cdn.discordapp.com/badge-icons/${b.img}.png" alt="${b.title}"></div>`
+      ).join('') + '</div>';
+    }
+
     function buildUserProfile(){
       const u = state.user || {};
       const p = state.profile || {};
@@ -3059,6 +3215,9 @@
         bannerUrl: u.bannerUrl || null,
         decorationUrl: u.decorationUrl || null,
         orbs,
+        publicFlags: u.publicFlags || 0,
+        premiumType: u.premiumType || 0,
+        socials: u.socials || {},
         isMe: true,
       };
     }
@@ -3135,12 +3294,21 @@
         ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="${p.name}">`
         : p.initial;
       const aviStyle = p.avatarUrl ? '' : `style="background:linear-gradient(135deg,${p.c1},${p.c2})"`;
+      const decoHtml = p.decorationUrl ? `<img class="avi-deco" src="${p.decorationUrl}" alt="">` : '';
+      const badgeRowHtml = renderBadgeRow(p.publicFlags, p.premiumType);
+      const s = p.socials || {};
+      const socialHtml = (s.instagram || s.tiktok || s.spotify) ? `<div class="card-socials">
+        ${s.instagram ? `<div class="card-social" data-kind="instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg><span>@${escapeHtmlMini(s.instagram)}</span></div>` : ''}
+        ${s.tiktok ? `<div class="card-social" data-kind="tiktok"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.5a6.5 6.5 0 0 1-3.8-1.2v8.3a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v3.1a2.9 2.9 0 1 0 2 2.7V2h3a3.5 3.5 0 0 0 3.8 3.5v2z"/></svg><span>@${escapeHtmlMini(s.tiktok)}</span></div>` : ''}
+        ${s.spotify ? `<div class="card-social" data-kind="spotify"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Z"/></svg><span>${escapeHtmlMini(s.spotify)}</span></div>` : ''}
+      </div>` : '';
       c.innerHTML = `
         <div class="badge-stamp like">LIKE</div>
         <div class="badge-stamp nope">NOPE</div>
         <div class="banner"${bannerStyle ? ` style="${bannerStyle}"` : ''}></div>
         <div class="avatar-wrap${p.nitro ? ' nitro' : ''}">
           <div class="avi" ${aviStyle}>${aviInner}</div>
+          ${decoHtml}
           <span class="status-dot ${p.status}"></span>
         </div>
         ${p.nitro ? `<span class="nitro-badge">${tx('nitro')}</span>` : ''}
@@ -3149,13 +3317,14 @@
             <div class="name-row">
               <span class="name">${p.name}</span>
               ${p.age ? `<span class="age">${p.age}</span>` : ''}
-              ${p.isMe ? '<span class="me-chip">👤 Moi</span>' : ''}
+              ${p.isMe ? '<span class="me-chip">Moi</span>' : ''}
             </div>
             <div class="handle">@${p.tag} <span class="sep">•</span> ${STATUS_LABEL[p.status] || ''}</div>
             <div class="joined">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
               ${tx('joined_on')} ${p.joinedOn}
             </div>
+            ${badgeRowHtml}
           </div>
           <hr class="div"/>
           <div class="activity">
@@ -3163,12 +3332,14 @@
             <div class="lbl"><b>${p.activity.title}</b><span>${p.activity.sub}</span></div>
           </div>
           <div class="bio"><b>Bio</b>${p.bio}</div>
+          ${socialHtml}
           <div class="common">
-            <span>👥 <b>${p.common.friends}</b> ami${p.common.friends > 1 ? 's' : ''} en commun</span>
-            <span>🏠 <b>${p.common.servers}</b> serveur${p.common.servers > 1 ? 's' : ''} en commun</span>
+            <span><b>${p.common.friends}</b> ami${p.common.friends > 1 ? 's' : ''} en commun</span>
+            <span><b>${p.common.servers}</b> serveur${p.common.servers > 1 ? 's' : ''} en commun</span>
           </div>
         </div>
-        <div class="lookfor" data-look="${p.looking}" title="${lookLabel}">${LOOK_EMOJI[p.looking] || '🎮'}</div>
+        <div class="lookfor" data-look="${p.looking}" title="${lookLabel}">${LOOK_EMOJI[p.looking] || ''}</div>
+        ${p.isMe && badgeRowHtml ? `<button class="badge-picker-btn" type="button" title="Voir mes badges" id="badgePickerBtn"></button>` : ''}
       `;
       if (isTop) attachDrag(c);
       // Clean up the entering class once the animation completes so future transforms (drag) aren't clobbered
@@ -3285,7 +3456,7 @@
     let _spotifyAudio = null;
 
     /* Audio fade helpers */
-    function fadeIn(audio, target=0.75, dur=700){
+    function fadeIn(audio, target=0.45, dur=700){
       if (!audio) return;
       const step = 40, n = Math.max(1, Math.round(dur/step));
       let i = 0;
@@ -3393,8 +3564,10 @@
           const a = new Audio(url);
           a._orbEl = el;
           a.volume = 0;
+          const startSec = (state.user && typeof state.user.musicStartTime === 'number') ? state.user.musicStartTime : 0;
+          if (startSec > 0) a.currentTime = Math.min(startSec, 28);
           a.play().catch(() => {});
-          fadeIn(a, 0.75, 700);
+          fadeIn(a, 0.45, 700);
           a.addEventListener('ended', () => { el.classList.remove('playing'); if (_spotifyAudio === a) _spotifyAudio = null; });
           _spotifyAudio = a;
           showToast('▶️', name, sub);
@@ -3752,10 +3925,12 @@
         let results = [];
         if (selectedOrbKind === 'music') {
           const tracks = await searchSpotifyTracks(val);
-          results = tracks.map(t => ({
-            name:t.name, sub:t.artist, cover:t.cover,
-            orb:{kind:'music', title:t.name+' · '+t.artist, previewUrl:t.previewUrl, cover:t.cover},
-          }));
+          results = tracks
+            .filter(t => t.previewUrl)
+            .map(t => ({
+              name:t.name, sub:t.artist, cover:t.cover,
+              orb:{kind:'music', title:t.name+' · '+t.artist, previewUrl:t.previewUrl, cover:t.cover},
+            }));
         } else if (selectedOrbKind === 'anime') {
           const animes = await searchAnime(val);
           results = animes.map(a => ({
@@ -3811,9 +3986,12 @@
       }
       document.getElementById('accGender').textContent  = ({ il:'Il', elle:'Elle', autre:'Préciser / Autre', male:'Il', female:'Elle', nonbinary:'Iel', other:'Autre' }[p.gender] || '—');
       document.getElementById('accAge').textContent     = p.age || '—';
-      const vol = typeof u.musicVolume === 'number' ? u.musicVolume : 0.35;
+      const vol = typeof u.musicVolume === 'number' ? u.musicVolume : 0.21;
       const volSlider = document.getElementById('musicVolume');
       if (volSlider) { volSlider.value = Math.round(vol * 100); document.getElementById('musicVolVal').textContent = Math.round(vol * 100) + '%'; }
+      const startSec = typeof u.musicStartTime === 'number' ? u.musicStartTime : 0;
+      const startSlider = document.getElementById('musicStartTime');
+      if (startSlider) { startSlider.value = startSec; document.getElementById('musicStartVal').textContent = startSec + 's'; }
       document.getElementById('accPseudo').value  = u.displayName || '';
       document.getElementById('accBio').value     = p.bio || '';
       document.getElementById('accLookSel').value = p.looking || 'game';
@@ -3839,18 +4017,43 @@
       const pseudo = (document.getElementById('accPseudo').value || u.displayName || 'Tindord_user').trim();
       const bio    = (document.getElementById('accBio').value || '').trim() || '—';
       const look   = document.getElementById('accLookSel').value;
+      // Banner
+      const banner = document.getElementById('prevBanner');
+      if (banner) {
+        if (u.bannerUrl) { banner.style.backgroundImage = `url('${u.bannerUrl}')`; banner.style.backgroundSize = 'cover'; banner.style.backgroundPosition = 'center'; banner.style.background = ''; }
+        else if (u.accentColor) { banner.style.background = `#${u.accentColor.toString(16).padStart(6,'0')}`; banner.style.backgroundImage = ''; }
+        else { banner.style.backgroundImage = ''; banner.style.background = 'linear-gradient(135deg,#5865F2,#9146FF)'; }
+      }
+      // Avatar
       const av = document.getElementById('prevAv');
       if (u.avatarUrl) { av.innerHTML = `<img src="${u.avatarUrl}">`; av.style.background = 'none'; }
       else { av.textContent = (pseudo || 'T').charAt(0).toUpperCase(); av.style.background = 'linear-gradient(135deg,#FF7EB6,#9146FF)'; }
+      // Decoration
+      const deco = document.getElementById('prevDeco');
+      if (deco) { if (u.decorationUrl) { deco.src = u.decorationUrl; deco.style.display = ''; } else { deco.style.display = 'none'; } }
+      // Badges
+      const badgeRow = document.getElementById('prevBadgeRow');
+      if (badgeRow) { badgeRow.innerHTML = renderBadgeRow(u.publicFlags, u.premiumType); }
+      // Name + handle + bio
       document.getElementById('prevName').textContent = pseudo;
-      document.getElementById('prevAge').textContent  = p.age ? '· ' + p.age : '';
+      document.getElementById('prevAge').textContent  = p.age ? ' · ' + p.age : '';
       document.getElementById('prevHandle').textContent = u.discordTag ? '@' + u.discordTag : (u.email || '');
       document.getElementById('prevBio').textContent = bio;
+      // Social connections
+      const prevSoc = document.getElementById('prevSocials');
+      if (prevSoc) {
+        const s = u.socials || {};
+        prevSoc.innerHTML = [
+          s.instagram ? `<div class="prev-social" data-kind="instagram"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg><span>@${escapeHtmlMini(s.instagram)}</span></div>` : '',
+          s.tiktok ? `<div class="prev-social" data-kind="tiktok"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.5a6.5 6.5 0 0 1-3.8-1.2v8.3a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v3.1a2.9 2.9 0 1 0 2 2.7V2h3a3.5 3.5 0 0 0 3.8 3.5v2z"/></svg><span>@${escapeHtmlMini(s.tiktok)}</span></div>` : '',
+          s.spotify ? `<div class="prev-social" data-kind="spotify"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Z"/></svg><span>${escapeHtmlMini(s.spotify)}</span></div>` : '',
+        ].join('');
+      }
+      // Orb chips
       const chips = [];
-      const lookLabel = { chill:'🛋️ ' + tx('look_chill'), game:'🎮 ' + tx('look_game'), now:'⌨️ ' + tx('look_now'), sleep:'💤 ' + tx('look_sleep') }[look];
+      const lookLabel = { chill:tx('look_chill'), game:tx('look_game'), now:tx('look_now'), sleep:tx('look_sleep') }[look];
       if (lookLabel) chips.push(lookLabel);
-      const emoByKind = {music:'🎵', game:'🎮', anime:'📺', film:'🎬'};
-      (p.userOrbs || []).forEach(o => chips.push((emoByKind[o.kind] || '✨') + ' ' + o.title));
+      (p.userOrbs || []).forEach(o => chips.push(o.title));
       document.getElementById('prevChips').innerHTML = chips.map(c => `<span>${escapeHtmlMini(c)}</span>`).join('');
     }
     ['accPseudo','accBio','accLookSel'].forEach(id => {
@@ -3974,20 +4177,20 @@
       clearTimeout(_smDebounce);
       _smDebounce = setTimeout(async () => {
         try {
-          const results = await searchSpotifyTracks(val);
+          const allResults = await searchSpotifyTracks(val);
+          const results = allResults.filter(r => r.previewUrl);
           if (!results.length) { sugg.innerHTML=''; sugg.classList.remove('open'); return; }
           sugg.innerHTML = '';
           results.forEach(r => {
             const it = document.createElement('div');
             it.className = 'sp-item';
             it.innerHTML =
-              (r.cover ? `<img src="${r.cover}" alt="">` : '<div class="sp-no-cover">🎵</div>') +
+              (r.cover ? `<img src="${r.cover}" alt="">` : '<div class="sp-no-cover"></div>') +
               `<div class="sp-info"><div class="sp-title">${escapeHtmlMini(r.name)}</div>` +
               `<div class="sp-artist">${escapeHtmlMini(r.artist)}</div></div>`;
             it.addEventListener('mousedown', ev => {
               ev.preventDefault();
               if (!state.user || !state.user.boost) { openBoostModal(); return; }
-              if (!r.previewUrl) { showToast('🎵', r.name, 'Pas de preview disponible'); return; }
               state.user.swipeMusic = { title: r.name+' · '+r.artist, artist: r.artist, previewUrl: r.previewUrl, cover: r.cover };
               save();
               document.getElementById('swipeMusicInput').value = '';
@@ -4186,7 +4389,7 @@
       banner.classList.toggle('is-active', active);
       if (active) {
         const plan = state.user.boostPlan === 'lifetime' ? 'À vie' : 'Mensuel';
-        title.textContent = '✨ Tindord Boost actif';
+        title.textContent = 'Tindord Boost actif';
         sub.textContent   = plan + ' · 18 bulles, Fake Nitro, filtre H/F…';
         cta.textContent   = 'Gérer';
       } else {
@@ -4272,12 +4475,69 @@
         const v = parseInt(sl.value, 10) / 100;
         document.getElementById('musicVolVal').textContent = Math.round(v * 100) + '%';
         if (_swipeMusicAudio) _swipeMusicAudio.volume = v;
+        if (_spotifyAudio) _spotifyAudio.volume = v;
         state.user = state.user || {};
         state.user.musicVolume = v;
         save();
       });
     })();
 
+    // Music start time slider
+    (function bindMusicStartTime(){
+      const sl = document.getElementById('musicStartTime');
+      if (!sl) return;
+      sl.addEventListener('input', () => {
+        const v = parseInt(sl.value, 10);
+        document.getElementById('musicStartVal').textContent = v + 's';
+        state.user = state.user || {};
+        state.user.musicStartTime = v;
+        save();
+      });
+    })();
+
+    /* ===== Badge picker ===== */
+    function openBadgePicker(){
+      const u = state.user || {};
+      const badges = getDiscordBadges(u.publicFlags || 0, u.premiumType || 0);
+      const list = document.getElementById('bppBadgeList');
+      const hint = document.querySelector('.bpp-hint');
+      if (!badges.length) {
+        list.innerHTML = '';
+        hint.style.display = '';
+        document.getElementById('badgePickerPanel').setAttribute('data-open','true');
+        return;
+      }
+      hint.style.display = 'none';
+      const selected = u.selectedBadge || null;
+      list.innerHTML = '';
+      badges.forEach(b => {
+        const el = document.createElement('div');
+        el.className = 'bpp-badge' + (selected === b.img ? ' selected' : '');
+        el.innerHTML = `<img src="https://cdn.discordapp.com/badge-icons/${b.img}.png" alt="${b.title}"><span>${b.title}</span>`;
+        el.addEventListener('click', () => {
+          list.querySelectorAll('.bpp-badge').forEach(x => x.classList.remove('selected'));
+          el.classList.add('selected');
+          state.user = state.user || {};
+          state.user.selectedBadge = b.img;
+          save();
+        });
+        list.appendChild(el);
+      });
+      document.getElementById('badgePickerPanel').setAttribute('data-open','true');
+    }
+    document.getElementById('badgePickerClose').addEventListener('click', () =>
+      document.getElementById('badgePickerPanel').setAttribute('data-open','false'));
+    document.getElementById('badgePickerBackdrop').addEventListener('click', () =>
+      document.getElementById('badgePickerPanel').setAttribute('data-open','false'));
+    // Delegate badge picker button (created dynamically inside cards)
+    document.getElementById('swipeWrap').addEventListener('click', e => {
+      if (e.target.closest('#badgePickerBtn')) { e.stopPropagation(); openBadgePicker(); }
+    });
+
+    document.getElementById('orbPreviewBtn').addEventListener('click', () => {
+      const profilBtn = document.querySelector('#accTabs .acc-tab-btn[data-tab="profil"]');
+      if (profilBtn) profilBtn.click();
+    });
     document.getElementById('accountChip').addEventListener('click', (e) => { e.preventDefault(); setScreen('account'); });
     document.getElementById('accSave').addEventListener('click', () => {
       state.profile = state.profile || { gender:null, age:null, looking:null };
