@@ -758,22 +758,20 @@
     background:#2b2d31;border-radius:10px;padding:10px 12px;
   }
   .swipe-card .bio b{color:#fff;display:block;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
-  /* Avatar decoration overlay (APNG from Discord auto-animates) */
+  /* Avatar decoration overlay — Discord serves it as APNG which auto-animates.
+     We avoid any CSS that could pause the animation (no will-change/transform/filter
+     on the <img> itself). The glow is applied to the parent wrapper. */
   .swipe-card .avatar-wrap{position:relative}
   .swipe-card .avi-deco{
     position:absolute;inset:-12px;width:calc(100% + 24px);height:calc(100% + 24px);
     object-fit:contain;pointer-events:none;z-index:3;
-    animation: decoFloat 4s ease-in-out infinite, decoGlow 3.6s ease-in-out infinite;
-    filter:drop-shadow(0 0 6px rgba(145,70,255,.0));
-    transform-origin:center;
   }
-  @keyframes decoFloat{
-    0%,100% { transform: translateY(0) scale(1) rotate(0deg); }
-    50%     { transform: translateY(-2px) scale(1.015) rotate(.6deg); }
+  .swipe-card .avatar-wrap.has-deco{
+    animation: decoGlowParent 3.6s ease-in-out infinite;
   }
-  @keyframes decoGlow{
-    0%,100% { filter: drop-shadow(0 0 6px rgba(145,70,255,.0)) drop-shadow(0 0 2px rgba(255,255,255,0)); }
-    50%     { filter: drop-shadow(0 0 14px rgba(145,70,255,.65)) drop-shadow(0 0 4px rgba(91,233,255,.35)); }
+  @keyframes decoGlowParent{
+    0%,100% { filter: drop-shadow(0 0 6px rgba(145,70,255,.0)); }
+    50%     { filter: drop-shadow(0 0 14px rgba(145,70,255,.55)) drop-shadow(0 0 4px rgba(91,233,255,.30)); }
   }
 
   /* Discord badges row on card */
@@ -2415,7 +2413,10 @@
     return `https://cdn.discordapp.com/avatars/${id}/${hash}.${ext}?size=256`;
   }
   function discordDecorationUrl(asset){
-    return asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${asset}.png?passthrough=false` : null;
+    // Discord serves the decoration as an animated APNG. The `passthrough=false`
+    // variant returns a STATIC version, so we use the default (animated) URL.
+    // `size=128` gives a high-res asset that scales cleanly.
+    return asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${asset}.png?size=128` : null;
   }
 
   /* Build the user payload Tindord expects from a Supabase session.
