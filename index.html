@@ -1151,8 +1151,8 @@
   }
   .acc-card{
     position:relative;
-    width:min(98vw,1280px);height:calc(100vh - 80px);max-height:calc(100vh - 80px);
-    padding:14px 18px 72px;border-radius:22px;display:flex;flex-direction:column;min-height:0;
+    width:min(98vw,1280px);height:calc(100vh - 60px);max-height:calc(100vh - 60px);
+    padding:12px 16px 14px;border-radius:22px;display:flex;flex-direction:column;min-height:0;
     background:linear-gradient(180deg, rgba(28,22,58,.78), rgba(18,12,42,.78));
     border:1px solid var(--stroke-2);
     backdrop-filter:blur(22px) saturate(150%);
@@ -1160,30 +1160,39 @@
     box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
     color:#fff;
   }
+  /* CRITICAL: hidden tabs really hidden */
+  .acc-tab[hidden]{display:none !important}
   /* No-scroll: tabs fit on screen */
-  .acc-tab{overflow:hidden !important;padding-right:0 !important}
-  .acc-section{padding:8px 0 !important;margin-top:4px !important}
-  .acc-section h3{margin:0 0 8px !important;font-size:14.5px !important}
-  .acc-field{margin-top:8px !important}
-  .acc-field label{font-size:12px !important;margin-bottom:4px !important}
-  .acc-input, .acc-select, .acc-field textarea{padding:8px 10px !important;font-size:13px !important}
-  .acc-field textarea{min-height:42px !important;max-height:42px !important}
-  .acc-color-row{gap:6px !important;margin-top:4px !important}
-  .acc-color-swatch{width:28px !important;height:28px !important}
-  .acc-color-swatch[data-color="discord"]{height:28px !important;padding:4px 10px 4px 4px !important;font-size:11px !important}
+  .acc-tab:not([hidden]){overflow:hidden !important;padding-right:0 !important}
+  .acc-section{padding:6px 0 !important;margin-top:2px !important}
+  .acc-section h3{margin:0 0 6px !important;font-size:13.5px !important}
+  .acc-field{margin-top:6px !important}
+  .acc-field label{font-size:11.5px !important;margin-bottom:3px !important}
+  .acc-input, .acc-select, .acc-field textarea{padding:7px 10px !important;font-size:12.5px !important}
+  .acc-field textarea{min-height:38px !important;max-height:38px !important}
+  .acc-color-row{gap:5px !important;margin-top:3px !important}
+  .acc-color-swatch{width:26px !important;height:26px !important}
+  .acc-color-swatch[data-color="discord"]{height:26px !important;padding:3px 8px 3px 3px !important;font-size:10.5px !important}
   .acc-color-swatch[data-color="discord"] span{width:18px !important;height:18px !important}
-  .acc-color-pick{width:28px !important;height:28px !important}
-  .acc-btn{padding:8px 12px !important;font-size:12.5px !important}
-  .acc-resync-btn{padding:7px 10px !important}
-  .acc-orb-grid{max-height:140px;overflow:auto}
-  .gif-stage{min-height:120px !important;height:120px !important}
-  /* Make 2-column inside profil tab when wide */
-  .acc-tab[data-tab="profil"]{display:grid !important;grid-template-columns:1fr 1fr;gap:14px;align-content:start;height:100%}
-  .acc-tab[data-tab="profil"] > .acc-section,
-  .acc-tab[data-tab="profil"] > .acc-field,
-  .acc-tab[data-tab="profil"] > hr{grid-column:span 1}
-  .acc-tab[data-tab="profil"] > .acc-section:first-child{grid-row:span 3}
-  @media (max-width:780px){ .acc-tab[data-tab="profil"]{grid-template-columns:1fr} }
+  .acc-color-pick{width:26px !important;height:26px !important}
+  .acc-btn{padding:7px 12px !important;font-size:12px !important}
+  .acc-resync-btn{padding:6px 10px !important}
+  .acc-orb-grid{max-height:110px;overflow:auto}
+  .gif-stage{min-height:90px !important;height:90px !important}
+  .acc-actions{margin-top:8px !important}
+  .acc-tabs{margin-bottom:8px !important}
+  .boost-banner{padding:8px 12px !important;margin-bottom:8px !important}
+
+  /* 2-column Profil (left preview, right settings) */
+  .acc-tab--2col:not([hidden]){display:grid !important;grid-template-columns:minmax(280px,360px) 1fr;gap:16px;align-content:start;height:100%;overflow:hidden}
+  .acc-tab--2col .acc-col-left,
+  .acc-tab--2col .acc-col-right{min-width:0;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+  @media (max-width:820px){ .acc-tab--2col:not([hidden]){grid-template-columns:1fr;overflow:auto} }
+
+  /* 2-column Boost */
+  .acc-tab[data-tab="boost"]:not([hidden]){display:grid !important;grid-template-columns:1fr 1fr;gap:8px 18px;align-content:start;height:100%}
+  .acc-tab[data-tab="boost"]:not([hidden]) > h3{grid-column:1 / -1;margin-bottom:0 !important}
+  @media (max-width:780px){ .acc-tab[data-tab="boost"]:not([hidden]){grid-template-columns:1fr} }
   /* 2-column main area: identity left, tab content right */
   .acc-main{
     flex:1 1 auto;min-height:0;display:grid;
@@ -1980,7 +1989,8 @@
         <div class="acc-tab-body">
 
       <!-- 🪪 Profil -->
-      <div class="acc-section acc-tab" data-tab="profil">
+      <div class="acc-section acc-tab acc-tab--2col" data-tab="profil">
+        <div class="acc-col-left">
         <h3>Apercu profil <span class="pill">LIVE</span></h3>
         <div class="preview-card" id="accPreview">
           <div class="pb" id="prevBanner"></div>
@@ -1997,7 +2007,9 @@
             <div class="pchips" id="prevChips"></div>
           </div>
         </div>
-        <div class="acc-field" style="margin-top:16px">
+        </div>
+        <div class="acc-col-right">
+        <div class="acc-field">
           <label style="margin-top:10px;display:block">Couleur de profil <small style="color:#b9bbbe;font-weight:400">(fond de la bannière sur ta carte)</small></label>
           <div class="acc-color-row">
             <button type="button" class="acc-color-swatch" data-color="discord" title="Couleur Discord (par défaut)"><span style="background:linear-gradient(135deg,#5865F2,#9146FF)"></span>Discord</button>
@@ -2022,8 +2034,8 @@
           </button>
           <small id="accResyncHint" style="color:#b9bbbe;font-weight:400;font-size:11.5px;display:block;margin-top:6px">Récupère ton avatar, bannière, décoration et badges depuis Discord</small>
         </div>
-        <div class="acc-field" style="margin-top:16px">
-          <label style="margin-top:10px;display:block">Je cherche</label>
+        <div class="acc-field">
+          <label>Je cherche</label>
           <select class="acc-select" id="accLookSel">
             <option value="chill">🛋️ Chill</option>
             <option value="game">🎮 Une game</option>
@@ -2032,8 +2044,7 @@
           </select>
         </div>
 
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:18px 0 12px" />
-        <h3 style="margin-bottom:8px" data-i18n="acc_socials">Comptes liés <small style="color:#b9bbbe;font-weight:400;font-size:12px">(cliquables sur ta carte de swipe)</small></h3>
+        <h3 style="margin-top:10px" data-i18n="acc_socials">Comptes liés <small style="color:#b9bbbe;font-weight:400;font-size:11px">(cliquables sur la carte)</small></h3>
         <div class="acc-social">
           <div class="acc-social-row" data-kind="instagram">
             <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></span>
@@ -2054,6 +2065,7 @@
             <button type="button" id="socSpBtn" data-i18n="connect">Connecter</button>
           </div>
         </div>
+        </div><!-- /acc-col-right -->
       </div>
 
       <!-- 🫧 Mes Bulles -->
