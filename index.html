@@ -4308,13 +4308,52 @@
     /* Cache: kind+title -> coverUrl */
     const _suggCoverCache = new Map();
     async function wikiPageSummary(title){
-      // REST summary API : direct lookup of the exact page title, returns a thumbnail
       try {
         const r = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title.replace(/\s/g, '_')));
         if (!r.ok) return null;
         const d = await r.json();
         return d.thumbnail?.source || d.originalimage?.source || null;
       } catch { return null; }
+    }
+    /* Wikipedia → Wikidata QID (e.g. "Minecraft" → "Q49740") */
+    async function wikiWikibaseId(title){
+      try {
+        const url = 'https://en.wikipedia.org/w/api.php?action=query&prop=pageprops&ppprop=wikibase_item&redirects=1&titles=' + encodeURIComponent(title) + '&format=json&origin=*';
+        const r = await fetch(url);
+        if (!r.ok) return null;
+        const d = await r.json();
+        const pages = d.query?.pages;
+        if (!pages) return null;
+        const first = Object.values(pages)[0];
+        return first?.pageprops?.wikibase_item || null;
+      } catch { return null; }
+    }
+    /* Wikidata claim → image. Tries each property in order (P154=logo, P18=image, P2716=collage). */
+    async function wikidataImage(qid, props){
+      if (!qid) return null;
+      try {
+        const r = await fetch('https://www.wikidata.org/wiki/Special:EntityData/' + qid + '.json');
+        if (!r.ok) return null;
+        const d = await r.json();
+        const claims = d.entities?.[qid]?.claims;
+        if (!claims) return null;
+        for (const p of props) {
+          const filename = claims?.[p]?.[0]?.mainsnak?.datavalue?.value;
+          if (filename) {
+            return 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(filename) + '?width=400';
+          }
+        }
+        return null;
+      } catch { return null; }
+    }
+    /* High-level: title → image via Wikidata logo (preferred for games) or image (preferred for films). */
+    async function wikidataCover(title, props){
+      let qid = await wikiWikibaseId(title);
+      if (qid) {
+        const img = await wikidataImage(qid, props);
+        if (img) return img;
+      }
+      return null;
     }
     async function fetchSuggCover(kind, title){
       const k = kind + ':' + title;
@@ -4324,18 +4363,19 @@
         if (kind === 'anime') {
           const r = await searchAnime(title);
           cover = (r && r[0] && r[0].cover) || null;
-          if (!cover) cover = await wikiPageSummary(title + ' (anime)');
-          if (!cover) cover = await wikiPageSummary(title);
+          if (!cover) cover = await wikidataCover(title, ['P154', 'P18']);
+          if (!cover) cover = await wikidataCover(title + ' (anime)', ['P154', 'P18']);
         } else if (kind === 'game') {
-          const r = await searchWiki(title, 'game');
-          cover = (r && r[0] && r[0].cover) || null;
-          if (!cover) cover = await wikiPageSummary(title + ' (video game)');
+          // Wikidata LOGO (P154) is the actual game logo. Fallback to P18 (cover/screenshot).
+          cover = await wikidataCover(title, ['P154', 'P18']);
+          if (!cover) cover = await wikidataCover(title + ' (video game)', ['P154', 'P18']);
+          // Final fallback : REST summary thumbnail (rarely needed)
           if (!cover) cover = await wikiPageSummary(title);
         } else if (kind === 'film') {
-          const r = await searchWiki(title, 'film');
-          cover = (r && r[0] && r[0].cover) || null;
-          if (!cover) cover = await wikiPageSummary(title + ' (film)');
-          if (!cover) cover = await wikiPageSummary(title + ' (TV series)');
+          // For films / series, P18 is the poster ; P154 is the logo (less common)
+          cover = await wikidataCover(title, ['P18', 'P154']);
+          if (!cover) cover = await wikidataCover(title + ' (film)', ['P18', 'P154']);
+          if (!cover) cover = await wikidataCover(title + ' (TV series)', ['P18', 'P154']);
           if (!cover) cover = await wikiPageSummary(title);
         }
       } catch {}
