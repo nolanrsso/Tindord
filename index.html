@@ -366,6 +366,11 @@
     box-shadow:0 14px 36px rgba(107,43,255,.45), 0 0 0 1px rgba(255,255,255,.10) inset;
   }
   .bf-fab--badge:hover{box-shadow:0 18px 44px rgba(107,43,255,.65), 0 0 0 1px rgba(255,255,255,.15) inset}
+  .bf-fab--badge[data-look="chill"]{background:linear-gradient(140deg,#FFB66E 0%,#FF7EB6 100%);box-shadow:0 14px 36px rgba(255,126,182,.45), 0 0 0 1px rgba(255,255,255,.10) inset}
+  .bf-fab--badge[data-look="game"] {background:linear-gradient(140deg,#5BE9FF 0%,#9146FF 100%);box-shadow:0 14px 36px rgba(91,233,255,.45), 0 0 0 1px rgba(255,255,255,.10) inset}
+  .bf-fab--badge[data-look="now"]  {background:linear-gradient(140deg,#e6ff00 0%,#03d100 100%);box-shadow:0 14px 36px rgba(3,209,0,.45), 0 0 0 1px rgba(255,255,255,.10) inset}
+  .bf-fab--badge[data-look="sleep"]{background:linear-gradient(140deg,#9146FF 0%,#3D0E9F 100%);box-shadow:0 14px 36px rgba(61,14,159,.55), 0 0 0 1px rgba(255,255,255,.10) inset}
+  .bf-fab .bf-emoji{font-size:30px;line-height:1;display:block}
   .bf-fab .fab-badge{
     position:absolute;top:-4px;right:-4px;
     min-width:22px;height:22px;padding:0 6px;border-radius:11px;
@@ -389,12 +394,13 @@
   }
   .badge-fab-pop[data-open="true"]{display:flex;opacity:1;transform:translateX(0)}
   .badge-fab-pop .bfp-item{
-    width:32px;height:32px;border-radius:8px;border:none;cursor:pointer;
-    background:#111;display:grid;place-items:center;flex:0 0 auto;
+    width:36px;height:36px;border-radius:10px;border:none;cursor:pointer;
+    background:rgba(255,255,255,.05);display:grid;place-items:center;flex:0 0 auto;
     transition:transform .15s ease, background .15s ease;
   }
-  .badge-fab-pop .bfp-item:hover{transform:scale(1.1);background:#1c1c22}
-  .badge-fab-pop .bfp-item img{width:22px;height:22px;object-fit:contain}
+  .badge-fab-pop .bfp-item:hover{transform:scale(1.12);background:rgba(255,255,255,.12)}
+  .badge-fab-pop .bfp-item.is-active{background:rgba(145,70,255,.25);box-shadow:0 0 0 1.5px rgba(145,70,255,.55)}
+  .badge-fab-pop .bfp-item .bfp-emoji{font-size:18px;line-height:1}
   .badge-fab-pop .bfp-empty{color:#b9bbbe;font-size:11.5px;padding:0 6px;white-space:nowrap}
 
   /* Messages panel — slide-out drawer */
@@ -986,7 +992,7 @@
     display:none;flex-direction:column-reverse;gap:10px;align-items:flex-end;
     pointer-events:none;
   }
-  body[data-screen="swipe"] .swipe-tools{display:flex}
+  body[data-screen="swipe"] .swipe-tools{display:none !important}
   .stool-btn{
     position:relative;
     display:flex;align-items:center;justify-content:center;
@@ -1707,6 +1713,17 @@
   }
   .liked-panel[data-open="true"]{transform:none}
   .liked-list{flex:1;overflow:auto;padding:6px}
+  .liked-paywall{display:flex;flex-direction:column;align-items:center;gap:18px;padding:32px 22px;text-align:center}
+  .liked-paywall .lp-avatars{display:flex;gap:-12px;justify-content:center;align-items:center}
+  .liked-paywall .lp-avi{
+    width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
+    color:#fff;font-family:"Clash Display",sans-serif;font-weight:800;font-size:20px;
+    border:3px solid #1c1d22;margin-left:-12px;
+  }
+  .liked-paywall .lp-avi:first-child{margin-left:0}
+  .liked-paywall .lp-text{font-size:15px;color:#dcddde;line-height:1.4;margin:0}
+  .liked-paywall .lp-text b{color:#FFD83D;font-weight:800}
+  .liked-paywall .lp-cta{width:100%;max-width:240px}
   .liked-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;cursor:pointer;transition:.12s}
   .liked-item:hover{background:rgba(255,255,255,.05)}
   .liked-item .lavi{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:"Clash Display",sans-serif;font-weight:800;font-size:18px;color:#fff;flex:0 0 auto}
@@ -2582,14 +2599,16 @@
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.3-9.3C1 8.3 3 4.5 6.7 4.5c1.9 0 3.5 1 4.3 2.4l1 1.7 1-1.7C13.8 5.5 15.4 4.5 17.3 4.5 21 4.5 23 8.3 21.3 11.7 19 16.5 12 21 12 21Z"/></svg>
     <span class="fab-badge" id="heartFabBadge">0</span>
   </button>
-  <button class="bf-fab bf-fab--badge" id="badgeFab" type="button" aria-label="Mes badges Discord">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2.5l2.4 2.1 3.1-.6.6 3.1 2.1 2.4-2.1 2.4-.6 3.1-3.1-.6L12 16.5l-2.4-2.1-3.1.6-.6-3.1L3.8 9.5 5.9 7.1l.6-3.1 3.1.6L12 2.5z"/>
-      <path d="M9 11l2 2 4-4"/>
-    </svg>
+  <button class="bf-fab bf-fab--badge" id="badgeFab" type="button" aria-label="Ce que je cherche" data-look="game">
+    <span class="bf-emoji" id="badgeFabEmoji">🎮</span>
   </button>
   <!-- Compact horizontal dropdown next to the badge FAB -->
-  <div class="badge-fab-pop" id="badgeFabPop" data-open="false" role="menu" aria-label="Mes badges"></div>
+  <div class="badge-fab-pop" id="badgeFabPop" data-open="false" role="menu" aria-label="Ce que tu cherches">
+    <button type="button" class="bfp-item" data-val="chill" title="Chill"><span class="bfp-emoji">🛋️</span></button>
+    <button type="button" class="bfp-item" data-val="game"  title="Une game"><span class="bfp-emoji">🎮</span></button>
+    <button type="button" class="bfp-item" data-val="now"   title="Mate maintenant"><span class="bfp-emoji">⌨️</span></button>
+    <button type="button" class="bfp-item" data-val="sleep" title="Sleepcall"><span class="bfp-emoji">💤</span></button>
+  </div>
 
   <aside class="msg-panel" id="msgPanel" data-open="false" data-view="list" aria-label="Messages">
     <div class="msg-head">
@@ -5419,20 +5438,34 @@
       const list = document.getElementById('likedList');
       list.innerHTML = '';
       const unlocked = !!(state.user && state.user.boost);
+      if (!unlocked) {
+        // CTA paywall : show ONLY a row of blurred avatars + the upsell text
+        const cta = document.createElement('div');
+        cta.className = 'liked-paywall';
+        cta.innerHTML = `
+          <div class="lp-avatars">
+            ${LIKED_ME.slice(0, 6).map(p => `<div class="lp-avi li-blur" style="background:linear-gradient(135deg,${p.c1},${p.c2})">${p.initial}</div>`).join('')}
+          </div>
+          <p class="lp-text">Passe à <b>Tindord Boost</b> pour voir ces likes ✨</p>
+          <button type="button" class="acc-btn acc-btn--primary lp-cta" id="likedPaywallCta">Découvrir Boost</button>
+        `;
+        list.appendChild(cta);
+        const cta2 = list.querySelector('#likedPaywallCta');
+        if (cta2) cta2.addEventListener('click', () => {
+          document.getElementById('likedPanel').setAttribute('data-open','false');
+          if (typeof openBoostModal === 'function') openBoostModal();
+        });
+        return;
+      }
       LIKED_ME.forEach(p => {
         const it = document.createElement('div');
         it.className = 'liked-item';
         it.innerHTML =
-          `<div class="lavi ${unlocked ? '' : 'li-blur'}" style="background:linear-gradient(135deg,${p.c1},${p.c2})">${p.initial}</div>` +
-          `<div class="li-info"><b class="${unlocked ? '' : 'li-blur'}">${escapeHtmlMini(p.name)} · ${p.age}</b><small class="${unlocked ? '' : 'li-blur'}">@${escapeHtmlMini(p.tag)}</small></div>`;
+          `<div class="lavi" style="background:linear-gradient(135deg,${p.c1},${p.c2})">${p.initial}</div>` +
+          `<div class="li-info"><b>${escapeHtmlMini(p.name)} · ${p.age}</b><small>@${escapeHtmlMini(p.tag)}</small></div>`;
         list.appendChild(it);
       });
     }
-    document.getElementById('openLikedMe').addEventListener('click', () => {
-      if (!state.user || !state.user.boost) { openBoostModal(); return; }
-      renderLikedMe();
-      document.getElementById('likedPanel').setAttribute('data-open','true');
-    });
     document.getElementById('likedClose').addEventListener('click', () => {
       document.getElementById('likedPanel').setAttribute('data-open','false');
     });
@@ -5991,38 +6024,40 @@
       });
     })();
 
-    /* ===== Badge FAB — compact horizontal popup ===== */
-    (function bindBadgeFab(){
+    /* ===== Looking-for FAB — chill / game / now / sleep ===== */
+    (function bindLookingFab(){
       const fab = document.getElementById('badgeFab');
       const pop = document.getElementById('badgeFabPop');
+      const emoEl = document.getElementById('badgeFabEmoji');
       if (!fab || !pop) return;
-      function renderPopup(){
-        const u = state.user || {};
-        const badges = getDiscordBadges(u.publicFlags || 0, u.premiumType || 0);
-        pop.innerHTML = '';
-        if (!badges.length) {
-          const empty = document.createElement('span');
-          empty.className = 'bfp-empty';
-          empty.textContent = 'Connecte Discord pour voir tes badges';
-          pop.appendChild(empty);
-          return;
-        }
-        badges.forEach(b => {
-          const it = document.createElement('button');
-          it.type = 'button';
-          it.className = 'bfp-item';
-          it.title = b.title;
-          it.innerHTML = `<img src="https://cdn.discordapp.com/badge-icons/${b.img}.png" alt="${b.title}">`;
-          pop.appendChild(it);
+      const EMO = { chill:'🛋️', game:'🎮', now:'⌨️', sleep:'💤' };
+      function refreshFabState(){
+        const look = (state.profile && state.profile.looking) || 'game';
+        fab.setAttribute('data-look', look);
+        emoEl.textContent = EMO[look] || '🎮';
+        pop.querySelectorAll('.bfp-item').forEach(it => {
+          it.classList.toggle('is-active', it.dataset.val === look);
         });
       }
+      refreshFabState();
+      window.__lookingFabRefresh = refreshFabState;
       fab.addEventListener('click', (e) => {
         e.stopPropagation();
         const open = pop.getAttribute('data-open') === 'true';
-        if (!open) renderPopup();
         pop.setAttribute('data-open', open ? 'false' : 'true');
       });
-      // Click outside → close
+      pop.querySelectorAll('.bfp-item').forEach(it => {
+        it.addEventListener('click', (e) => {
+          e.stopPropagation();
+          state.profile = state.profile || {};
+          state.profile.looking = it.dataset.val;
+          save();
+          refreshFabState();
+          pop.setAttribute('data-open', 'false');
+          // Refresh UI elements that depend on looking
+          if (typeof refreshMyStatusUI === 'function') refreshMyStatusUI();
+        });
+      });
       document.addEventListener('click', (e) => {
         if (pop.getAttribute('data-open') !== 'true') return;
         if (e.target.closest('#badgeFabPop') || e.target.closest('#badgeFab')) return;
@@ -6043,7 +6078,7 @@
       refresh();
       window.__heartFabRefresh = refresh;
       fab.addEventListener('click', () => {
-        // Open the existing Liked-me panel
+        if (typeof renderLikedMe === 'function') renderLikedMe();
         const panel = document.getElementById('likedPanel');
         if (panel) panel.setAttribute('data-open', 'true');
       });
