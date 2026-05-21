@@ -4921,6 +4921,51 @@
       }
       return null;
     }
+    /* Detect images with a transparent background by sampling the corner pixels
+       on a canvas. Returns true if any sampled pixel has alpha < 240. */
+    async function imageHasTransparency(url){
+      return new Promise(resolve => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        const TIMEOUT = setTimeout(() => resolve(false), 4000);
+        img.onload = () => {
+          clearTimeout(TIMEOUT);
+          try {
+            const canvas = document.createElement('canvas');
+            const w = canvas.width = 32, h = canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const data = ctx.getImageData(0, 0, w, h).data;
+            const checks = [[0,0],[w-1,0],[0,h-1],[w-1,h-1],[(w/2)|0,0],[(w/2)|0,h-1],[0,(h/2)|0],[w-1,(h/2)|0]];
+            for (const [x,y] of checks){
+              const i = (y * w + x) * 4;
+              if (data[i+3] < 240) { resolve(true); return; }
+            }
+            resolve(false);
+          } catch { resolve(false); /* tainted canvas */ }
+        };
+        img.onerror = () => { clearTimeout(TIMEOUT); resolve(false); };
+        img.src = url;
+      });
+    }
+    /* Try Wikidata cover variants for games and pick the first one without a
+       transparent background. Returns null if everything is transparent. */
+    async function gameCoverOpaque(title){
+      // Pull the QID once, then test each candidate property until we find an opaque image.
+      const qid = await wikiWikibaseId(title);
+      if (!qid) return null;
+      const props = ['P18', 'P154', 'P2716'];
+      for (const p of props){
+        const url = await wikidataImage(qid, [p]);
+        if (!url) continue;
+        // .svg : almost always transparent → skip outright
+        if (/\.svg(\?|$)/i.test(url)) continue;
+        const transparent = await imageHasTransparency(url);
+        if (!transparent) return url;
+      }
+      return null;
+    }
+
     async function fetchSuggCover(kind, title){
       const k = kind + ':' + title;
       if (_suggCoverCache.has(k)) return _suggCoverCache.get(k);
@@ -4932,13 +4977,12 @@
           if (!cover) cover = await wikidataCover(title, ['P154', 'P18']);
           if (!cover) cover = await wikidataCover(title + ' (anime)', ['P154', 'P18']);
         } else if (kind === 'game') {
-          // Prefer P18 (key visual / box art with characters), fallback to P154 (logo)
-          // then P2716 (collage). Final fallback : REST summary thumbnail.
-          cover = await wikidataCover(title, ['P18', 'P154', 'P2716']);
-          if (!cover) cover = await wikidataCover(title + ' (video game)', ['P18', 'P154', 'P2716']);
+          // Try opaque cover first (skip transparent / SVG)
+          cover = await gameCoverOpaque(title);
+          if (!cover) cover = await gameCoverOpaque(title + ' (video game)');
+          // Fallback REST thumbnail if nothing opaque found
           if (!cover) cover = await wikiPageSummary(title);
         } else if (kind === 'film') {
-          // For films / series, P18 is the poster ; P154 is the logo (less common)
           cover = await wikidataCover(title, ['P18', 'P154']);
           if (!cover) cover = await wikidataCover(title + ' (film)', ['P18', 'P154']);
           if (!cover) cover = await wikidataCover(title + ' (TV series)', ['P18', 'P154']);
