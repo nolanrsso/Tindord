@@ -337,6 +337,74 @@
   body[data-auth="in"] #langSwitch{display:none}
   body[data-auth="out"] #msgFab{display:none}
 
+  /* Match celebration overlay */
+  .match-overlay{
+    position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;
+    pointer-events:none;
+  }
+  .match-overlay[data-show="true"]{display:flex}
+  .match-backdrop{
+    position:absolute;inset:0;background:radial-gradient(circle at 50% 45%, rgba(145,70,255,.45) 0%, rgba(0,0,0,.85) 65%);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    pointer-events:auto;
+    animation:matchBackdropIn .4s ease-out;
+  }
+  @keyframes matchBackdropIn{from{opacity:0}to{opacity:1}}
+  .match-content{
+    position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:20px;
+    pointer-events:auto;
+    animation:matchPop .6s cubic-bezier(.2,.7,.3,1.2);
+  }
+  @keyframes matchPop{0%{opacity:0;transform:scale(.3) rotate(-8deg)}60%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+  .match-title{
+    font-family:"Clash Display",sans-serif;font-weight:800;font-size:48px;letter-spacing:.02em;
+    color:#fff;margin:0;text-shadow:0 6px 26px rgba(0,0,0,.6);
+  }
+  .match-accent{background:linear-gradient(135deg,#FF7EB6,#9146FF,#5BE9FF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .match-sub{font-size:15px;color:#dcddde;margin:0}
+  .match-avatars{display:flex;align-items:center;gap:18px;margin-top:8px}
+  .match-avi{
+    width:120px;height:120px;border-radius:50%;
+    display:grid;place-items:center;color:#fff;
+    font-family:"Clash Display",sans-serif;font-weight:800;font-size:48px;
+    box-shadow:0 14px 42px rgba(0,0,0,.6), 0 0 0 4px rgba(255,255,255,.10) inset;
+    overflow:hidden;
+  }
+  .match-avi img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+  .match-avi-me  {background:linear-gradient(135deg,#5BE9FF,#9146FF);animation:matchAviInLeft  .6s .15s both cubic-bezier(.2,.7,.3,1.2)}
+  .match-avi-them{background:linear-gradient(135deg,#FF7EB6,#9146FF);animation:matchAviInRight .6s .15s both cubic-bezier(.2,.7,.3,1.2)}
+  @keyframes matchAviInLeft {0%{opacity:0;transform:translateX(-80px) scale(.6)}100%{opacity:1;transform:translateX(0) scale(1)}}
+  @keyframes matchAviInRight{0%{opacity:0;transform:translateX(80px)  scale(.6)}100%{opacity:1;transform:translateX(0) scale(1)}}
+  .match-heart-burst{animation:matchHeartBeat 1.2s infinite ease-in-out}
+  @keyframes matchHeartBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+  .match-names{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:700;color:#fff}
+  .match-names .match-x{color:#FF4FA0;font-size:22px}
+
+  /* Mini avatar that flies to the bottom-left msg-fab */
+  .match-fly{
+    position:fixed;width:64px;height:64px;border-radius:50%;
+    display:grid;place-items:center;color:#fff;
+    font-family:"Clash Display",sans-serif;font-weight:800;font-size:24px;
+    background:linear-gradient(135deg,#FF7EB6,#9146FF);
+    box-shadow:0 12px 32px rgba(255,79,160,.5);
+    z-index:201;overflow:hidden;pointer-events:none;
+  }
+  .match-fly img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+  .match-fly.is-flying{
+    animation:matchFly 1.1s cubic-bezier(.5,.1,.3,1.2) forwards;
+  }
+  @keyframes matchFly{
+    0%   { transform:translate(0,0) scale(1.3); opacity:1 }
+    60%  { transform:translate(var(--fx,-200px), var(--fy,200px)) scale(.7); opacity:1 }
+    100% { transform:translate(var(--fx,-200px), var(--fy,200px)) scale(.2); opacity:0 }
+  }
+  /* msg-fab pulse when receiving a new match */
+  .msg-fab.pulse-match{animation:msgFabPulse .9s 3 ease-out}
+  @keyframes msgFabPulse{
+    0%,100%{box-shadow:0 14px 36px rgba(64,78,237,.45), 0 0 0 0 rgba(255,79,160,.6)}
+    50%    {box-shadow:0 14px 36px rgba(64,78,237,.45), 0 0 0 14px rgba(255,79,160,0)}
+  }
+
   /* Floating Messages FAB (bottom-left when logged-in) */
   .msg-fab{
     position:fixed;left:18px;bottom:18px;z-index:24;
@@ -2642,6 +2710,27 @@
       <div class="bpp-badges" id="bppBadgeList"></div>
       <p class="bpp-hint">Connecte-toi avec Discord pour voir tes vrais badges</p>
     </div>
+  </div>
+
+  <!-- Match celebration overlay -->
+  <div class="match-overlay" id="matchOverlay" data-show="false" aria-hidden="true">
+    <div class="match-backdrop"></div>
+    <div class="match-content">
+      <h2 class="match-title">C'est un <span class="match-accent">MATCH</span> !</h2>
+      <p class="match-sub" id="matchSub">Lance la conversation</p>
+      <div class="match-avatars">
+        <div class="match-avi match-avi-me" id="matchAviMe"><span id="matchInitMe">M</span></div>
+        <div class="match-heart-burst"><svg width="48" height="48" viewBox="0 0 24 24" fill="#FF4FA0"><path d="M12 21s-7-4.5-9.3-9.3C1 8.3 3 4.5 6.7 4.5c1.9 0 3.5 1 4.3 2.4l1 1.7 1-1.7C13.8 5.5 15.4 4.5 17.3 4.5 21 4.5 23 8.3 21.3 11.7 19 16.5 12 21 12 21Z"/></svg></div>
+        <div class="match-avi match-avi-them" id="matchAviThem"><span id="matchInitThem">P</span></div>
+      </div>
+      <div class="match-names">
+        <span id="matchNameMe">Moi</span>
+        <span class="match-x">×</span>
+        <span id="matchNameThem">Partenaire</span>
+      </div>
+    </div>
+    <!-- Flying mini avatar (animation to bottom-left) -->
+    <div class="match-fly" id="matchFly" hidden><span id="matchFlyInit">P</span></div>
   </div>
 
   <!-- Messages floating button + slide-out panel (auth=in only) -->
@@ -4958,29 +5047,97 @@
     });
     renderMsgList();
 
-    // Create a match from a liker (Boost flow) → adds a convo + opens chat
+    // Create a match from a liker → match animation, then fly to msg-fab + badge
     window.createMatchFromLiker = function(p){
       const id = 'm_' + Date.now();
-      // Remove the liker from the secret-likes list (already liked back)
       const idx = LIKED_ME.findIndex(x => x.tag === p.tag);
       if (idx >= 0) LIKED_ME.splice(idx, 1);
-      // Inject at the top of CONVOS with a "C'est un match !" first message
+      // Inject the new convo as UNREAD so the badge increments
       CONVOS.unshift({
         id, name: p.name, tag: p.tag, c1: p.c1, c2: p.c2, initial: p.initial,
-        t: "à l'instant", unread: false,
+        t: "à l'instant", unread: true,
         last: 'Vous venez de matcher 🎉',
-        msgs: [
-          { who: 'system', text: `🎉 C'est un match avec ${p.name} ! Lancez la conversation.` },
-        ],
+        msgs: [{ who: 'system', text: `🎉 C'est un match avec ${p.name} ! Lancez la conversation.` }],
       });
-      // Refresh secret-likes panel + open messages panel + open the convo
+      // Close the liked panel + refresh
       if (typeof renderLikedMe === 'function') renderLikedMe();
       document.getElementById('likedPanel').setAttribute('data-open', 'false');
-      panel.setAttribute('data-open', 'true');
-      panel.setAttribute('data-view', 'list');
-      renderMsgList();
-      setTimeout(() => openConvo(id), 60);
+      // Trigger the match overlay animation, then fly to bottom-left
+      playMatchAnimation(p, id);
     };
+
+    function playMatchAnimation(p, convoId){
+      const overlay = document.getElementById('matchOverlay');
+      const aviMe   = document.getElementById('matchAviMe');
+      const aviThem = document.getElementById('matchAviThem');
+      const initMe   = document.getElementById('matchInitMe');
+      const initThem = document.getElementById('matchInitThem');
+      const nameMe   = document.getElementById('matchNameMe');
+      const nameThem = document.getElementById('matchNameThem');
+      const fly      = document.getElementById('matchFly');
+      const flyInit  = document.getElementById('matchFlyInit');
+
+      const u = state.user || {};
+      const myName = u.displayName || 'Moi';
+      const myInit = (myName || 'M').charAt(0).toUpperCase();
+      const myAvatar = u.avatarUrl;
+
+      nameMe.textContent = myName;
+      nameThem.textContent = p.name;
+      initMe.innerHTML = myAvatar ? `<img src="${myAvatar}" alt="">` : myInit;
+      initThem.textContent = p.initial;
+      aviThem.style.background = `linear-gradient(135deg,${p.c1},${p.c2})`;
+
+      overlay.setAttribute('data-show', 'true');
+
+      // After 1.9s : start the fly-to-fab animation
+      setTimeout(() => {
+        const aviRect = aviThem.getBoundingClientRect();
+        const fab = document.getElementById('msgFab');
+        const fabRect = fab ? fab.getBoundingClientRect() : { left: 30, top: window.innerHeight - 50 };
+        const fx = (fabRect.left + fabRect.width / 2) - (aviRect.left + aviRect.width / 2);
+        const fy = (fabRect.top  + fabRect.height / 2) - (aviRect.top  + aviRect.height / 2);
+
+        fly.style.left = aviRect.left + 'px';
+        fly.style.top  = aviRect.top  + 'px';
+        fly.style.width  = aviRect.width  + 'px';
+        fly.style.height = aviRect.height + 'px';
+        fly.style.background = `linear-gradient(135deg,${p.c1},${p.c2})`;
+        flyInit.textContent = p.initial;
+        fly.style.setProperty('--fx', fx + 'px');
+        fly.style.setProperty('--fy', fy + 'px');
+        fly.hidden = false;
+
+        // Fade out the main content while the avatar flies
+        overlay.querySelector('.match-content').style.transition = 'opacity .3s';
+        overlay.querySelector('.match-content').style.opacity = '0';
+
+        // Start the fly animation
+        requestAnimationFrame(() => fly.classList.add('is-flying'));
+
+        // When the avatar lands : update badge + pulse + close overlay
+        setTimeout(() => {
+          fly.classList.remove('is-flying');
+          fly.hidden = true;
+          overlay.setAttribute('data-show', 'false');
+          overlay.querySelector('.match-content').style.opacity = '';
+          // Bump the FAB unread badge + pulse
+          if (fab) {
+            fab.classList.remove('pulse-match'); void fab.offsetWidth; fab.classList.add('pulse-match');
+          }
+          renderMsgList();
+        }, 1100);
+      }, 1900);
+
+      // Click outside the content closes the overlay early (skip animation)
+      const closeOnClick = (ev) => {
+        if (ev.target.closest('.match-content')) return;
+        overlay.setAttribute('data-show', 'false');
+        overlay.removeEventListener('click', closeOnClick);
+        renderMsgList();
+      };
+      overlay.addEventListener('click', closeOnClick);
+    }
 
     // ---------- Orb manager ----------
     let selectedOrbKind = 'music';
