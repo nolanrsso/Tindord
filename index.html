@@ -2171,6 +2171,45 @@
               <label>Bio</label>
               <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
             </div>
+            <div class="acc-field" id="accColorBlock">
+              <label style="display:block">Couleur de profil <small style="color:#b9bbbe;font-weight:400">(corps de la carte, sous la bannière)</small></label>
+              <div class="acc-color-section">
+                <div class="acc-color-pair">
+                  <span class="acc-color-lbl">Primaire</span>
+                  <div class="acc-color-row" data-target="profileColor">
+                    <button type="button" class="acc-color-swatch" data-color="discord" title="Discord"><span style="background:#1c1d22"></span></button>
+                    <button type="button" class="acc-color-swatch" data-color="#9146FF" style="--c:#9146FF"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#FF7EB6" style="--c:#FF7EB6"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#5BE9FF" style="--c:#5BE9FF"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#3BD17C" style="--c:#3BD17C"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#FFB66E" style="--c:#FFB66E"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#ED4245" style="--c:#ED4245"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#1a1a1a" style="--c:#1a1a1a"></button>
+                    <label class="acc-color-pick" title="Couleur personnalisée">
+                      <span class="acc-color-pick-ico">+</span>
+                      <input type="color" id="accProfileColor" value="#9146FF" />
+                    </label>
+                  </div>
+                </div>
+                <div class="acc-color-pair">
+                  <span class="acc-color-lbl">Secondaire <small style="color:#72767d;font-weight:400">(option)</small></span>
+                  <div class="acc-color-row" data-target="profileColor2">
+                    <button type="button" class="acc-color-swatch" data-color="discord" title="Aucune"><span style="background:#1c1d22"></span></button>
+                    <button type="button" class="acc-color-swatch" data-color="#6B2BFF" style="--c:#6B2BFF"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#FF4FA0" style="--c:#FF4FA0"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#2BC4FF" style="--c:#2BC4FF"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#1E6F3A" style="--c:#1E6F3A"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#C56A1C" style="--c:#C56A1C"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#7A1F22" style="--c:#7A1F22"></button>
+                    <button type="button" class="acc-color-swatch" data-color="#000000" style="--c:#000000"></button>
+                    <label class="acc-color-pick" title="Couleur personnalisée">
+                      <span class="acc-color-pick-ico">+</span>
+                      <input type="color" id="accProfileColor2" value="#6B2BFF" />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="acc-profil-col">
             <h3 style="margin:0 0 8px" data-i18n="acc_socials">Comptes liés <small style="color:#b9bbbe;font-weight:400;font-size:11px">(cliquables sur la carte)</small></h3>
@@ -2225,46 +2264,6 @@
             </div>
           </div>
         </div>
-        <div class="acc-field">
-          <label style="display:block">Couleur de profil <small style="color:#b9bbbe;font-weight:400">(corps de la carte, sous la bannière)</small></label>
-          <div class="acc-color-section">
-            <div class="acc-color-pair">
-              <span class="acc-color-lbl">Primaire</span>
-              <div class="acc-color-row" data-target="profileColor">
-                <button type="button" class="acc-color-swatch" data-color="discord" title="Discord"><span style="background:#1c1d22"></span></button>
-                <button type="button" class="acc-color-swatch" data-color="#9146FF" style="--c:#9146FF"></button>
-                <button type="button" class="acc-color-swatch" data-color="#FF7EB6" style="--c:#FF7EB6"></button>
-                <button type="button" class="acc-color-swatch" data-color="#5BE9FF" style="--c:#5BE9FF"></button>
-                <button type="button" class="acc-color-swatch" data-color="#3BD17C" style="--c:#3BD17C"></button>
-                <button type="button" class="acc-color-swatch" data-color="#FFB66E" style="--c:#FFB66E"></button>
-                <button type="button" class="acc-color-swatch" data-color="#ED4245" style="--c:#ED4245"></button>
-                <button type="button" class="acc-color-swatch" data-color="#1a1a1a" style="--c:#1a1a1a"></button>
-                <label class="acc-color-pick" title="Couleur personnalisée">
-                  <span class="acc-color-pick-ico">+</span>
-                  <input type="color" id="accProfileColor" value="#9146FF" />
-                </label>
-              </div>
-            </div>
-            <div class="acc-color-pair">
-              <span class="acc-color-lbl">Secondaire <small style="color:#72767d;font-weight:400">(option)</small></span>
-              <div class="acc-color-row" data-target="profileColor2">
-                <button type="button" class="acc-color-swatch" data-color="discord" title="Aucune"><span style="background:#1c1d22"></span></button>
-                <button type="button" class="acc-color-swatch" data-color="#6B2BFF" style="--c:#6B2BFF"></button>
-                <button type="button" class="acc-color-swatch" data-color="#FF4FA0" style="--c:#FF4FA0"></button>
-                <button type="button" class="acc-color-swatch" data-color="#2BC4FF" style="--c:#2BC4FF"></button>
-                <button type="button" class="acc-color-swatch" data-color="#1E6F3A" style="--c:#1E6F3A"></button>
-                <button type="button" class="acc-color-swatch" data-color="#C56A1C" style="--c:#C56A1C"></button>
-                <button type="button" class="acc-color-swatch" data-color="#7A1F22" style="--c:#7A1F22"></button>
-                <button type="button" class="acc-color-swatch" data-color="#000000" style="--c:#000000"></button>
-                <label class="acc-color-pick" title="Couleur personnalisée">
-                  <span class="acc-color-pick-ico">+</span>
-                  <input type="color" id="accProfileColor2" value="#6B2BFF" />
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div class="acc-field" style="margin-top:10px">
           <button type="button" class="acc-btn acc-btn--ghost acc-resync-btn" id="accResyncDiscord" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="accResyncIco"><path d="M3 12a9 9 0 0 1 15.5-6.4L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.4L3 16"/><path d="M3 21v-5h5"/></svg>
@@ -5362,17 +5361,19 @@
       function renderExisting(){
         const u = state.user || {};
         const has = !!u.profileVoice;
+        // Reset recording state
+        fab.setAttribute('data-state', 'idle');
+        timer.textContent = '';
         if (has) {
           audioEl.src = u.profileVoice;
           preview.hidden = false;
-          fab.hidden = true;
+          fab.hidden = false;
+          lbl.textContent = 'Ré-enregistrer le vocal';
         } else {
           audioEl.src = '';
           preview.hidden = true;
           fab.hidden = false;
-          fab.setAttribute('data-state', 'idle');
           lbl.textContent = 'Enregistrer un vocal';
-          timer.textContent = '';
         }
       }
       renderExisting();
