@@ -3658,8 +3658,25 @@
     window.__tindord = {
       onLogin(user){
         state.user = Object.assign({}, state.user || {}, user);
+        // Restore an archived profile if we have one for this Discord ID
+        try {
+          const key = state.user.discordId || state.user.email || state.user.discordTag;
+          if (key && !state.profile) {
+            const archives = JSON.parse(localStorage.getItem('tindord_archived_profiles') || '{}');
+            const arch = archives[key];
+            if (arch && arch.profile) {
+              state.profile = arch.profile;
+              // Merge non-identity user extras (voice, color, music settings, boost, etc.)
+              if (arch.userExtras) {
+                Object.entries(arch.userExtras).forEach(([k, v]) => {
+                  if (v !== null && v !== undefined && state.user[k] == null) state.user[k] = v;
+                });
+              }
+              console.log('[Tindord] Restored archived profile for', key);
+            }
+          }
+        } catch (e) { console.warn('restore archive failed', e); }
         save(); setAuth(true);
-        // Connected users: stay on landing with "Commencer à swiper" CTA
         setScreen(state.profile ? 'landing' : 'onboarding');
       },
       go(screen){ setScreen(screen); },
@@ -6283,6 +6300,34 @@
     });
     document.getElementById('accBackSwipe').addEventListener('click', () => setScreen('swipe'));
     document.getElementById('accLogout').addEventListener('click', () => {
+      // Archive the current profile so we can restore it on next Discord reconnect.
+      // Keyed by Discord ID (or email as fallback) so different users keep separate profiles.
+      try {
+        const u = state.user || {};
+        const key = u.discordId || u.email || u.discordTag;
+        if (key && state.profile) {
+          const archives = JSON.parse(localStorage.getItem('tindord_archived_profiles') || '{}');
+          archives[key] = {
+            profile: state.profile,
+            userExtras: {
+              profileVoice: u.profileVoice || null,
+              profileColor: u.profileColor || null,
+              profileColor2: u.profileColor2 || null,
+              musicVolume: u.musicVolume || null,
+              musicStartTime: u.musicStartTime || null,
+              socials: u.socials || null,
+              swipeMusic: u.swipeMusic || null,
+              gifs: u.gifs || null,
+              fakeNitro: u.fakeNitro || null,
+              genderFilter: u.genderFilter || null,
+              boost: u.boost || null,
+              boostPlan: u.boostPlan || null,
+            },
+            savedAt: Date.now(),
+          };
+          localStorage.setItem('tindord_archived_profiles', JSON.stringify(archives));
+        }
+      } catch (e) { console.warn('archive failed', e); }
       state = { user:null, profile:null };
       save();
       setAuth(false);
