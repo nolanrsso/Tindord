@@ -566,9 +566,9 @@
     pointer-events:auto;
     animation:orbFloat 6s ease-in-out infinite;
   }
-  /* Orb bubble — fully circular, vibrant. 1.4x for non-music. */
+  /* Orb bubble — fully circular, vibrant. 80% of previous (1.12x of original). */
   .swipe-stage .orbit .orb{
-    width:182px;height:182px;border-radius:50%;
+    width:146px;height:146px;border-radius:50%;
     display:grid;place-items:center;
     border:1.5px solid rgba(255,255,255,.28);
     cursor:pointer;pointer-events:auto;
@@ -585,7 +585,7 @@
   }
   .swipe-stage .orbit .orb:hover{transform:scale(1.12);border-color:rgba(255,255,255,.42)}
   .swipe-stage .orbit .orb:active{transform:scale(.93)}
-  .swipe-stage .orbit .orb svg{width:54px;height:54px;position:relative;z-index:2;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+  .swipe-stage .orbit .orb svg{width:44px;height:44px;position:relative;z-index:2;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
   .swipe-stage .orbit .orb .orb-cover{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:2}
   /* Music orbs: white aura. All other kinds (game/anime/film/voice): deep black + black aura. */
   .swipe-stage .orbit .orb[data-kind="music"]{
@@ -631,9 +631,9 @@
     50%    { filter:drop-shadow(0 8px 18px rgba(255,255,255,.08)) }
   }
   /* When >6 orbs : shrink so they all fit on screen */
-  .orbit.orbit--dynamic .orb{width:140px;height:140px}
-  .orbit.orbit--dynamic .orb svg{width:48px;height:48px}
-  .orbit.orbit--dynamic .orb-label{max-width:130px;font-size:10.5px}
+  .orbit.orbit--dynamic .orb{width:112px;height:112px}
+  .orbit.orbit--dynamic .orb svg{width:38px;height:38px}
+  .orbit.orbit--dynamic .orb-label{max-width:104px;font-size:10px}
   /* When dynamic, position is set inline → kill the CSS nth-child defaults */
   .orbit.orbit--dynamic .orb-wrap:nth-child(n){top:auto;left:auto;right:auto;bottom:auto;animation:none}
   .orbit .orb-wrap{user-select:none;-webkit-user-select:none}
@@ -4085,7 +4085,7 @@
         wrap.appendChild(label);
 
         const isMusic = o.kind === 'music';
-        const orbR = isMusic ? 90 : (n > 6 ? 70 : 91);
+        const orbR = isMusic ? 90 : (n > 6 ? 56 : 73);
         const pos = pickPos(orbR);
 
         if (isMusic) wrap.classList.add('orb-wrap--music');
@@ -4269,7 +4269,41 @@
           else if (it.x > sw - margin) { it.x = sw - margin; it.vx = -Math.abs(it.vx); }
           if (it.y < margin)        { it.y = margin;        it.vy = Math.abs(it.vy); }
           else if (it.y > sh - margin) { it.y = sh - margin; it.vy = -Math.abs(it.vy); }
-
+        }
+        // Pairwise collisions — bubble-against-bubble, elastic bounce.
+        const items = _orbSim.items;
+        for (let i = 0; i < items.length; i++){
+          const a = items[i];
+          for (let j = i + 1; j < items.length; j++){
+            const b = items[j];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const d  = Math.hypot(dx, dy);
+            const minD = a.r + b.r;
+            if (d > 0 && d < minD){
+              const overlap = (minD - d);
+              const nx = dx / d, ny = dy / d;
+              // Push apart proportionally to radius (lighter orb moves more)
+              const totalR = a.r + b.r;
+              const wa = b.r / totalR, wb = a.r / totalR;
+              a.x -= nx * overlap * wa;
+              a.y -= ny * overlap * wa;
+              b.x += nx * overlap * wb;
+              b.y += ny * overlap * wb;
+              // Elastic velocity exchange along the normal
+              const va = a.vx * nx + a.vy * ny;
+              const vb = b.vx * nx + b.vy * ny;
+              const diff = vb - va;
+              // Soft restitution (0.7) to keep system stable
+              a.vx += nx * diff * 0.5 * 0.7;
+              a.vy += ny * diff * 0.5 * 0.7;
+              b.vx -= nx * diff * 0.5 * 0.7;
+              b.vy -= ny * diff * 0.5 * 0.7;
+            }
+          }
+        }
+        // Apply transforms after collision resolution
+        for (const it of items){
           it.el.style.transform = `translate(${it.x - it.r}px, ${it.y - it.r}px)`;
         }
         _orbSim.raf = requestAnimationFrame(step);
