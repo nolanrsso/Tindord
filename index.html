@@ -1393,6 +1393,41 @@
   body[data-screen="account"] .acc-discord-fab{display:flex}
   .acc-discord-fab:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 16px 38px rgba(88,101,242,.6)}
 
+  /* Voice recorder FAB — bottom-right of the acc-card (above the actions row) */
+  .acc-voice-fab{
+    position:absolute;right:24px;bottom:78px;
+    width:64px;height:64px;border-radius:50%;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;
+    background:linear-gradient(180deg,#9146FF,#6B2BFF);color:#fff;
+    box-shadow:0 14px 36px rgba(107,43,255,.55), 0 0 0 1px rgba(255,255,255,.10) inset;
+    transition:transform .18s ease, box-shadow .18s ease, background .2s ease;
+    z-index:18;
+  }
+  .acc-voice-fab:hover{transform:scale(1.07) translateY(-2px);box-shadow:0 18px 42px rgba(145,70,255,.65)}
+  .acc-voice-fab .acc-voice-ico{display:grid;place-items:center}
+  .acc-voice-fab .ico-stop{display:none}
+  .acc-voice-fab[data-state="recording"]{background:linear-gradient(180deg,#FF4FA0,#C92866);animation:voiceRecPulse 1.2s ease-in-out infinite}
+  .acc-voice-fab[data-state="recording"] .ico-mic{display:none}
+  .acc-voice-fab[data-state="recording"] .ico-stop{display:block}
+  .acc-voice-fab .acc-voice-timer{font-size:10px;font-weight:800;letter-spacing:.04em}
+  @keyframes voiceRecPulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(255,79,160,.7), 0 14px 36px rgba(255,79,160,.6)}
+    50%    {box-shadow:0 0 0 14px rgba(255,79,160,0), 0 14px 36px rgba(255,79,160,.6)}
+  }
+  /* Don't show the voice FAB on other tabs */
+  body[data-screen="account"] .acc-card:not([data-current-tab="profil"]) .acc-voice-fab,
+  body[data-screen="account"] .acc-card:not([data-current-tab="profil"]) .acc-voice-preview{display:none}
+
+  .acc-voice-preview{
+    position:absolute;right:100px;bottom:88px;z-index:18;
+    display:flex;align-items:center;gap:8px;
+    padding:6px 8px 6px 10px;border-radius:14px;
+    background:rgba(20,21,26,.96);border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 14px 32px rgba(0,0,0,.55);
+  }
+  .acc-voice-preview audio{height:28px}
+  .acc-voice-preview .acc-btn{padding:5px 9px !important;font-size:11px !important;background:rgba(255,79,160,.18)!important;color:#FF7EB6!important;border:1px solid rgba(255,79,160,.35)!important}
+
   /* ===== GIF placement stage (account) ===== */
   .gif-stage{
     position:relative;width:100%;aspect-ratio:920/740;border-radius:16px;
@@ -2283,6 +2318,19 @@
         </div>
       </div>
       <div class="acc-msg" id="accMsg" data-show="false"></div>
+
+      <!-- Voice recorder FAB (bottom-right of acc-card, visible only on Profil tab) -->
+      <div class="acc-voice-preview" id="accVoicePreview" hidden>
+        <audio id="accVoiceAudio" controls></audio>
+        <button type="button" class="acc-btn acc-btn--ghost" id="accVoiceDel" title="Supprimer le vocal">✕</button>
+      </div>
+      <button type="button" class="acc-voice-fab" id="accVoiceFab" title="Enregistrer un vocal pour ton profil" data-state="idle">
+        <span class="acc-voice-ico">
+          <svg class="ico-mic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M9 21h6"/></svg>
+          <svg class="ico-stop" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+        </span>
+        <span class="acc-voice-timer" id="accVoiceTimer">15s</span>
+      </button>
     </div>
 
     <!-- Boost banner is OUTSIDE the acc-card frame (full width below) -->
@@ -5216,6 +5264,80 @@
     })();
 
     // Discord resync button — fetches latest Discord profile and merges into state.user
+    /* ===== Voice recorder (profile audio) ===== */
+    (function bindVoiceRecorder(){
+      const fab = document.getElementById('accVoiceFab');
+      const timer = document.getElementById('accVoiceTimer');
+      const preview = document.getElementById('accVoicePreview');
+      const audioEl = document.getElementById('accVoiceAudio');
+      const delBtn = document.getElementById('accVoiceDel');
+      if (!fab) return;
+      let mediaRec = null, chunks = [], tickIv = null, secs = 0, MAX = 15;
+
+      function renderExisting(){
+        const u = state.user || {};
+        if (u.profileVoice) {
+          audioEl.src = u.profileVoice;
+          preview.hidden = false;
+        } else {
+          audioEl.src = '';
+          preview.hidden = true;
+        }
+      }
+      // Initial render + re-render on account screen entry
+      renderExisting();
+      window.__voiceRefresh = renderExisting;
+
+      async function start(){
+        if (!navigator.mediaDevices?.getUserMedia) { alert('Enregistrement non supporté par ce navigateur.'); return; }
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          chunks = [];
+          mediaRec = new MediaRecorder(stream);
+          mediaRec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+          mediaRec.onstop = () => {
+            stream.getTracks().forEach(t => t.stop());
+            const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+            const reader = new FileReader();
+            reader.onload = () => {
+              state.user = state.user || {};
+              state.user.profileVoice = reader.result;
+              save();
+              renderExisting();
+            };
+            reader.readAsDataURL(blob);
+            fab.setAttribute('data-state', 'idle');
+            timer.textContent = MAX + 's';
+            clearInterval(tickIv); tickIv = null; secs = 0;
+          };
+          mediaRec.start();
+          fab.setAttribute('data-state', 'recording');
+          secs = 0;
+          timer.textContent = (MAX - secs) + 's';
+          tickIv = setInterval(() => {
+            secs++;
+            timer.textContent = (MAX - secs) + 's';
+            if (secs >= MAX) stop();
+          }, 1000);
+        } catch (e) {
+          console.warn('mic denied', e);
+          alert('Accès au micro refusé.');
+        }
+      }
+      function stop(){
+        try { mediaRec?.stop(); } catch {}
+      }
+      fab.addEventListener('click', () => {
+        if (fab.dataset.state === 'recording') stop(); else start();
+      });
+      delBtn.addEventListener('click', () => {
+        state.user = state.user || {};
+        delete state.user.profileVoice;
+        save();
+        renderExisting();
+      });
+    })();
+
     (function bindDiscordResync(){
       const btn = document.getElementById('accResyncDiscord');
       if (!btn) return;
