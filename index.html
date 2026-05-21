@@ -337,6 +337,38 @@
   body[data-auth="in"] #langSwitch{display:none}
   body[data-auth="out"] #msgFab{display:none}
 
+  /* Liker full-profile overlay */
+  .liker-overlay{
+    position:fixed;inset:0;z-index:180;display:none;align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .liker-overlay[data-show="true"]{display:flex;animation:fadeInOverlay .25s ease-out}
+  @keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
+  .liker-backdrop{
+    position:absolute;inset:0;background:rgba(8,9,14,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    cursor:pointer;
+  }
+  .liker-close{
+    position:fixed;top:18px;right:18px;z-index:2;
+    width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;
+    display:grid;place-items:center;color:#fff;
+    background:rgba(20,21,26,.95);border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 8px 22px rgba(0,0,0,.6);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .liker-close:hover{transform:scale(1.08);background:rgba(255,79,160,.18);border-color:rgba(255,79,160,.45)}
+  .liker-card-wrap{
+    position:relative;z-index:1;
+    width:min(96vw,420px);height:min(90vh,640px);
+    border-radius:20px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.7);
+    animation:likerPop .35s cubic-bezier(.2,.7,.3,1.1);
+  }
+  @keyframes likerPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .liker-card-wrap .swipe-card{position:absolute !important;inset:0 !important;transform:none !important;cursor:default !important}
+  .liker-card-wrap .swipe-card .badge-stamp,
+  .liker-card-wrap .swipe-card .badge-picker-btn{display:none !important}
+
   /* Match celebration overlay */
   .match-overlay{
     position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;
@@ -1865,12 +1897,20 @@
   .liked-item--clickable{cursor:pointer}
   .liked-item--clickable:hover{background:rgba(255,79,160,.10)}
   .liked-item .li-action{
-    margin-left:auto;width:32px;height:32px;border-radius:50%;
-    display:grid;place-items:center;color:#FF7EB6;flex:0 0 auto;
-    background:rgba(255,79,160,.12);border:1px solid rgba(255,79,160,.35);
+    width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+    display:grid;place-items:center;flex:0 0 auto;
     transition:.15s ease;
   }
-  .liked-item--clickable:hover .li-action{background:rgba(255,79,160,.28);transform:scale(1.08)}
+  .liked-item .li-act-heart{
+    margin-left:auto;color:#FF7EB6;
+    background:rgba(255,79,160,.14);border:1px solid rgba(255,79,160,.35);
+  }
+  .liked-item .li-act-heart:hover{background:rgba(255,79,160,.32);transform:scale(1.10)}
+  .liked-item .li-act-x{
+    color:#fff;background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.20);
+  }
+  .liked-item .li-act-x:hover{background:rgba(255,255,255,.16);transform:scale(1.10)}
 
   /* ===== Boost banner (account) ===== */
   .boost-banner{
@@ -2738,6 +2778,15 @@
       <div class="bpp-badges" id="bppBadgeList"></div>
       <p class="bpp-hint">Connecte-toi avec Discord pour voir tes vrais badges</p>
     </div>
+  </div>
+
+  <!-- Liker full-profile overlay -->
+  <div class="liker-overlay" id="likerOverlay" data-show="false" aria-hidden="true">
+    <div class="liker-backdrop" id="likerBackdrop"></div>
+    <button type="button" class="liker-close" id="likerClose" aria-label="Fermer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+    </button>
+    <div class="liker-card-wrap" id="likerCardWrap"></div>
   </div>
 
   <!-- Match celebration overlay -->
@@ -5740,6 +5789,52 @@
       { name:'Inès',    tag:'ineslalala', age:20, c1:'#FFB66E', c2:'#FF4FA0', initial:'I' },
       { name:'Lucas',   tag:'lucazz', age:23, c1:'#3BD17C', c2:'#5BE9FF', initial:'L' },
     ];
+    /* Open a liker's full profile in an overlay (Boost only) */
+    function openLikerProfile(p){
+      const overlay = document.getElementById('likerOverlay');
+      const wrap = document.getElementById('likerCardWrap');
+      if (!overlay || !wrap) return;
+      // Build a mini "profile" object with sensible defaults so buildCard works
+      const profileObj = {
+        name: p.name,
+        tag: p.tag,
+        age: p.age || '',
+        gender: p.gender || '',
+        looking: p.looking || 'game',
+        status: p.status || 'online',
+        nitro: !!p.nitro,
+        joinedOn: p.joinedOn || 'récemment',
+        activity: p.activity || { type:'game', title:'Tindord', sub:'Vient de te liker' },
+        games: p.games || [],
+        bio: p.bio || 'Vient de liker ton profil. Réponds vite ?',
+        common: p.common || { friends:0, servers:0 },
+        c1: p.c1, c2: p.c2,
+        initial: p.initial,
+        avatarUrl: p.avatarUrl || null,
+        bannerUrl: p.bannerUrl || null,
+        decorationUrl: p.decorationUrl || null,
+        orbs: p.orbs || [],
+        publicFlags: p.publicFlags || 0,
+        premiumType: p.premiumType || 0,
+        socials: p.socials || {},
+        isMe: false,
+      };
+      wrap.innerHTML = '';
+      const card = buildCard(profileObj, false);
+      wrap.appendChild(card);
+      overlay.setAttribute('data-show', 'true');
+    }
+    (function bindLikerOverlay(){
+      const overlay = document.getElementById('likerOverlay');
+      if (!overlay) return;
+      const close = () => overlay.setAttribute('data-show', 'false');
+      document.getElementById('likerClose').addEventListener('click', close);
+      document.getElementById('likerBackdrop').addEventListener('click', close);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.getAttribute('data-show') === 'true') close();
+      });
+    })();
+
     function renderLikedMe(){
       const list = document.getElementById('likedList');
       list.innerHTML = '';
@@ -5759,7 +5854,7 @@
       }
 
       // List of likers — photo always visible on the LEFT, info blurred for non-boost
-      // (revealed on hover). Boost users : click → like back → match + open chat.
+      // (revealed on hover). Boost users : click info area to OPEN profile, click ❤️ to match, click ✕ to reject.
       likers.forEach((p, idx) => {
         const it = document.createElement('div');
         it.className = 'liked-item' + (unlocked ? ' liked-item--clickable' : ' liked-item--locked');
@@ -5770,9 +5865,28 @@
              <b class="${unlocked ? '' : 'li-blur'}">${escapeHtmlMini(p.name)} · ${p.age}</b>
              <small class="${unlocked ? '' : 'li-blur'}">@${escapeHtmlMini(p.tag)}</small>
            </div>` +
-          (unlocked ? `<span class="li-action" title="Like en retour"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.3-9.3C1 8.3 3 4.5 6.7 4.5c1.9 0 3.5 1 4.3 2.4l1 1.7 1-1.7C13.8 5.5 15.4 4.5 17.3 4.5 21 4.5 23 8.3 21.3 11.7 19 16.5 12 21 12 21Z"/></svg></span>` : '');
+          (unlocked ? `
+            <button type="button" class="li-action li-act-heart" title="Like en retour">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.3-9.3C1 8.3 3 4.5 6.7 4.5c1.9 0 3.5 1 4.3 2.4l1 1.7 1-1.7C13.8 5.5 15.4 4.5 17.3 4.5 21 4.5 23 8.3 21.3 11.7 19 16.5 12 21 12 21Z"/></svg>
+            </button>
+            <button type="button" class="li-action li-act-x" title="Supprimer ce like">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+            </button>
+          ` : '');
         if (unlocked) {
-          it.addEventListener('click', () => createMatchFromLiker(p));
+          // Click on the avatar/info area → open the full profile overlay
+          const heartBtn = it.querySelector('.li-act-heart');
+          const xBtn = it.querySelector('.li-act-x');
+          it.querySelector('.lavi').addEventListener('click', (e) => { e.stopPropagation(); openLikerProfile(p); });
+          it.querySelector('.li-info').addEventListener('click', (e) => { e.stopPropagation(); openLikerProfile(p); });
+          heartBtn.addEventListener('click', (e) => { e.stopPropagation(); createMatchFromLiker(p); });
+          xBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const i = LIKED_ME.findIndex(x => x.tag === p.tag);
+            if (i >= 0) LIKED_ME.splice(i, 1);
+            renderLikedMe();
+            if (typeof window.__heartFabRefresh === 'function') window.__heartFabRefresh();
+          });
         }
         list.appendChild(it);
       });
