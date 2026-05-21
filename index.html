@@ -1231,8 +1231,11 @@
   .acc-actions{display:flex;align-items:center;gap:12px}
   .boost-banner--inline{flex:1 1 auto;margin-bottom:0 !important;min-width:0}
 
-  /* Profil tab: single column (all options right of the preview) */
-  .acc-tab--profil:not([hidden]){display:flex !important;flex-direction:column;gap:8px}
+  /* Profil tab: top row 2 columns (Pseudo/Bio | Comptes liés), then full-width below */
+  .acc-tab--profil:not([hidden]){display:flex !important;flex-direction:column;gap:10px}
+  .acc-profil-top{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin-bottom:6px}
+  .acc-profil-col{display:flex;flex-direction:column;gap:8px;min-width:0}
+  @media (max-width:780px){ .acc-profil-top{grid-template-columns:1fr} }
 
   /* Preview-mode swipe-card — scale down everything proportionally for the mini preview */
   .acc-preview-wrap .swipe-card.preview-mode .banner{height:90px !important;max-height:90px !important}
@@ -2053,13 +2056,40 @@
 
       <!-- 🪪 Profil -->
       <div class="acc-section acc-tab acc-tab--profil" data-tab="profil">
-        <div class="acc-field">
-          <label>Pseudo</label>
-          <input class="acc-input" id="accPseudo" type="text" maxlength="32" placeholder="Tindord_user" />
-        </div>
-        <div class="acc-field">
-          <label>Bio</label>
-          <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
+        <div class="acc-profil-top">
+          <div class="acc-profil-col">
+            <div class="acc-field">
+              <label>Pseudo</label>
+              <input class="acc-input" id="accPseudo" type="text" maxlength="32" placeholder="Tindord_user" />
+            </div>
+            <div class="acc-field">
+              <label>Bio</label>
+              <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
+            </div>
+          </div>
+          <div class="acc-profil-col">
+            <h3 style="margin:0 0 8px" data-i18n="acc_socials">Comptes liés <small style="color:#b9bbbe;font-weight:400;font-size:11px">(cliquables sur la carte)</small></h3>
+            <div class="acc-social">
+              <div class="acc-social-row" data-kind="instagram">
+                <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></span>
+                <span class="so-name">Instagram</span>
+                <input type="text" id="socIg" placeholder="@username" autocomplete="off" />
+                <button type="button" id="socIgBtn" data-i18n="connect">Connecter</button>
+              </div>
+              <div class="acc-social-row" data-kind="tiktok">
+                <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.5a6.5 6.5 0 0 1-3.8-1.2v8.3a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v3.1a2.9 2.9 0 1 0 2 2.7V2h3a3.5 3.5 0 0 0 3.8 3.5v2z"/></svg></span>
+                <span class="so-name">TikTok</span>
+                <input type="text" id="socTt" placeholder="@username" autocomplete="off" />
+                <button type="button" id="socTtBtn" data-i18n="connect">Connecter</button>
+              </div>
+              <div class="acc-social-row" data-kind="spotify">
+                <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Zm1.25-2.78a.88.88 0 0 1-1.2.28c-2.97-1.83-7.5-2.36-11.02-1.3a.88.88 0 0 1-.5-1.69c4-1.2 8.97-.6 12.4 1.5.4.25.55.81.32 1.21Zm.1-2.9c-3.56-2.12-9.44-2.32-12.83-1.28a1.05 1.05 0 1 1-.6-2.02c3.9-1.18 10.4-.95 14.5 1.5a1.05 1.05 0 1 1-1.07 1.8Z"/></svg></span>
+                <span class="so-name">Spotify</span>
+                <input type="text" id="socSp" placeholder="username" autocomplete="off" />
+                <button type="button" id="socSpBtn" data-i18n="connect">Connecter</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="acc-field">
           <label style="display:block">Couleur de profil <small style="color:#b9bbbe;font-weight:400">(corps de la carte, sous la bannière)</small></label>
@@ -2114,28 +2144,6 @@
           <option value="now">⌨️ Mate maintenant</option>
           <option value="sleep">💤 Sleepcall</option>
         </select>
-
-        <h3 style="margin-top:10px" data-i18n="acc_socials">Comptes liés <small style="color:#b9bbbe;font-weight:400;font-size:11px">(cliquables sur la carte)</small></h3>
-        <div class="acc-social">
-          <div class="acc-social-row" data-kind="instagram">
-            <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></span>
-            <span class="so-name">Instagram</span>
-            <input type="text" id="socIg" placeholder="@username" autocomplete="off" />
-            <button type="button" id="socIgBtn" data-i18n="connect">Connecter</button>
-          </div>
-          <div class="acc-social-row" data-kind="tiktok">
-            <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.5a6.5 6.5 0 0 1-3.8-1.2v8.3a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v3.1a2.9 2.9 0 1 0 2 2.7V2h3a3.5 3.5 0 0 0 3.8 3.5v2z"/></svg></span>
-            <span class="so-name">TikTok</span>
-            <input type="text" id="socTt" placeholder="@username" autocomplete="off" />
-            <button type="button" id="socTtBtn" data-i18n="connect">Connecter</button>
-          </div>
-          <div class="acc-social-row" data-kind="spotify">
-            <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Zm1.25-2.78a.88.88 0 0 1-1.2.28c-2.97-1.83-7.5-2.36-11.02-1.3a.88.88 0 0 1-.5-1.69c4-1.2 8.97-.6 12.4 1.5.4.25.55.81.32 1.21Zm.1-2.9c-3.56-2.12-9.44-2.32-12.83-1.28a1.05 1.05 0 1 1-.6-2.02c3.9-1.18 10.4-.95 14.5 1.5a1.05 1.05 0 1 1-1.07 1.8Z"/></svg></span>
-            <span class="so-name">Spotify</span>
-            <input type="text" id="socSp" placeholder="username" autocomplete="off" />
-            <button type="button" id="socSpBtn" data-i18n="connect">Connecter</button>
-          </div>
-        </div>
       </div>
 
       <!-- 🫧 Mes Bulles -->
