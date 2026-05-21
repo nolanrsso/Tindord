@@ -4969,16 +4969,32 @@
        transparent logo or a bad asset. Either a forced URL, or "logo:true" to
        accept a transparent logo for that game (e.g. Dead by Daylight). */
     const GAME_COVER_OVERRIDES = {
-      'Minecraft': 'https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png',
+      // Minecraft : use the Wikipedia cover page via Special:FilePath (redirects
+      // to upload.wikimedia.org with proper CORS).
+      'Minecraft': 'https://en.wikipedia.org/wiki/Special:FilePath/Minecraft_cover.png?width=500',
       'Dead by Daylight': { logo: true }, // allow transparent logo
     };
+
+    /* Quickly verifies an image URL loads (HEAD + size > 0). Returns true if usable. */
+    async function imageLoads(url){
+      return new Promise(resolve => {
+        const img = new Image();
+        const TIMEOUT = setTimeout(() => resolve(false), 4000);
+        img.onload = () => { clearTimeout(TIMEOUT); resolve(img.naturalWidth > 0); };
+        img.onerror = () => { clearTimeout(TIMEOUT); resolve(false); };
+        img.src = url;
+      });
+    }
 
     /* Try Wikidata cover variants for games and pick the first one without a
        transparent background. Falls back to manual overrides. */
     async function gameCoverOpaque(title){
-      // Manual override (forced URL)
+      // Manual override (forced URL) — verify it loads before using
       const ovr = GAME_COVER_OVERRIDES[title];
-      if (ovr && typeof ovr === 'string') return ovr;
+      if (ovr && typeof ovr === 'string') {
+        if (await imageLoads(ovr)) return ovr;
+        // Override URL is broken — fall through to Wikidata
+      }
       const allowLogo = !!(ovr && ovr.logo);
 
       const qid = await wikiWikibaseId(title);
