@@ -555,8 +555,9 @@
     pointer-events:none;
   }
   .swipe-stage .swipe-wrap{pointer-events:auto}
+  /* Orbit floats across the whole viewport, on top of every screen */
   .swipe-stage .orbit{
-    position:absolute;inset:0;pointer-events:none;z-index:50;
+    position:fixed;inset:0;pointer-events:none;z-index:50;
   }
   /* Orb wrapper — carries absolute position + float animation */
   .swipe-stage .orbit .orb-wrap{
@@ -565,9 +566,9 @@
     pointer-events:auto;
     animation:orbFloat 6s ease-in-out infinite;
   }
-  /* Orb bubble — fully circular, vibrant */
+  /* Orb bubble — fully circular, vibrant. 1.4x for non-music. */
   .swipe-stage .orbit .orb{
-    width:130px;height:130px;border-radius:50%;
+    width:182px;height:182px;border-radius:50%;
     display:grid;place-items:center;
     border:1.5px solid rgba(255,255,255,.28);
     cursor:pointer;pointer-events:auto;
@@ -586,11 +587,39 @@
   .swipe-stage .orbit .orb:active{transform:scale(.93)}
   .swipe-stage .orbit .orb svg{width:54px;height:54px;position:relative;z-index:2;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
   .swipe-stage .orbit .orb .orb-cover{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:2}
-  /* Kind-specific vibrant gradients */
-  .swipe-stage .orbit .orb[data-kind="voice"]{background:linear-gradient(145deg,#7289DA,#5865F2,#9146FF);border-color:rgba(173,140,255,.85);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 -10px 22px rgba(0,0,0,.28), 0 0 0 2px rgba(88,101,242,.30), 0 0 18px 2px rgba(88,101,242,.75), 0 0 48px 10px rgba(88,101,242,.32), 0 14px 30px rgba(0,0,0,.45)}
-  .swipe-stage .orbit .orb[data-kind="music"]{background:linear-gradient(145deg,#1ed760,#1DB954,#0e7a38);border-color:rgba(110,255,160,.85);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 -10px 22px rgba(0,0,0,.28), 0 0 0 2px rgba(29,185,84,.30), 0 0 18px 2px rgba(29,185,84,.75), 0 0 48px 10px rgba(29,185,84,.32), 0 14px 30px rgba(0,0,0,.45)}
-  .swipe-stage .orbit .orb[data-kind="anime"]{background:linear-gradient(145deg,#FF9CC0,#FF7EB6,#b020b8);border-color:rgba(255,180,220,.9);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 -10px 22px rgba(0,0,0,.28), 0 0 0 2px rgba(192,38,211,.30), 0 0 18px 2px rgba(255,126,182,.75), 0 0 48px 10px rgba(192,38,211,.32), 0 14px 30px rgba(0,0,0,.45)}
-  .swipe-stage .orbit .orb[data-kind="game"] {background:linear-gradient(145deg,#FFD080,#FFB66E,#FF4FA0);border-color:rgba(255,200,150,.9);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 -10px 22px rgba(0,0,0,.28), 0 0 0 2px rgba(255,79,160,.30), 0 0 18px 2px rgba(255,182,110,.75), 0 0 48px 10px rgba(255,79,160,.32), 0 14px 30px rgba(0,0,0,.45)}
+  /* Music orbs: white aura. All other kinds (game/anime/film/voice): deep black + black aura. */
+  .swipe-stage .orbit .orb[data-kind="music"]{
+    background:radial-gradient(circle at 34% 28%, #ffffff 0%, #f3f3f3 35%, #d9d9d9 70%, #b6b6b6 100%);
+    border-color:rgba(255,255,255,.95);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.55),
+      inset 0 -10px 22px rgba(0,0,0,.10),
+      0 0 0 3px rgba(255,255,255,.35),
+      0 0 24px 6px rgba(255,255,255,.65),
+      0 0 68px 16px rgba(255,255,255,.40),
+      0 14px 30px rgba(0,0,0,.55);
+  }
+  .swipe-stage .orbit .orb[data-kind="voice"],
+  .swipe-stage .orbit .orb[data-kind="anime"],
+  .swipe-stage .orbit .orb[data-kind="game"],
+  .swipe-stage .orbit .orb[data-kind="film"]{
+    background:radial-gradient(circle at 36% 32%, #2a2a2e 0%, #15151a 45%, #07070b 100%);
+    border-color:rgba(0,0,0,.85);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.06),
+      inset 0 -12px 24px rgba(0,0,0,.7),
+      0 0 0 2px rgba(0,0,0,.50),
+      0 0 22px 4px rgba(0,0,0,.85),
+      0 0 60px 18px rgba(0,0,0,.65),
+      0 14px 30px rgba(0,0,0,.65);
+  }
+  /* Orb covers (game/anime/film/voice) — sit on top of the black background */
+  .swipe-stage .orbit .orb[data-kind="voice"] .orb-cover,
+  .swipe-stage .orbit .orb[data-kind="anime"] .orb-cover,
+  .swipe-stage .orbit .orb[data-kind="game"] .orb-cover,
+  .swipe-stage .orbit .orb[data-kind="film"] .orb-cover{
+    box-shadow:0 0 0 3px rgba(0,0,0,.85);
+  }
   .swipe-stage .orbit .orb[data-kind="voice"].playing{animation:voicePulse 1s ease-in-out infinite}
   @keyframes voicePulse{
     0%,100%{box-shadow:0 0 0 4px rgba(145,70,255,.5), 0 0 32px rgba(145,70,255,.75)}
@@ -601,10 +630,10 @@
     0%,100%{ filter:drop-shadow(0 0 0 transparent) }
     50%    { filter:drop-shadow(0 8px 18px rgba(255,255,255,.08)) }
   }
-  /* When >6 orbs : shrink slightly so they all fit on screen */
-  .orbit.orbit--dynamic .orb{width:100px;height:100px}
-  .orbit.orbit--dynamic .orb svg{width:42px;height:42px}
-  .orbit.orbit--dynamic .orb-label{max-width:104px;font-size:10.5px}
+  /* When >6 orbs : shrink so they all fit on screen */
+  .orbit.orbit--dynamic .orb{width:140px;height:140px}
+  .orbit.orbit--dynamic .orb svg{width:48px;height:48px}
+  .orbit.orbit--dynamic .orb-label{max-width:130px;font-size:10.5px}
   /* When dynamic, position is set inline → kill the CSS nth-child defaults */
   .orbit.orbit--dynamic .orb-wrap:nth-child(n){top:auto;left:auto;right:auto;bottom:auto;animation:none}
   .orbit .orb-wrap{user-select:none;-webkit-user-select:none}
@@ -3932,27 +3961,23 @@
       const n = list.length;
       orbit.classList.toggle('orbit--dynamic', n > 0);
 
-      const stage = orbit.parentElement; // .swipe-stage
-      const sw = stage.clientWidth;
-      const sh = stage.clientHeight;
-      // Card central rect (estimated) — orbs avoid the very center where the
-      // card sits, but they CAN drift over it (just less likely to spawn there).
-      const cardW = Math.min(sw * 0.55, 400);
-      const cardH = Math.min(sh * 0.96, 620);
+      // Fullscreen viewport bounds — orbs roam the entire page
+      const sw = window.innerWidth;
+      const sh = window.innerHeight;
+      // Avoid spawning right on top of the swipe card (estimated center band)
+      const cardW = Math.min(sw * 0.42, 420);
+      const cardH = Math.min(sh * 0.85, 640);
       const cardCx = sw / 2, cardCy = sh / 2;
 
-      // Build a non-overlapping random distribution scattered across the stage
       function pickPos(orbR){
         for (let tries = 0; tries < 40; tries++){
-          const x = orbR + 10 + Math.random() * (sw - 2 * orbR - 20);
-          const y = orbR + 10 + Math.random() * (sh - 2 * orbR - 20);
-          // Penalize position too close to card center : push outward
+          const x = orbR + 12 + Math.random() * (sw - 2 * orbR - 24);
+          const y = orbR + 12 + Math.random() * (sh - 2 * orbR - 24);
           const dx = x - cardCx, dy = y - cardCy;
-          if (Math.abs(dx) < cardW * 0.35 && Math.abs(dy) < cardH * 0.35) continue;
+          if (Math.abs(dx) < cardW * 0.5 && Math.abs(dy) < cardH * 0.5) continue;
           return { x, y };
         }
-        // Fallback: edge of stage
-        return { x: Math.random() < 0.5 ? orbR + 20 : sw - orbR - 20, y: orbR + 20 + Math.random() * (sh - 2 * orbR - 40) };
+        return { x: Math.random() < 0.5 ? orbR + 24 : sw - orbR - 24, y: orbR + 24 + Math.random() * (sh - 2 * orbR - 48) };
       }
 
       list.forEach((o, i) => {
@@ -3985,7 +4010,7 @@
         wrap.appendChild(label);
 
         const isMusic = o.kind === 'music';
-        const orbR = isMusic ? 90 : (n > 6 ? 50 : 65);
+        const orbR = isMusic ? 90 : (n > 6 ? 70 : 91);
         const pos = pickPos(orbR);
 
         if (isMusic) wrap.classList.add('orb-wrap--music');
@@ -3998,9 +4023,9 @@
 
         orbit.appendChild(wrap);
 
-        // Initial gentle drift velocity (random direction). Music orbs barely drift.
+        // Initial drift velocity (random direction). Music orbs barely drift, others go fast.
         const ang = Math.random() * Math.PI * 2;
-        const speed = isMusic ? 0.18 : 0.85;
+        const speed = isMusic ? 0.18 : 2.6;
 
         _orbSim.items.push({
           el: wrap,
@@ -4019,36 +4044,33 @@
       orbSimStart();
     }
 
-    /* Mouse tracking on the swipe stage */
+    /* Mouse tracking on the WHOLE viewport (orbit is fullscreen) */
     (function bindOrbMouse(){
-      const stage = document.querySelector('.swipe-stage');
-      if (!stage) return;
-      stage.addEventListener('mousemove', (e) => {
-        const r = stage.getBoundingClientRect();
-        _orbSim.mouse.x = e.clientX - r.left;
-        _orbSim.mouse.y = e.clientY - r.top;
+      window.addEventListener('mousemove', (e) => {
+        _orbSim.mouse.x = e.clientX;
+        _orbSim.mouse.y = e.clientY;
         _orbSim.mouse.has = true;
       });
-      stage.addEventListener('mouseleave', () => { _orbSim.mouse.has = false; });
+      window.addEventListener('mouseleave', () => { _orbSim.mouse.has = false; });
     })();
 
     function orbSimStart(){
       if (_orbSim.raf) return;
-      const stage = document.querySelector('.swipe-stage');
       const step = () => {
         const m = _orbSim.mouse;
-        const sw = stage ? stage.clientWidth : 1000;
-        const sh = stage ? stage.clientHeight : 700;
+        // Orbit is position:fixed -> bounce off viewport edges (full page)
+        const sw = window.innerWidth;
+        const sh = window.innerHeight;
         for (const it of _orbSim.items){
-          it.phase += 0.012;
+          it.phase += 0.014;
 
           // Mouse repulsion (music = soft, others = strong)
           if (m.has){
             const dx = it.x - m.x;
             const dy = it.y - m.y;
             const d2 = dx*dx + dy*dy;
-            const range = it.isMusic ? 60 : 200;
-            const fScale = it.isMusic ? 0.25 : 1.8;
+            const range = it.isMusic ? 70 : 240;
+            const fScale = it.isMusic ? 0.30 : 2.6;
             if (d2 < range*range){
               const d = Math.sqrt(d2) || 1;
               const force = (1 - d/range);
@@ -4057,33 +4079,44 @@
             }
           }
 
-          // Constant drift bias (tiny random wobble) so orbs never settle.
-          // Music orbs get a much smaller bias.
-          const wobble = it.isMusic ? 0.02 : 0.10;
-          it.vx += (Math.random() - 0.5) * wobble;
-          it.vy += (Math.random() - 0.5) * wobble;
+          // Wobble — random impulses every frame for organic, non-rectilinear motion.
+          // Non-music orbs get a strong, biased wobble + a slow curl so trajectories curve.
+          if (it.isMusic) {
+            it.vx += (Math.random() - 0.5) * 0.025;
+            it.vy += (Math.random() - 0.5) * 0.025;
+          } else {
+            // Curl: rotate velocity slightly each frame
+            const curl = Math.sin(it.phase * 0.7) * 0.03;
+            const cs = Math.cos(curl), sn = Math.sin(curl);
+            const nvx = it.vx * cs - it.vy * sn;
+            const nvy = it.vx * sn + it.vy * cs;
+            it.vx = nvx; it.vy = nvy;
+            // Random jitter
+            it.vx += (Math.random() - 0.5) * 0.35;
+            it.vy += (Math.random() - 0.5) * 0.35;
+          }
 
-          // Damping — light for free-floaters, heavier for music
-          const damp = it.isMusic ? 0.96 : 0.985;
+          // Damping — very light for free-floaters (keeps them moving fast)
+          const damp = it.isMusic ? 0.95 : 0.993;
           it.vx *= damp;
           it.vy *= damp;
 
           // Clamp max speed
           const sp = Math.hypot(it.vx, it.vy);
-          const maxSp = it.isMusic ? 0.8 : 3.2;
+          const maxSp = it.isMusic ? 0.9 : 5.5;
           if (sp > maxSp) { it.vx = it.vx / sp * maxSp; it.vy = it.vy / sp * maxSp; }
 
-          // Maintain a minimum drift for non-music orbs (so they keep moving)
-          if (!it.isMusic && sp < 0.4) {
+          // Maintain a minimum drift for non-music orbs
+          if (!it.isMusic && sp < 1.0) {
             const ang = Math.atan2(it.vy || (Math.random() - 0.5), it.vx || (Math.random() - 0.5));
-            it.vx = Math.cos(ang) * 0.6;
-            it.vy = Math.sin(ang) * 0.6;
+            it.vx = Math.cos(ang) * 1.4;
+            it.vy = Math.sin(ang) * 1.4;
           }
 
           it.x += it.vx;
           it.y += it.vy;
 
-          // Bounce off walls of the stage
+          // Bounce off viewport edges
           const margin = it.r + 4;
           if (it.x < margin)        { it.x = margin;        it.vx = Math.abs(it.vx); }
           else if (it.x > sw - margin) { it.x = sw - margin; it.vx = -Math.abs(it.vx); }
