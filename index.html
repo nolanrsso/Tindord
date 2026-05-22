@@ -335,7 +335,9 @@
   /* Hide bubble-only landing extras on non-landing screens (decluttering) */
   body:not([data-screen="landing"]) .corner-ctrl--discord{display:none}
   body[data-auth="in"] #langSwitch{display:none}
-  body[data-auth="out"] #msgFab{display:none}
+  body[data-auth="out"] #msgFab,
+  body[data-screen="account"] #msgFab,
+  body[data-screen="account"] .bf-fab{display:none !important}
 
   /* Liker full-profile overlay */
   .liker-overlay{
@@ -963,11 +965,14 @@
   .swipe-card .status-dot{
     position:absolute;right:4px;bottom:4px;width:24px;height:24px;border-radius:50%;
     border:5px solid #1c1d22;box-sizing:content-box;
+    display:grid;place-items:center;
   }
+  .swipe-card .status-dot svg{display:block}
   .swipe-card .status-dot.online{background:#3ba55d}
-  .swipe-card .status-dot.idle  {background:#faa61a;clip-path:circle(50%)}
-  .swipe-card .status-dot.dnd   {background:#ed4245}
+  /* idle / offline : Discord moon style — grey background + crescent inside */
+  .swipe-card .status-dot.idle,
   .swipe-card .status-dot.offline{background:#747f8d}
+  .swipe-card .status-dot.dnd   {background:#ed4245}
 
   .swipe-card .body{
     flex:1 1 auto;padding:108px 18px 60px;display:flex;flex-direction:column;gap:12px;
@@ -995,19 +1000,19 @@
   /* age inline next to the name (legacy / fallback) — hidden in favor of the corner badge */
   .swipe-card .age{display:none}
 
-  /* Age + gender badge — top-right of the banner */
+  /* Age + gender badge — placed just BELOW the banner, on the right side */
   .card-age-badge{
-    position:absolute;top:12px;right:14px;z-index:6;
-    display:flex;align-items:center;gap:6px;
-    padding:6px 12px;border-radius:999px;
-    background:rgba(0,0,0,.55);
-    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-    box-shadow:0 4px 14px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.12) inset;
+    position:absolute;top:128px;right:16px;z-index:6;
+    display:flex;align-items:center;gap:8px;
+    padding:8px 16px;border-radius:999px;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:0 6px 18px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.14) inset;
     color:#fff;font-family:"Clash Display",sans-serif;font-weight:800;
   }
-  .card-age-badge .cab-age{font-size:18px;line-height:1;letter-spacing:.02em}
+  .card-age-badge .cab-age{font-size:24px;line-height:1;letter-spacing:.02em}
   .card-age-badge .cab-gender{
-    font-size:16px;line-height:1;width:22px;height:22px;border-radius:50%;
+    font-size:20px;line-height:1;width:28px;height:28px;border-radius:50%;
     display:grid;place-items:center;
   }
   .card-age-badge .cab-gender[data-g="male"],
@@ -4232,7 +4237,9 @@
       if (type === 'music') return `<svg width="18" height="18" viewBox="0 0 24 24" fill="#1DB954"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Zm1.25-2.78a.88.88 0 0 1-1.2.28c-2.97-1.83-7.5-2.36-11.02-1.3a.88.88 0 0 1-.5-1.69c4-1.2 8.97-.6 12.4 1.5.4.25.55.81.32 1.21Zm.1-2.9c-3.56-2.12-9.44-2.32-12.83-1.28a1.05 1.05 0 1 1-.6-2.02c3.9-1.18 10.4-.95 14.5 1.5a1.05 1.05 0 1 1-1.07 1.8Z"/></svg>`;
       return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 12h2M9 11v2M14 12h.01M16 13h.01"/></svg>`;
     }
-    const STATUS_LABEL = { online:'En ligne', idle:'Inactif', dnd:'Ne pas déranger', offline:'Hors ligne' };
+    const STATUS_LABEL = { online:'En ligne sur Tindord', idle:'Inactif', dnd:'Ne pas déranger', offline:'Inactif' };
+    /* Moon icon shown over the avatar for inactive/offline users (Discord-style) */
+    const STATUS_MOON_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="#dcddde"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>';
     // Outline-style SVG icons (white) for looking_for badges — same DA as ♂ ♀ ⭐
     const LOOK_SVG = {
       chill: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M3 14v-3a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v3"/><path d="M3 14h18"/><path d="M6 19v2M18 19v2"/></svg>',
@@ -4303,11 +4310,12 @@
       c.innerHTML = `
         <div class="badge-stamp like">LIKE</div>
         <div class="badge-stamp nope">NOPE</div>
-        <div class="banner"${bannerStyle ? ` style="${bannerStyle}"` : ''}>${ageBadgeHtml}</div>
+        <div class="banner"${bannerStyle ? ` style="${bannerStyle}"` : ''}></div>
+        ${ageBadgeHtml}
         <div class="avatar-wrap${(p.nitro && !p.decorationUrl) ? ' nitro' : ''}${p.decorationUrl ? ' has-deco' : ''}">
           <div class="avi" ${aviStyle}>${aviInner}</div>
           ${decoHtml}
-          <span class="status-dot ${p.status}"></span>
+          <span class="status-dot ${p.status}">${(p.status === 'offline' || p.status === 'idle') ? STATUS_MOON_SVG : ''}</span>
         </div>
         ${(p.nitro && !p.decorationUrl) ? `<span class="nitro-badge">${tx('nitro')}</span>` : ''}
         <div class="body">
