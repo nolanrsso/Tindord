@@ -6180,8 +6180,16 @@
     /* Games that have a ranked / competitive ladder → we ask the user which
        rank they're at when they add the bubble. The rank shows as a small
        badge on the orb and on the profile card. */
+    /* Build a tier list with sub-divisions (1/2/3) for a base list of ranks,
+       plus a single-tile "apex" rank at the end (Radiant, Champion, etc.). */
+    function _expandTiers(base, apex) {
+      const out = [];
+      for (const r of base) for (const n of [1, 2, 3]) out.push(`${r} ${n}`);
+      if (apex) out.push(apex);
+      return out;
+    }
     const RANKED_GAMES = {
-      'Valorant':                       ['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal','Radiant'],
+      'Valorant': _expandTiers(['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal'], 'Radiant'),
       'League of Legends':              ['Iron','Bronze','Silver','Gold','Platinum','Emerald','Diamond','Master','Grandmaster','Challenger'],
       'Counter-Strike 2':               ['Silver','Gold Nova','Master Guardian','DMG','LE','LEM','Supreme','Global Elite','Premier'],
       'Rocket League':                  ['Bronze','Silver','Gold','Platinum','Diamond','Champion','Grand Champion','Supersonic Legend'],
@@ -6272,23 +6280,32 @@
     };
     function rankVisual(rank){
       if (!rank) return null;
-      return RANK_VISUAL[rank] || { ico:'⭐', c1:'#FFD83D', c2:'#8c6e0a' };
+      // Try exact match first, then strip the sub-tier ("Platinum 2" → "Platinum")
+      if (RANK_VISUAL[rank]) return RANK_VISUAL[rank];
+      const base = String(rank).replace(/\s+\d+\s*$/, '');
+      if (RANK_VISUAL[base]) return RANK_VISUAL[base];
+      return { ico:'⭐', c1:'#FFD83D', c2:'#8c6e0a' };
     }
 
     /* Real rank icons (cropped from official rank charts). Keyed by game → rank → URL.
        When present, the orbiting rank bubble displays this image instead of an emoji. */
+    /* Helper : Valorant has 3 sub-tiers per rank (Iron 1/2/3, Bronze 1/2/3, …) +
+       Radiant. We expose every sub-tier individually so the rank picker can
+       offer "Platinum 2" etc., and each gets its own cropped PNG. */
+    function _valorantRanks(){
+      const base = ['iron','bronze','silver','gold','platinum','diamond','ascendant','immortal'];
+      const out = {};
+      const CAP = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+      for (const r of base) {
+        // Canonical fallback (no sub-tier)
+        out[CAP(r)] = `assets/ranks/valorant/${r}.png`;
+        for (const n of [1,2,3]) out[`${CAP(r)} ${n}`] = `assets/ranks/valorant/${r}_${n}.png`;
+      }
+      out['Radiant'] = 'assets/ranks/valorant/radiant.png';
+      return out;
+    }
     const RANK_ICONS = {
-      'Valorant': {
-        'Iron':       'assets/ranks/valorant/iron.png',
-        'Bronze':     'assets/ranks/valorant/bronze.png',
-        'Silver':     'assets/ranks/valorant/silver.png',
-        'Gold':       'assets/ranks/valorant/gold.png',
-        'Platinum':   'assets/ranks/valorant/platinum.png',
-        'Diamond':    'assets/ranks/valorant/diamond.png',
-        'Ascendant':  'assets/ranks/valorant/ascendant.png',
-        'Immortal':   'assets/ranks/valorant/immortal.png',
-        'Radiant':    'assets/ranks/valorant/radiant.png',
-      },
+      'Valorant': _valorantRanks(),
       'Fortnite': {
         'Bronze':   'assets/ranks/fortnite/bronze.png',
         'Silver':   'assets/ranks/fortnite/silver.png',
@@ -6325,7 +6342,11 @@
     function rankIconUrl(game, rank){
       if (!game || !rank) return null;
       const g = RANK_ICONS[game];
-      return (g && g[rank]) || null;
+      if (!g) return null;
+      // Try exact match first ("Platinum 2"), then strip the sub-tier ("Platinum")
+      if (g[rank]) return g[rank];
+      const base = String(rank).replace(/\s+\d+\s*$/, '');
+      return g[base] || null;
     }
 
     /* Curated suggestion lists by category — used as the primary set of
