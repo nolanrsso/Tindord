@@ -2076,35 +2076,66 @@
   }
   .oeo-close:hover{transform:scale(1.06);background:rgba(255,79,160,.18);border-color:rgba(255,79,160,.45)}
   .oeo-stage{
-    position:relative;z-index:1;
-    width:min(96vw,460px);height:min(92vh,720px);
+    position:relative;z-index:1;width:100vw;height:100vh;
     display:grid;place-items:center;
   }
   .oeo-card-wrap{
-    position:relative;width:100%;height:100%;border-radius:20px;overflow:hidden;
+    position:relative;width:min(96vw,420px);height:min(86vh,620px);
+    border-radius:20px;overflow:hidden;
     box-shadow:0 30px 80px rgba(0,0,0,.7);
     animation:likerPop .35s cubic-bezier(.2,.7,.3,1.1);
   }
   .oeo-card-wrap .swipe-card{position:absolute !important;inset:0 !important;transform:none !important;cursor:default !important}
   .oeo-card-wrap .swipe-card .badge-stamp{display:none !important}
+
+  /* Mini orb tiles (existing bubbles) + "+" FAB positioned around the card */
+  .oeo-orb,
   .oeo-add-fab{
-    position:absolute;right:-20px;bottom:34px;z-index:2;
-    width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;
-    background:rgba(145,70,255,.18);
+    position:absolute;width:78px;height:78px;border-radius:50%;
+    display:grid;place-items:center;color:#fff;
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease, top .3s cubic-bezier(.2,.7,.3,1), left .3s cubic-bezier(.2,.7,.3,1);
+    animation:oeoFloat 4.2s ease-in-out infinite;
+  }
+  .oeo-orb{
+    cursor:pointer;
+    border:2px solid rgba(255,255,255,.25);
+    background:#1c1d22;
+    box-shadow:0 12px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06) inset;
+    overflow:hidden;
+  }
+  .oeo-orb img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+  .oeo-orb .oeo-orb-ico{font-size:30px}
+  .oeo-orb[data-kind="music"]{border-color:rgba(80,255,150,.85);box-shadow:0 12px 30px rgba(29,185,84,.45)}
+  .oeo-orb[data-kind="game"]{border-color:rgba(141,203,255,.85);box-shadow:0 12px 30px rgba(47,123,216,.45)}
+  .oeo-orb[data-kind="film"]{border-color:rgba(199,165,255,.85);box-shadow:0 12px 30px rgba(139,92,246,.45)}
+  .oeo-orb:hover{transform:scale(1.08);box-shadow:0 16px 40px rgba(0,0,0,.7)}
+  .oeo-orb .oeo-orb-del{
+    position:absolute;top:-4px;right:-4px;width:22px;height:22px;border-radius:50%;
+    border:2px solid #0d0b1e;background:#FF4FA0;color:#fff;font-size:14px;line-height:18px;
+    cursor:pointer;padding:0;display:none;
+  }
+  .oeo-orb:hover .oeo-orb-del{display:block}
+  .oeo-add-fab{
+    border:2px dashed rgba(145,70,255,.7);
+    background:rgba(145,70,255,.14);
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    border:2px dashed rgba(145,70,255,.65);
-    color:#fff;display:grid;place-items:center;
-    box-shadow:0 14px 40px rgba(145,70,255,.45), 0 0 0 1px rgba(255,255,255,.08) inset;
-    transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
-    animation:oeoFabFloat 3.6s ease-in-out infinite;
+    cursor:pointer;
+    box-shadow:0 12px 30px rgba(145,70,255,.40), 0 0 0 1px rgba(255,255,255,.05) inset;
   }
   .oeo-add-fab:hover{
-    transform:scale(1.10) translateY(-4px);
-    background:rgba(145,70,255,.36);
-    box-shadow:0 18px 50px rgba(145,70,255,.70), 0 0 0 1px rgba(255,255,255,.15) inset;
+    transform:scale(1.10);
+    background:rgba(145,70,255,.30);
+    box-shadow:0 16px 40px rgba(145,70,255,.65), 0 0 0 1px rgba(255,255,255,.15) inset;
   }
   .oeo-plus{font-size:38px;line-height:1;font-weight:300;font-family:"Clash Display",sans-serif;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.45)}
-  @keyframes oeoFabFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes oeoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .oeo-orb-rank{
+    position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+    padding:0 8px;height:20px;border-radius:11px;
+    background:linear-gradient(135deg,#FFD83D,#FF9A3D);color:#1c1d22;
+    font-size:9.5px;font-weight:800;line-height:20px;text-align:center;
+    border:2px solid #0d0b1e;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;
+  }
 
   .oeo-add-panel{
     position:fixed;top:0;right:0;height:100vh;width:min(380px,92vw);z-index:4;
@@ -3125,11 +3156,9 @@
     <button class="oeo-close" id="oeoClose" type="button" aria-label="Fermer">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
-    <div class="oeo-stage">
+    <div class="oeo-stage" id="oeoStage">
       <div class="oeo-card-wrap" id="oeoCardWrap"></div>
-      <button class="oeo-add-fab" id="oeoAddFab" type="button" title="Ajouter une bulle">
-        <span class="oeo-plus">+</span>
-      </button>
+      <!-- Bulles existantes + "+" injectées dynamiquement par renderOrbEditLayout -->
     </div>
     <aside class="oeo-add-panel" id="oeoAddPanel" data-open="false" aria-label="Ajouter une bulle">
       <div class="oeo-panel-head">
@@ -4975,27 +5004,21 @@
             }
           }
 
-          // Very gentle drift — orbs barely move on their own. Mouse repulsion + collisions
-          // are still active so the field reacts when you interact, but ambient motion is
-          // calm enough to read the labels comfortably.
-          if (it.isMusic) {
-            it.vx += (Math.random() - 0.5) * 0.04;
-            it.vy += (Math.random() - 0.5) * 0.04;
-          } else {
-            it.vx += (Math.random() - 0.5) * 0.03;
-            it.vy += (Math.random() - 0.5) * 0.03;
-          }
-
-          // Strong damping so velocity decays quickly back to ~0
-          const damp = it.isMusic ? 0.93 : 0.92;
+          // Orbs are practically fixed — no random jitter at all. Mouse repulsion +
+          // collisions stay active so they react when you interact, but they snap
+          // back to their anchor position when left alone.
+          // Spring toward anchor position (ax, ay)
+          const sk = 0.018;
+          it.vx += (it.ax - it.x) * sk;
+          it.vy += (it.ay - it.y) * sk;
+          // Strong damping
+          const damp = 0.82;
           it.vx *= damp;
           it.vy *= damp;
-
           // Hard cap max speed
           const sp = Math.hypot(it.vx, it.vy);
-          const maxSp = it.isMusic ? 1.0 : 0.9;
+          const maxSp = 2.2;
           if (sp > maxSp) { it.vx = it.vx / sp * maxSp; it.vy = it.vy / sp * maxSp; }
-          // No forced minimum drift — let orbs settle
 
           it.x += it.vx;
           it.y += it.vy;
@@ -7239,7 +7262,7 @@
       });
     })();
 
-    /* ===== Orb edit overlay (fullscreen profile preview + "+" bubble to add) ===== */
+    /* ===== Orb edit overlay (fullscreen profile preview + symmetric "+" layout) ===== */
     function openOrbEditOverlay(){
       const overlay = document.getElementById('orbEditOverlay');
       const wrap    = document.getElementById('oeoCardWrap');
@@ -7259,7 +7282,117 @@
       document.getElementById('oeoAddPanel').setAttribute('data-open', 'false');
       document.getElementById('oeoSugg').innerHTML = '';
       document.getElementById('oeoSearch').value = '';
+      // Render the symmetric orb layout (existing bubbles + floating "+")
+      // Wait a frame so the card has a measurable bounding box
+      requestAnimationFrame(renderOrbEditLayout);
     }
+    /* Render the existing user orbs in two symmetric columns around the profile card,
+       and add a transparent "+" bubble at the next position.
+       Layout rules :
+         - 1ère bulle au milieu-gauche
+         - 2ème au milieu-droite (même y)
+         - 3ème en bas-gauche (les bulles gauche remontent pour rester centrées)
+         - 4ème en bas-droite (idem côté droit)
+         - etc.
+       Implémenté en split [pair → gauche, impair → droite], "+" sur la colonne qui
+       a le moins de bulles (gauche en cas d'égalité). */
+    function renderOrbEditLayout(){
+      const stage = document.getElementById('oeoStage');
+      const wrap  = document.getElementById('oeoCardWrap');
+      if (!stage || !wrap) return;
+      // Clear previously injected orbs (keep the card)
+      stage.querySelectorAll('.oeo-orb, .oeo-add-fab').forEach(el => el.remove());
+      const orbs = (state.profile && state.profile.userOrbs) || [];
+      // Split: index pair → gauche, impair → droite
+      const left  = orbs.filter((_, i) => i % 2 === 0);
+      const right = orbs.filter((_, i) => i % 2 === 1);
+      const plusOnLeft = left.length <= right.length;
+
+      const sRect = stage.getBoundingClientRect();
+      const cRect = wrap.getBoundingClientRect();
+      const cx = (cRect.left + cRect.width / 2) - sRect.left;
+      const cy = (cRect.top  + cRect.height / 2) - sRect.top;
+      const cardHalfW = cRect.width / 2;
+
+      const orbSize = 78;
+      const orbR    = orbSize / 2;
+      const gap     = 14;
+      const step    = orbSize + gap;
+      const colMargin = 22;
+
+      const leftX  = cx - cardHalfW - colMargin - orbR;
+      const rightX = cx + cardHalfW + colMargin + orbR;
+
+      function renderColumn(items, xPos, isLeft){
+        const total = items.length + ((plusOnLeft === isLeft) ? 1 : 0);
+        if (!total) return;
+        const colH = total * step - gap;
+        const startY = cy - colH / 2 + orbR;
+        items.forEach((o, i) => {
+          const y = startY + i * step;
+          stage.appendChild(makeMiniOrb(o, xPos - orbR, y - orbR, orbs.indexOf(o)));
+        });
+        if (plusOnLeft === isLeft){
+          const y = startY + items.length * step;
+          stage.appendChild(makeAddFab(xPos - orbR, y - orbR));
+        }
+      }
+      renderColumn(left,  leftX,  true);
+      renderColumn(right, rightX, false);
+    }
+    function makeMiniOrb(o, leftPx, topPx, indexInUserOrbs){
+      const el = document.createElement('div');
+      el.className = 'oeo-orb';
+      el.dataset.kind = o.kind;
+      el.style.left = leftPx + 'px';
+      el.style.top  = topPx  + 'px';
+      el.title = `${o.title}${o.rank ? ' · ' + o.rank : ''}`;
+      const fallback = {music:'🎵', game:'🎮', film:'🎬'}[o.kind] || '✨';
+      if (o.cover) {
+        el.innerHTML = `<img src="${o.cover}" alt="${escapeHtmlMini(o.title)}">`;
+      } else {
+        el.innerHTML = `<span class="oeo-orb-ico">${fallback}</span>`;
+      }
+      if (o.kind === 'game' && o.rank){
+        const rb = document.createElement('span');
+        rb.className = 'oeo-orb-rank';
+        rb.textContent = o.rank;
+        el.appendChild(rb);
+      }
+      const del = document.createElement('button');
+      del.className = 'oeo-orb-del';
+      del.type = 'button';
+      del.textContent = '×';
+      del.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        if (indexInUserOrbs >= 0) (state.profile.userOrbs || []).splice(indexInUserOrbs, 1);
+        save();
+        renderUserOrbs();
+        if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
+        renderOrbEditLayout();
+      });
+      el.appendChild(del);
+      // Click on an existing game orb → re-open rank/clip modal
+      el.addEventListener('click', () => {
+        if (o.kind === 'game' && typeof openGameMetaModal === 'function') openGameMetaModal(o);
+      });
+      return el;
+    }
+    function makeAddFab(leftPx, topPx){
+      const btn = document.createElement('button');
+      btn.className = 'oeo-add-fab';
+      btn.type = 'button';
+      btn.title = 'Ajouter une bulle';
+      btn.style.left = leftPx + 'px';
+      btn.style.top  = topPx  + 'px';
+      btn.innerHTML = '<span class="oeo-plus">+</span>';
+      btn.addEventListener('click', () => {
+        document.getElementById('oeoAddPanel').setAttribute('data-open', 'true');
+        setTimeout(() => document.getElementById('oeoSearch').focus(), 200);
+      });
+      return btn;
+    }
+    window.renderOrbEditLayout = renderOrbEditLayout;
     function closeOrbEditOverlay(){
       document.getElementById('orbEditOverlay').setAttribute('data-show', 'false');
       document.getElementById('oeoAddPanel').setAttribute('data-open', 'false');
@@ -7274,13 +7407,8 @@
       document.getElementById('oeoPanelClose').addEventListener('click', () => {
         document.getElementById('oeoAddPanel').setAttribute('data-open', 'false');
       });
-      // Floating "+" bubble → open add panel
-      document.getElementById('oeoAddFab').addEventListener('click', () => {
-        document.getElementById('oeoAddPanel').setAttribute('data-open', 'true');
-        setTimeout(() => document.getElementById('oeoSearch').focus(), 200);
-        // Trigger an initial search render with current kind
-        runOeoSearch('');
-      });
+      // The "+" FAB is now created dynamically by renderOrbEditLayout()
+      // and opens the add panel via the click handler set in makeAddFab().
       // Category tabs
       let oeoKind = 'music';
       document.querySelectorAll('#oeoCats button').forEach(b => {
@@ -7350,9 +7478,13 @@
               state.profile.userOrbs.push(r.orb);
               save();
               renderUserOrbs();
+              if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
               showToast(fallbackIcon, 'Bulle ajoutée', r.orb.title);
-              // Re-render the overlay card to reflect the new bubble
-              openOrbEditOverlay();
+              // Re-render just the bubbles layout (keep card in place, close panel)
+              renderOrbEditLayout();
+              document.getElementById('oeoAddPanel').setAttribute('data-open', 'false');
+              document.getElementById('oeoSearch').value = '';
+              document.getElementById('oeoSugg').innerHTML = '';
               if (r.orb.kind === 'game') openGameMetaModal(r.orb);
             });
             sugg.appendChild(item);
@@ -7363,6 +7495,10 @@
       // Esc closes the overlay
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && overlay.getAttribute('data-show') === 'true') closeOrbEditOverlay();
+      });
+      // Re-render layout on resize (keeps the columns aligned with the card)
+      window.addEventListener('resize', () => {
+        if (overlay.getAttribute('data-show') === 'true') renderOrbEditLayout();
       });
     })();
 
