@@ -2154,11 +2154,20 @@
   .oeo-orb[data-kind="film"]{border-color:rgba(199,165,255,.85);box-shadow:0 12px 30px rgba(139,92,246,.45)}
   .oeo-orb:hover{transform:scale(1.08);box-shadow:0 16px 40px rgba(0,0,0,.7)}
   .oeo-orb .oeo-orb-del{
-    position:absolute;top:-4px;right:-4px;width:22px;height:22px;border-radius:50%;
-    border:2px solid #0d0b1e;background:#FF4FA0;color:#fff;font-size:14px;line-height:18px;
-    cursor:pointer;padding:0;display:none;
+    position:absolute;top:-6px;right:-6px;width:30px;height:30px;border-radius:50%;
+    border:2.5px solid #0d0b1e;
+    background:linear-gradient(135deg,#FF4FA0,#C92866);
+    color:#fff;font-size:18px;font-weight:800;line-height:1;
+    cursor:pointer;padding:0;
+    display:grid;place-items:center;z-index:6;
+    box-shadow:0 6px 18px rgba(255,79,160,.6), 0 0 0 1px rgba(255,255,255,.20) inset;
+    opacity:.92;transition:transform .15s ease, opacity .15s ease, box-shadow .15s ease;
   }
-  .oeo-orb:hover .oeo-orb-del{display:block}
+  .oeo-orb .oeo-orb-del:hover{
+    opacity:1;transform:scale(1.15);
+    box-shadow:0 10px 26px rgba(255,79,160,.85), 0 0 0 1px rgba(255,255,255,.30) inset;
+  }
+  .oeo-orb .oeo-orb-del svg{display:block}
   .oeo-add-fab{
     border:2px dashed rgba(145,70,255,.7);
     background:rgba(145,70,255,.14);
@@ -4822,27 +4831,48 @@
       const myOrbs = (state.profile && state.profile.userOrbs) || [];
       const mineSet = new Set(myOrbs.map(o => `${o.kind}::${norm(o.title)}`));
 
-      // Fullscreen viewport bounds — orbs roam the entire page
+      // Fullscreen viewport bounds
       const sw = window.innerWidth;
       const sh = window.innerHeight;
-      // Avoid spawning right on top of the swipe card (estimated center band)
-      const cardW = Math.min(sw * 0.42, 420);
-      const cardH = Math.min(sh * 0.85, 640);
-      const cardCx = sw / 2, cardCy = sh / 2;
 
-      const headerH = document.querySelector('header')?.getBoundingClientRect().height || 0;
-      const yMin = headerH + 18 + orbR_default();
-      function orbR_default(){ return 90; }
-      function pickPos(orbR){
-        const top = headerH + 18 + orbR;
-        for (let tries = 0; tries < 40; tries++){
-          const x = orbR + 12 + Math.random() * (sw - 2 * orbR - 24);
-          const y = top + Math.random() * (sh - top - orbR - 24);
-          const dx = x - cardCx, dy = y - cardCy;
-          if (Math.abs(dx) < cardW * 0.5 && Math.abs(dy) < cardH * 0.5) continue;
-          return { x, y };
-        }
-        return { x: Math.random() < 0.5 ? orbR + 24 : sw - orbR - 24, y: top + Math.random() * (sh - top - orbR - 48) };
+      // Position the orbs in two symmetric columns around the visible profile card
+      // (same layout as the edit overlay). Even-index → left column, odd-index → right.
+      const cardEl = document.querySelector('.swipe-card');
+      const cardRect = cardEl
+        ? cardEl.getBoundingClientRect()
+        : { left: sw/2 - 210, top: sh/2 - 320, width: 420, height: 640 };
+      const cardCx = cardRect.left + cardRect.width / 2;
+      const cardCy = cardRect.top + cardRect.height / 2;
+      const cardHalfW = cardRect.width / 2;
+      const colMargin = 30;
+
+      function colPositions(items, xPos) {
+        // Use the largest item's diameter to size the step so music orbs don't overlap
+        if (!items.length) return [];
+        const stepLocal = Math.max(...items.map(o => (o.kind === 'music' ? 84 : (n > 6 ? 53 : 68)))) * 2 + 22;
+        const colH = items.length * stepLocal - 22;
+        const startY = cardCy - colH / 2 + stepLocal / 2;
+        return items.map((_, i) => ({ x: xPos, y: startY + i * stepLocal }));
+      }
+      // Build per-orb anchor positions in original list order
+      const anchors = new Array(n);
+      const leftIdx  = [];
+      const rightIdx = [];
+      list.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
+      const leftItems  = leftIdx.map(i => list[i]);
+      const rightItems = rightIdx.map(i => list[i]);
+      // Pick X for the columns based on the max orb radius in each side
+      const leftMaxR  = leftItems.length  ? Math.max(...leftItems.map(o => (o.kind === 'music' ? 84 : (n > 6 ? 53 : 68))))  : 68;
+      const rightMaxR = rightItems.length ? Math.max(...rightItems.map(o => (o.kind === 'music' ? 84 : (n > 6 ? 53 : 68)))) : 68;
+      const leftXPos  = Math.max(leftMaxR + 12, cardCx - cardHalfW - colMargin - leftMaxR);
+      const rightXPos = Math.min(sw - rightMaxR - 12, cardCx + cardHalfW + colMargin + rightMaxR);
+      colPositions(leftItems,  leftXPos).forEach((p, k) => anchors[leftIdx[k]]  = p);
+      colPositions(rightItems, rightXPos).forEach((p, k) => anchors[rightIdx[k]] = p);
+      function pickPos(orbR, idx){
+        const a = anchors[idx];
+        if (a) return { x: Math.max(orbR + 6, Math.min(sw - orbR - 6, a.x)), y: Math.max(orbR + 6, Math.min(sh - orbR - 6, a.y)) };
+        // Fallback — should not happen
+        return { x: orbR + 24, y: sh/2 };
       }
 
       list.forEach((o, i) => {
@@ -4884,7 +4914,7 @@
 
         const isMusic = o.kind === 'music';
         const orbR = isMusic ? 84 : (n > 6 ? 53 : 68);
-        const pos = pickPos(orbR);
+        const pos = pickPos(orbR, i);
 
         if (isMusic) wrap.classList.add('orb-wrap--music');
         wrap.style.position = 'absolute';
@@ -4896,16 +4926,12 @@
 
         orbit.appendChild(wrap);
 
-        // Initial drift velocity (random direction).
-        const ang = Math.random() * Math.PI * 2;
-        const speed = isMusic ? 0.29 : 1.3;
-
+        // Start at rest at the anchor — the spring keeps them locked unless interacted.
         _orbSim.items.push({
           el: wrap,
           ax: pos.x, ay: pos.y,
           x:  pos.x, y:  pos.y,
-          vx: Math.cos(ang) * speed,
-          vy: Math.sin(ang) * speed,
+          vx: 0, vy: 0,
           phase: Math.random() * Math.PI * 2,
           r: wrap.offsetWidth / 2 || orbR,
           isMusic,
@@ -4916,6 +4942,37 @@
       _orbSim.items.forEach(it => { it.el.style.transform = `translate(${it.x - it.r}px, ${it.y - it.r}px)`; });
       orbSimStart();
     }
+    // Recompute anchors on viewport resize (keep bubbles aligned to the card)
+    window.addEventListener('resize', () => {
+      if (!_orbSim.items.length) return;
+      const cardEl = document.querySelector('.swipe-card');
+      if (!cardEl) return;
+      const cardRect = cardEl.getBoundingClientRect();
+      const cardCx = cardRect.left + cardRect.width / 2;
+      const cardCy = cardRect.top  + cardRect.height / 2;
+      const cardHalfW = cardRect.width / 2;
+      const items = _orbSim.items;
+      const n = items.length;
+      const colMargin = 30;
+      const leftIdx = [], rightIdx = [];
+      items.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
+      function placeCol(idxs, sideSign){
+        if (!idxs.length) return;
+        const maxR = Math.max(...idxs.map(k => items[k].r));
+        const stepLocal = 2 * maxR + 22;
+        const colH = idxs.length * stepLocal - 22;
+        const startY = cardCy - colH / 2 + stepLocal / 2;
+        const xPos = sideSign < 0
+          ? Math.max(maxR + 12, cardCx - cardHalfW - colMargin - maxR)
+          : Math.min(window.innerWidth - maxR - 12, cardCx + cardHalfW + colMargin + maxR);
+        idxs.forEach((k, j) => {
+          items[k].ax = xPos;
+          items[k].ay = startY + j * stepLocal;
+        });
+      }
+      placeCol(leftIdx,  -1);
+      placeCol(rightIdx, +1);
+    });
 
     /* Mouse tracking on the WHOLE viewport (orbit is fullscreen) */
     (function bindOrbMouse(){
@@ -7422,7 +7479,8 @@
       const del = document.createElement('button');
       del.className = 'oeo-orb-del';
       del.type = 'button';
-      del.textContent = '×';
+      del.setAttribute('aria-label', 'Supprimer cette bulle');
+      del.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
       del.addEventListener('click', (ev) => {
         ev.stopPropagation();
         if (indexInUserOrbs >= 0) (state.profile.userOrbs || []).splice(indexInUserOrbs, 1);
