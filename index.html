@@ -5531,23 +5531,36 @@
       } else if (o.kind === 'music') {
         // Toggle: re-click on the same playing orb stops it
         if (_spotifyAudio && _spotifyAudio._orbEl === el) {
+          _spotifyAudio._userStopped = true;
           fadeOutAndStop(_spotifyAudio);
           _spotifyAudio = null;
           el.classList.remove('playing');
           return;
         }
         // Different orb: stop previous, start new
-        if (_spotifyAudio) { fadeOutAndStop(_spotifyAudio); _spotifyAudio = null; }
+        if (_spotifyAudio) { _spotifyAudio._userStopped = true; fadeOutAndStop(_spotifyAudio); _spotifyAudio = null; }
         el.classList.add('playing');
         const playUrl = (url, name, sub) => {
           const a = new Audio(url);
           a._orbEl = el;
+          a._userStopped = false;
           a.volume = 0;
           const startSec = (state.user && typeof state.user.musicStartTime === 'number') ? state.user.musicStartTime : 0;
           if (startSec > 0) a.currentTime = Math.min(startSec, 28);
           a.play().catch(() => {});
           fadeIn(a, 0.45, 700);
           a.addEventListener('ended', () => { el.classList.remove('playing'); if (_spotifyAudio === a) _spotifyAudio = null; });
+          // Anti-cutoff : si l'audio est pausé sans intervention utilisateur (swipe, re-render,
+          // perte de focus de l'onglet…), on le redémarre automatiquement.
+          a.addEventListener('pause', () => {
+            if (a._userStopped || a.ended) return;
+            if (_spotifyAudio !== a) return;
+            setTimeout(() => {
+              if (!a._userStopped && !a.ended && _spotifyAudio === a && a.paused) {
+                a.play().catch(() => {});
+              }
+            }, 50);
+          });
           _spotifyAudio = a;
         };
         if (o.previewUrl) {
