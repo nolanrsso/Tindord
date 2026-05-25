@@ -2253,7 +2253,7 @@
   .oeo-sugg .sp-item{cursor:pointer}
 
   /* Game meta modal (rank + clip after adding a game bubble) */
-  .gmm-modal{position:fixed;inset:0;z-index:320;display:none;align-items:center;justify-content:center;padding:18px}
+  .gmm-modal{position:fixed;inset:0;z-index:360;display:none;align-items:center;justify-content:center;padding:18px}
   .gmm-modal[data-open="true"]{display:flex}
   .gmm-backdrop{position:absolute;inset:0;background:rgba(8,9,14,.78);backdrop-filter:blur(8px)}
   .gmm-card{
@@ -2271,7 +2271,7 @@
   .gmm-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
 
   /* Clip overlay (click on a game bubble → embed plays) */
-  .clip-overlay{position:fixed;inset:0;z-index:340;display:none;align-items:center;justify-content:center;padding:24px}
+  .clip-overlay{position:fixed;inset:0;z-index:380;display:none;align-items:center;justify-content:center;padding:24px}
   .clip-overlay[data-show="true"]{display:flex;animation:fadeInOverlay .25s ease-out}
   .clip-backdrop{position:absolute;inset:0;background:rgba(8,9,14,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:pointer}
   .clip-close{position:fixed;top:18px;right:18px;z-index:2;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;display:grid;place-items:center;color:#fff;background:rgba(20,21,26,.95);border:1px solid rgba(255,255,255,.10);box-shadow:0 8px 22px rgba(0,0,0,.6)}
