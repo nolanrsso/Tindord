@@ -1389,6 +1389,15 @@
     50%     { background-position: 100% 100%; }
   }
 
+  /* Discord notifications panel */
+  .acc-notif-toggles{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .acc-notif-row{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:10px 12px;border-radius:10px;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  }
+  .acc-notif-lbl{font-size:13.5px;color:#dcddde;font-weight:500}
+
   /* Danger zone in Paramètres */
   .acc-danger-zone{display:flex;flex-direction:column;gap:8px;margin-top:8px}
   .acc-danger-zone .acc-btn--danger{margin-left:0 !important}
@@ -2890,6 +2899,38 @@
         <div class="acc-field" style="margin-top:14px">
           <label>Debut de la musique <span id="musicStartVal" style="color:#b9bbbe;font-weight:400;margin-left:6px">0s</span></label>
           <input type="range" id="musicStartTime" min="0" max="28" value="0" style="width:100%;accent-color:#9146FF;margin-top:6px" />
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:22px 0 14px" />
+        <h3 style="display:flex;align-items:center;gap:8px">
+          <svg width="18" height="14" viewBox="0 0 71 55" fill="#5865F2"><path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z"/></svg>
+          Notifications Discord
+        </h3>
+        <div class="acc-field">
+          <label>URL du webhook Discord <small style="color:#b9bbbe;font-weight:400">(Serveur → Paramètres → Intégrations → Webhooks)</small></label>
+          <input type="text" class="acc-input" id="accDiscordWebhook" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" />
+          <p style="font-size:11.5px;color:#72767d;margin:6px 0 0">L'avatar de la personne qui te notifie apparaît en miniature dans l'embed.</p>
+        </div>
+        <div class="acc-field" style="margin-top:10px">
+          <label>Quand m'envoyer une notification ?</label>
+          <div class="acc-notif-toggles">
+            <label class="acc-notif-row">
+              <span class="acc-notif-lbl">❤️ Quand je reçois un like</span>
+              <label class="toggle"><input type="checkbox" id="notifLike" /><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+            </label>
+            <label class="acc-notif-row">
+              <span class="acc-notif-lbl">💞 Quand c'est un match</span>
+              <label class="toggle"><input type="checkbox" id="notifMatch" /><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+            </label>
+            <label class="acc-notif-row">
+              <span class="acc-notif-lbl">💬 Quand je reçois un nouveau message</span>
+              <label class="toggle"><input type="checkbox" id="notifMessage" /><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+            </label>
+          </div>
+        </div>
+        <div class="acc-field" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="acc-btn acc-btn--ghost" id="notifTestBtn">Envoyer une notif de test</button>
+          <span id="notifTestStatus" style="font-size:12px;color:#b9bbbe;align-self:center"></span>
         </div>
 
         <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:22px 0 14px" />
@@ -5174,7 +5215,28 @@
       state.user = state.user || {};
       state.user.stats = state.user.stats || { viewed:0, liked:0 };
       state.user.stats.viewed++;
-      if (dir === 'yes') state.user.stats.liked++;
+      // Simulate a like-back ~30 % of the time after a LIKE swipe → Discord notif
+      if (dir === 'yes') {
+        state.user.stats.liked++;
+        const swiped = (typeof genderFilteredProfiles === 'function') ? genderFilteredProfiles()[deckIdx] : null;
+        if (swiped && Math.random() < 0.30) {
+          setTimeout(() => {
+            if (typeof sendDiscordNotif === 'function') sendDiscordNotif('like', swiped);
+            state.user.likesReceived = (state.user.likesReceived || 0) + 1;
+            save();
+            if (typeof window.__heartFabRefresh === 'function') window.__heartFabRefresh();
+            // Push to the liked-me list so the user can see who liked back
+            if (typeof LIKED_ME !== 'undefined' && !LIKED_ME.some(x => x.tag === swiped.tag)) {
+              LIKED_ME.unshift({
+                name: swiped.name, tag: swiped.tag, age: swiped.age,
+                c1: swiped.c1, c2: swiped.c2, initial: swiped.initial,
+                avatarUrl: swiped.avatarUrl || null,
+              });
+              if (typeof renderLikedMe === 'function') renderLikedMe();
+            }
+          }, 1500 + Math.random() * 3000);
+        }
+      }
       save();
       refreshSwipeTools();
       setTimeout(() => { deckIdx++; ensureDeck(); }, 320);
@@ -5357,6 +5419,8 @@
         activeConvo.last = r; activeConvo.t = t2;
         const e2 = document.createElement('div'); e2.className = 'msg-bubble them'; e2.textContent = r;
         chatBody.appendChild(e2); chatBody.scrollTop = chatBody.scrollHeight;
+        // Discord notification (new message)
+        if (typeof sendDiscordNotif === 'function') sendDiscordNotif('message', activeConvo, r);
       }, 900 + Math.random()*900);
     });
     renderMsgList();
@@ -5366,6 +5430,8 @@
       const id = 'm_' + Date.now();
       const idx = LIKED_ME.findIndex(x => x.tag === p.tag);
       if (idx >= 0) LIKED_ME.splice(idx, 1);
+      // Discord notification (match)
+      if (typeof sendDiscordNotif === 'function') sendDiscordNotif('match', p);
       // Inject the new convo as UNREAD so the badge increments
       CONVOS.unshift({
         id, name: p.name, tag: p.tag, c1: p.c1, c2: p.c2, initial: p.initial,
@@ -5892,6 +5958,7 @@
       refreshBoostUI();
       if (typeof window.__refreshBannerPrev === 'function') window.__refreshBannerPrev();
       if (typeof window.__refreshDecoPicker === 'function') window.__refreshDecoPicker();
+      if (typeof window.__hydrateDiscordNotifs === 'function') window.__hydrateDiscordNotifs();
       const s = u.socials || {};
       document.getElementById('socIg').value = s.instagram || '';
       document.getElementById('socTt').value = s.tiktok    || '';
@@ -6783,6 +6850,105 @@
       });
     })();
 
+    /* ===== Discord webhook notifications ===== */
+    /* Build a stable PNG avatar URL from a profile. Discord webhooks need a real
+       https:// image for `thumbnail.url` — gradient + initial cards have no URL,
+       so we fall back to ui-avatars.com (free, CORS-friendly, returns a PNG). */
+    function profileToAvatarUrl(p){
+      if (!p) return null;
+      if (p.avatarUrl && /^https?:/i.test(p.avatarUrl)) return p.avatarUrl;
+      const name = encodeURIComponent(p.name || p.initial || '?');
+      const c1   = (p.c1 || '#9146FF').replace('#', '');
+      return `https://ui-avatars.com/api/?name=${name}&size=128&background=${c1}&color=fff&bold=true&format=png`;
+    }
+    /* Send an embed to the user's Discord webhook. type ∈ 'like'|'match'|'message'|'test'. */
+    async function sendDiscordNotif(type, p, extra){
+      const u = state.user || {};
+      const url = (u.discordWebhook || '').trim();
+      if (!url || !/^https:\/\/(?:discord|discordapp)\.com\/api\/webhooks\//i.test(url)) return false;
+      const enabled = u.notifTypes || {};
+      if (type !== 'test' && !enabled[type]) return false;
+      const meta = {
+        like:    { title: '❤️ Nouveau like sur Tindord',    color: 0xFF4FA0, desc: `**${p?.name || 'Quelqu\'un'}** t'a liké !` },
+        match:   { title: '💞 C\'est un match !',           color: 0x9146FF, desc: `Tu as matché avec **${p?.name || 'quelqu\'un'}** sur Tindord.` },
+        message: { title: '💬 Nouveau message Tindord',     color: 0x5BE9FF, desc: `**${p?.name || 'Quelqu\'un'}** t'a écrit : ${extra ? `\n> ${String(extra).slice(0,200)}` : ''}` },
+        test:    { title: '🔔 Notification de test',        color: 0x3BD17C, desc: `Si tu vois ce message dans Discord, ton webhook est bien configuré !` },
+      }[type] || null;
+      if (!meta) return false;
+      const thumbUrl = profileToAvatarUrl(p);
+      const body = {
+        username: 'Tindord',
+        avatar_url: 'https://ui-avatars.com/api/?name=T&size=128&background=9146FF&color=fff&bold=true&format=png',
+        embeds: [{
+          title: meta.title,
+          description: meta.desc,
+          color: meta.color,
+          thumbnail: thumbUrl ? { url: thumbUrl } : undefined,
+          timestamp: new Date().toISOString(),
+          footer: { text: 'Tindord' },
+        }],
+      };
+      try {
+        const r = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        return r.ok;
+      } catch (e) {
+        console.warn('Discord webhook failed', e);
+        return false;
+      }
+    }
+    window.sendDiscordNotif = sendDiscordNotif;
+
+    /* Bind the Paramètres → Notifications Discord panel */
+    (function bindDiscordNotifs(){
+      const urlEl = document.getElementById('accDiscordWebhook');
+      const tg    = { like: document.getElementById('notifLike'), match: document.getElementById('notifMatch'), message: document.getElementById('notifMessage') };
+      const testBtn = document.getElementById('notifTestBtn');
+      const testStatus = document.getElementById('notifTestStatus');
+      if (!urlEl) return;
+      // Hydrate from state
+      function hydrate(){
+        state.user = state.user || {};
+        urlEl.value = state.user.discordWebhook || '';
+        const t = state.user.notifTypes || {};
+        tg.like.checked    = !!t.like;
+        tg.match.checked   = !!t.match;
+        tg.message.checked = !!t.message;
+      }
+      hydrate();
+      window.__hydrateDiscordNotifs = hydrate;
+      urlEl.addEventListener('input', () => {
+        state.user = state.user || {};
+        state.user.discordWebhook = urlEl.value.trim();
+        save();
+      });
+      Object.entries(tg).forEach(([k, el]) => {
+        el.addEventListener('change', () => {
+          state.user = state.user || {};
+          state.user.notifTypes = Object.assign({}, state.user.notifTypes || {}, { [k]: el.checked });
+          save();
+        });
+      });
+      testBtn.addEventListener('click', async () => {
+        testStatus.textContent = 'Envoi…';
+        testStatus.style.color = '#b9bbbe';
+        const me = state.user || {};
+        const fakeMe = {
+          name: me.displayName || 'Toi',
+          initial: (me.displayName || 'T').charAt(0).toUpperCase(),
+          avatarUrl: me.avatarUrl,
+          c1: '#9146FF', c2: '#FF7EB6',
+        };
+        const ok = await sendDiscordNotif('test', fakeMe);
+        testStatus.textContent = ok ? '✅ Envoyé ! Vérifie ton serveur Discord.' : '❌ Échec — URL invalide ?';
+        testStatus.style.color = ok ? '#3BD17C' : '#FF4FA0';
+        setTimeout(() => { testStatus.textContent = ''; }, 5000);
+      });
+    })();
+
     document.getElementById('orbPreviewBtn').addEventListener('click', () => {
       const profilBtn = document.querySelector('#accTabs .acc-tab-btn[data-tab="profil"]');
       if (profilBtn) profilBtn.click();
@@ -6903,6 +7069,8 @@
               fakeDeco: u.fakeDeco || null,
               bannerUrl: u.bannerCustom ? (u.bannerUrl || null) : null,
               bannerCustom: u.bannerCustom || null,
+              discordWebhook: u.discordWebhook || null,
+              notifTypes: u.notifTypes || null,
               genderFilter: u.genderFilter || null,
               boost: u.boost || null,
               boostPlan: u.boostPlan || null,
