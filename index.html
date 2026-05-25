@@ -6180,30 +6180,38 @@
     /* Games that have a ranked / competitive ladder → we ask the user which
        rank they're at when they add the bubble. The rank shows as a small
        badge on the orb and on the profile card. */
-    /* Build a tier list with sub-divisions (1/2/3) for a base list of ranks,
-       plus a single-tile "apex" rank at the end (Radiant, Champion, etc.). */
-    function _expandTiers(base, apex) {
+    /* Unified ranking strategy : main tiers as a single label, then the
+       TWO LAST tiers BEFORE the apex get sub-divisions (1/2/3), then the apex.
+       Example Valorant: Iron, …, Diamond, Ascendant 1/2/3, Immortal 1/2/3, Radiant. */
+    function _ranksWithTopSubTiers(base, apex) {
       const out = [];
-      for (const r of base) for (const n of [1, 2, 3]) out.push(`${r} ${n}`);
+      const lastTwoStart = Math.max(0, base.length - 2);
+      for (let i = 0; i < base.length; i++) {
+        if (i >= lastTwoStart) {
+          for (const n of [1,2,3]) out.push(`${base[i]} ${n}`);
+        } else {
+          out.push(base[i]);
+        }
+      }
       if (apex) out.push(apex);
       return out;
     }
     const RANKED_GAMES = {
-      'Valorant': _expandTiers(['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal'], 'Radiant'),
-      'League of Legends':              ['Iron','Bronze','Silver','Gold','Platinum','Emerald','Diamond','Master','Grandmaster','Challenger'],
-      'Counter-Strike 2':               ['Silver','Gold Nova','Master Guardian','DMG','LE','LEM','Supreme','Global Elite','Premier'],
-      'Rocket League':                  ['Bronze','Silver','Gold','Platinum','Diamond','Champion','Grand Champion','Supersonic Legend'],
-      'Apex Legends':                   ['Rookie','Bronze','Silver','Gold','Platinum','Diamond','Master','Apex Predator'],
-      'Overwatch 2':                    ['Bronze','Silver','Gold','Platinum','Diamond','Master','Grandmaster','Top 500'],
-      "Tom Clancy's Rainbow Six Siege": ['Copper','Bronze','Silver','Gold','Platinum','Emerald','Diamond','Champion'],
-      'Dota 2':                         ['Herald','Guardian','Crusader','Archon','Legend','Ancient','Divine','Immortal'],
-      'Fortnite':                       ['Bronze','Silver','Gold','Platinum','Diamond','Elite','Champion','Unreal'],
-      'PUBG: Battlegrounds':            ['Bronze','Silver','Gold','Platinum','Diamond','Crown','Ace','Master'],
-      'Marvel Rivals':                  ['Bronze','Silver','Gold','Platinum','Diamond','Grandmaster','Celestial','Eternity','One Above All'],
-      'Call of Duty: Warzone':          ['Bronze','Silver','Gold','Platinum','Diamond','Crimson','Iridescent','Top 250'],
-      'Mortal Kombat 1':                ['Apprentice','Novice','Warrior','Kombatant','Elite','Champion','Demigod','Elder God'],
-      'Tekken 8':                       ['Beginner','Vanquisher','Cavalry','Warrior','Fighter','Eliminator','Vindicator','Tekken King','Tekken God'],
-      'Street Fighter 6':               ['Rookie','Iron','Bronze','Silver','Gold','Platinum','Diamond','Master'],
+      'Valorant':                       _ranksWithTopSubTiers(['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal'], 'Radiant'),
+      'League of Legends':              _ranksWithTopSubTiers(['Iron','Bronze','Silver','Gold','Platinum','Emerald','Diamond','Master','Grandmaster'], 'Challenger'),
+      'Counter-Strike 2':               _ranksWithTopSubTiers(['Silver','Gold Nova','Master Guardian','DMG','LE','LEM','Supreme','Global Elite'], 'Premier'),
+      'Rocket League':                  _ranksWithTopSubTiers(['Bronze','Silver','Gold','Platinum','Diamond','Champion','Grand Champion'], 'Supersonic Legend'),
+      'Apex Legends':                   _ranksWithTopSubTiers(['Rookie','Bronze','Silver','Gold','Platinum','Diamond','Master'], 'Apex Predator'),
+      'Overwatch 2':                    _ranksWithTopSubTiers(['Bronze','Silver','Gold','Platinum','Diamond','Master','Grandmaster'], 'Top 500'),
+      "Tom Clancy's Rainbow Six Siege": _ranksWithTopSubTiers(['Copper','Bronze','Silver','Gold','Platinum','Emerald','Diamond'], 'Champion'),
+      'Dota 2':                         _ranksWithTopSubTiers(['Herald','Guardian','Crusader','Archon','Legend','Ancient','Divine'], 'Immortal'),
+      'Fortnite':                       _ranksWithTopSubTiers(['Bronze','Silver','Gold','Platinum','Diamond','Elite','Champion'], 'Unreal'),
+      'PUBG: Battlegrounds':            _ranksWithTopSubTiers(['Bronze','Silver','Gold','Platinum','Diamond','Crown','Ace'], 'Master'),
+      'Marvel Rivals':                  _ranksWithTopSubTiers(['Bronze','Silver','Gold','Platinum','Diamond','Grandmaster','Celestial','Eternity'], 'One Above All'),
+      'Call of Duty: Warzone':          _ranksWithTopSubTiers(['Bronze','Silver','Gold','Platinum','Diamond','Crimson','Iridescent'], 'Top 250'),
+      'Mortal Kombat 1':                _ranksWithTopSubTiers(['Apprentice','Novice','Warrior','Kombatant','Elite','Champion','Demigod'], 'Elder God'),
+      'Tekken 8':                       _ranksWithTopSubTiers(['Beginner','Vanquisher','Cavalry','Warrior','Fighter','Eliminator','Vindicator','Tekken King'], 'Tekken God'),
+      'Street Fighter 6':               _ranksWithTopSubTiers(['Rookie','Iron','Bronze','Silver','Gold','Platinum','Diamond'], 'Master'),
     };
     function isRankedGame(title){ return !!RANKED_GAMES[title]; }
 
