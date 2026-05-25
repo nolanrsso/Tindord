@@ -2603,17 +2603,6 @@
               <label>Bio</label>
               <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…"></textarea>
             </div>
-            <div class="acc-field">
-              <label>Bannière personnalisée <small style="color:#b9bbbe;font-weight:400">(image, max 2 Mo)</small></label>
-              <div class="acc-banner-row">
-                <div class="acc-banner-prev" id="accBannerPrev" aria-label="Aperçu bannière"></div>
-                <div class="acc-banner-actions">
-                  <input type="file" id="accBannerFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" />
-                  <button type="button" class="acc-btn acc-btn--ghost" id="accBannerImport">Importer</button>
-                  <button type="button" class="acc-btn acc-btn--ghost" id="accBannerReset" hidden>Reset</button>
-                </div>
-              </div>
-            </div>
             <div class="acc-field" id="accColorBlock">
               <label style="display:block">Couleur de profil <small style="color:#b9bbbe;font-weight:400">(corps de la carte, sous la bannière)</small></label>
               <div class="acc-color-pair">
@@ -2762,6 +2751,18 @@
         <div class="acc-field">
           <label>Fake Nitro <small style="color:#b9bbbe;font-weight:400">(anneau animé + badge NITRO sur ton avatar)</small></label>
           <label class="toggle"><input type="checkbox" id="boostFakeNitro" /><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+        </div>
+
+        <div class="acc-field">
+          <label>Bannière personnalisée <small style="color:#b9bbbe;font-weight:400">(image, max 2 Mo — Boost only)</small></label>
+          <div class="acc-banner-row">
+            <div class="acc-banner-prev" id="accBannerPrev" aria-label="Aperçu bannière"></div>
+            <div class="acc-banner-actions">
+              <input type="file" id="accBannerFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" />
+              <button type="button" class="acc-btn acc-btn--ghost" id="accBannerImport">Importer</button>
+              <button type="button" class="acc-btn acc-btn--ghost" id="accBannerReset" hidden>Reset</button>
+            </div>
+          </div>
         </div>
 
         <div class="acc-field" id="accDecoBlock">
@@ -6735,7 +6736,10 @@
       }
       refreshPrev();
       window.__refreshBannerPrev = refreshPrev;
-      importBtn.addEventListener('click', () => fileEl.click());
+      importBtn.addEventListener('click', () => {
+        if (!state.user || !state.user.boost) { openBoostModal(); return; }
+        fileEl.click();
+      });
       fileEl.addEventListener('change', e => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
