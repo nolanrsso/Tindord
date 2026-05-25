@@ -1,1 +1,992 @@
-{"nodes":[{"id":"index_tindord_app","label":"Tindord Application (v1)","file_type":"code","source_file":"index.html","source_location":null,"source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"v2_tindord_app","label":"Tindord Application (v2 Landing)","file_type":"code","source_file":"v2/index.html","source_location":null,"source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_screen_landing","label":"Screen: Landing / Hero","file_type":"code","source_file":"index.html","source_location":"#screen-landing","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_screen_onboarding","label":"Screen: Onboarding (3-step)","file_type":"code","source_file":"index.html","source_location":"#screen-onboarding","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_screen_swipe","label":"Screen: Swipe Deck","file_type":"code","source_file":"index.html","source_location":"#screen-swipe","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_screen_account","label":"Screen: Account / Profile","file_type":"code","source_file":"index.html","source_location":"#screen-account","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_auth_modal","label":"Auth Modal (Discord + Email)","file_type":"code","source_file":"index.html","source_location":"#authModal","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_boost_modal","label":"Boost Pricing Modal","file_type":"code","source_file":"index.html","source_location":"#boostModal","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_msg_panel","label":"Messages Slide-out Panel","file_type":"code","source_file":"index.html","source_location":"#msgPanel","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_liked_panel","label":"Liked-Me Panel (Boost only)","file_type":"code","source_file":"index.html","source_location":"#likedPanel","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_swipe_stage","label":"CSS: swipe-stage layout","file_type":"code","source_file":"index.html","source_location":".swipe-stage","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_swipe_wrap","label":"CSS: swipe-wrap card container","file_type":"code","source_file":"index.html","source_location":".swipe-wrap","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_swipe_card","label":"CSS: Discord-style swipe-card","file_type":"code","source_file":"index.html","source_location":".swipe-card","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_swipe_tools","label":"CSS: Swipe Toolbar (.swipe-tools)","file_type":"code","source_file":"index.html","source_location":".swipe-tools","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_orbit","label":"CSS: Orb Orbit Layer (.orbit)","file_type":"code","source_file":"index.html","source_location":".swipe-stage .orbit","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_bubble_layer","label":"CSS: Animated Bubble Field (.bubbles)","file_type":"code","source_file":"index.html","source_location":".bubbles","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_scene_bg","label":"CSS: Background mesh scene (.scene + .blob)","file_type":"code","source_file":"index.html","source_location":".scene","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_state_obj","label":"App State Object (state.user / state.profile)","file_type":"code","source_file":"index.html","source_location":"const state = { user, profile }","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_orb_structure","label":"Orb Data Structure","file_type":"code","source_file":"index.html","source_location":"orbs array in PROFILES","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_profile_structure","label":"Profile Data Structure (PROFILES array)","file_type":"code","source_file":"index.html","source_location":"const PROFILES = [...]","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_setscreen","label":"Function: setScreen()","file_type":"code","source_file":"index.html","source_location":"function setScreen(name)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_buildcard","label":"Function: buildCard()","file_type":"code","source_file":"index.html","source_location":"function buildCard(p, isTop)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_attachdrag","label":"Function: attachDrag()","file_type":"code","source_file":"index.html","source_location":"function attachDrag(card)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_commitswipe","label":"Function: commitSwipe()","file_type":"code","source_file":"index.html","source_location":"function commitSwipe(dir, cardEl)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_renderorbs","label":"Function: renderOrbs()","file_type":"code","source_file":"index.html","source_location":"function renderOrbs(p)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_playorb","label":"Function: playOrb()","file_type":"code","source_file":"index.html","source_location":"function playOrb(o, el)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_ensuredeck","label":"Function: ensureDeck()","file_type":"code","source_file":"index.html","source_location":"function ensureDeck()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_builduser","label":"Function: buildUserProfile()","file_type":"code","source_file":"index.html","source_location":"function buildUserProfile()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_renderaccount","label":"Function: renderAccount()","file_type":"code","source_file":"index.html","source_location":"function renderAccount()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_refreshboostui","label":"Function: refreshBoostUI()","file_type":"code","source_file":"index.html","source_location":"function refreshBoostUI()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_startswipemusic","label":"Function: startSwipeMusic()","file_type":"code","source_file":"index.html","source_location":"function startSwipeMusic()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_stopswipemusic","label":"Function: stopSwipeMusic()","file_type":"code","source_file":"index.html","source_location":"function stopSwipeMusic()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_searchspotify","label":"Function: searchSpotifyTracks()","file_type":"code","source_file":"index.html","source_location":"async function searchSpotifyTracks(query, limit)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_getspotifytoken","label":"Function: getSpotifyToken()","file_type":"code","source_file":"index.html","source_location":"async function getSpotifyToken()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_searchanime","label":"Function: searchAnime()","file_type":"code","source_file":"index.html","source_location":"async function searchAnime(query)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_searchwiki","label":"Function: searchWiki()","file_type":"code","source_file":"index.html","source_location":"async function searchWiki(query, kindHint)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_searchgiphy","label":"Function: searchGiphy()","file_type":"code","source_file":"index.html","source_location":"async function searchGiphy(query)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_backfillcovers","label":"Function: backfillCovers()","file_type":"code","source_file":"index.html","source_location":"async function backfillCovers()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_signinwithdisc","label":"Function: signInWithDiscord()","file_type":"code","source_file":"index.html","source_location":"function signInWithDiscord()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_userfromsupa","label":"Function: userFromSupabaseSession()","file_type":"code","source_file":"index.html","source_location":"function userFromSupabaseSession(session)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_fadein","label":"Function: fadeIn() audio","file_type":"code","source_file":"index.html","source_location":"function fadeIn(audio, target, dur)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_fadeout","label":"Function: fadeOutAndStop() audio","file_type":"code","source_file":"index.html","source_location":"function fadeOutAndStop(audio, dur)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_explode","label":"Function: explode() bubble","file_type":"code","source_file":"index.html","source_location":"function explode(b)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_spawn","label":"Function: spawn() bubble","file_type":"code","source_file":"index.html","source_location":"function spawn(cfg, idx, initial)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_step","label":"Function: step() bubble physics loop","file_type":"code","source_file":"index.html","source_location":"function step()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_renderlikedme","label":"Function: renderLikedMe()","file_type":"code","source_file":"index.html","source_location":"function renderLikedMe()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_rendergifstage","label":"Function: renderGifStage()","file_type":"code","source_file":"index.html","source_location":"function renderGifStage()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_renderuserorbs","label":"Function: renderUserOrbs()","file_type":"code","source_file":"index.html","source_location":"function renderUserOrbs()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_refreshswipetools","label":"Function: refreshSwipeTools()","file_type":"code","source_file":"index.html","source_location":"function refreshSwipeTools()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_refreshmystatusui","label":"Function: refreshMyStatusUI()","file_type":"code","source_file":"index.html","source_location":"function refreshMyStatusUI()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_addorb","label":"Function: addOrb()","file_type":"code","source_file":"index.html","source_location":"function addOrb(orbOverride)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_openconvo","label":"Function: openConvo()","file_type":"code","source_file":"index.html","source_location":"function openConvo(id)","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_fn_rendermsglist","label":"Function: renderMsgList()","file_type":"code","source_file":"index.html","source_location":"function renderMsgList()","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"api_supabase","label":"External API: Supabase (Auth + DB)","file_type":"code","source_file":"index.html","source_location":"SUPABASE_URL","source_url":"https://kspyqwqudnvjvfdsybam.supabase.co","captured_at":null,"author":null,"contributor":null},{"id":"api_spotify","label":"External API: Spotify Web API","file_type":"code","source_file":"index.html","source_location":"https://api.spotify.com/v1/search","source_url":"https://api.spotify.com","captured_at":null,"author":null,"contributor":null},{"id":"api_jikan","label":"External API: Jikan (MyAnimeList)","file_type":"code","source_file":"index.html","source_location":"https://api.jikan.moe/v4/anime","source_url":"https://api.jikan.moe","captured_at":null,"author":null,"contributor":null},{"id":"api_wikipedia","label":"External API: Wikipedia REST API","file_type":"code","source_file":"index.html","source_location":"https://en.wikipedia.org/w/api.php","source_url":"https://en.wikipedia.org","captured_at":null,"author":null,"contributor":null},{"id":"api_giphy","label":"External API: Giphy Search","file_type":"code","source_file":"index.html","source_location":"https://api.giphy.com/v1/gifs/search","source_url":"https://api.giphy.com","captured_at":null,"author":null,"contributor":null},{"id":"api_discord_oauth","label":"External API: Discord OAuth2","file_type":"code","source_file":"index.html","source_location":"https://discord.com/oauth2/authorize","source_url":"https://discord.com","captured_at":null,"author":null,"contributor":null},{"id":"index_boost_system","label":"Boost Premium System","file_type":"rationale","source_file":"index.html","source_location":"boost_banner, boost_modal, state.user.boost","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_i18n","label":"i18n Dictionary (FR/EN)","file_type":"code","source_file":"index.html","source_location":"const I18N = { FR: {...}, EN: {...} }","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_acc_tabs","label":"Account Tabs UI (Profil/Bulles/Boost/Comptes/Infos)","file_type":"code","source_file":"index.html","source_location":"#accTabs","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_gif_system","label":"GIF Placement System (Boost)","file_type":"code","source_file":"index.html","source_location":"gif-stage, gif-item, swipe-gifs","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_lang_switcher","label":"Language Switcher Widget","file_type":"code","source_file":"index.html","source_location":"#langSwitch","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_my_status","label":"My Status Floating Control","file_type":"code","source_file":"index.html","source_location":"#myStatusBtn .my-status","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_swipe_music_player","label":"Ambient Swipe Music Player (Boost)","file_type":"code","source_file":"index.html","source_location":"#swipeMusic .swipe-music","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_onb_draft","label":"Onboarding Draft State (gender/age/looking)","file_type":"code","source_file":"index.html","source_location":"const draft = { gender, age, looking }","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_convos_data","label":"CONVOS Mock Data (messages)","file_type":"code","source_file":"index.html","source_location":"const CONVOS = [...]","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"index_liked_me_data","label":"LIKED_ME Mock Data","file_type":"code","source_file":"index.html","source_location":"const LIKED_ME = [...]","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"v2_screen_landing","label":"v2 Screen: Landing / Hero","file_type":"code","source_file":"v2/index.html","source_location":"#screen-landing","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"v2_auth_modal","label":"v2 Auth Modal (Discord + Google + Email)","file_type":"code","source_file":"v2/index.html","source_location":"#authModal","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"v2_bubble_layer","label":"v2 Animated Bubble Field","file_type":"code","source_file":"v2/index.html","source_location":".bubbles","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"v2_i18n","label":"v2 i18n Dictionary (FR/EN, landing-only)","file_type":"code","source_file":"v2/index.html","source_location":"const I18N = {...}","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"v2_lang_switcher","label":"v2 Language Switcher","file_type":"code","source_file":"v2/index.html","source_location":"#langSwitch","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"api_google_oauth","label":"External API: Google OAuth2 (v2 only)","file_type":"code","source_file":"v2/index.html","source_location":"https://accounts.google.com/o/oauth2/v2/auth","source_url":"https://accounts.google.com","captured_at":null,"author":null,"contributor":null},{"id":"rationale_v1_vs_v2","label":"Design Decision: v1 full SPA vs v2 landing-only","file_type":"rationale","source_file":"v2/index.html","source_location":null,"source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"rationale_boost_design","label":"Rationale: Boost as freemium gate for power features","file_type":"rationale","source_file":"index.html","source_location":"bm-compare, bm-plans","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"rationale_orb_system","label":"Rationale: Orbs as interest bubbles orbiting card","file_type":"rationale","source_file":"index.html","source_location":".orbit .orb-wrap","source_url":null,"captured_at":null,"author":null,"contributor":null},{"id":"rationale_discord_aesthetic","label":"Rationale: Discord-themed card aesthetic","file_type":"rationale","source_file":"index.html","source_location":".swipe-card .banner .avatar-wrap .nitro","source_url":null,"captured_at":null,"author":null,"contributor":null}],"edges":[{"source":"index_tindord_app","target":"index_screen_landing","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"body[data-screen='landing'] #screen-landing","weight":1.0},{"source":"index_tindord_app","target":"index_screen_onboarding","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"body[data-screen='onboarding']","weight":1.0},{"source":"index_tindord_app","target":"index_screen_swipe","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"body[data-screen='swipe']","weight":1.0},{"source":"index_tindord_app","target":"index_screen_account","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"body[data-screen='account']","weight":1.0},{"source":"index_tindord_app","target":"api_supabase","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"SUPABASE_URL, SUPABASE_ANON_KEY","weight":1.0},{"source":"index_tindord_app","target":"api_spotify","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"SPOTIFY_CLIENT_ID","weight":1.0},{"source":"index_tindord_app","target":"api_jikan","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"https://api.jikan.moe/v4/anime","weight":1.0},{"source":"index_tindord_app","target":"api_wikipedia","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"https://en.wikipedia.org/w/api.php","weight":1.0},{"source":"index_tindord_app","target":"api_giphy","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"GIPHY_KEY, searchGiphy","weight":1.0},{"source":"index_tindord_app","target":"api_discord_oauth","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"DISCORD_CLIENT_ID, signInWithDiscord","weight":1.0},{"source":"index_fn_setscreen","target":"index_screen_landing","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"setScreen('landing')","weight":1.0},{"source":"index_fn_setscreen","target":"index_screen_onboarding","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"setScreen('onboarding')","weight":1.0},{"source":"index_fn_setscreen","target":"index_screen_swipe","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"setScreen('swipe')","weight":1.0},{"source":"index_fn_setscreen","target":"index_screen_account","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"setScreen('account')","weight":1.0},{"source":"index_fn_setscreen","target":"index_fn_renderaccount","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"if (name === 'account') renderAccount()","weight":1.0},{"source":"index_fn_setscreen","target":"index_fn_ensuredeck","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"if (name === 'swipe') { ensureDeck() }","weight":1.0},{"source":"index_fn_setscreen","target":"index_fn_startswipemusic","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"if (name === 'swipe') { startSwipeMusic() }","weight":1.0},{"source":"index_fn_setscreen","target":"index_fn_stopswipemusic","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"if (name !== 'swipe') stopSwipeMusic()","weight":1.0},{"source":"index_fn_setscreen","target":"index_fn_refreshswipetools","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"if (name === 'swipe') { refreshSwipeTools() }","weight":1.0},{"source":"index_fn_ensuredeck","target":"index_fn_buildcard","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"wrap.appendChild(buildCard(p, true))","weight":1.0},{"source":"index_fn_ensuredeck","target":"index_fn_renderorbs","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"renderOrbs(p)","weight":1.0},{"source":"index_fn_ensuredeck","target":"index_fn_builduser","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"const myP = buildUserProfile()","weight":1.0},{"source":"index_fn_ensuredeck","target":"index_profile_structure","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"const pool = genderFilteredProfiles()","weight":1.0},{"source":"index_fn_buildcard","target":"index_swipe_card","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"c.className = 'swipe-card'","weight":1.0},{"source":"index_fn_buildcard","target":"index_fn_attachdrag","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"if (isTop) attachDrag(c)","weight":1.0},{"source":"index_fn_attachdrag","target":"index_fn_commitswipe","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"commitSwipe(dx > 0 ? 'yes' : 'no', card)","weight":1.0},{"source":"index_fn_commitswipe","target":"index_state_obj","relation":"shares_data_with","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"state.user.stats.viewed++","weight":1.0},{"source":"index_fn_commitswipe","target":"index_fn_ensuredeck","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"setTimeout(() => { deckIdx++; ensureDeck(); }, 320)","weight":1.0},{"source":"index_fn_commitswipe","target":"index_fn_refreshswipetools","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"refreshSwipeTools()","weight":1.0},{"source":"index_fn_renderorbs","target":"index_orbit","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"document.getElementById('swipeOrbit')","weight":1.0},{"source":"index_fn_renderorbs","target":"index_fn_playorb","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"btn.addEventListener('click', () => playOrb(o, btn))","weight":1.0},{"source":"index_fn_renderorbs","target":"index_orb_structure","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"p.orbs.slice(0, maxOrbs)","weight":1.0},{"source":"index_fn_playorb","target":"index_fn_searchspotify","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"searchSpotifyTracks(o.title, 1)","weight":1.0},{"source":"index_fn_playorb","target":"index_fn_fadein","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"fadeIn(a, 0.75, 700)","weight":1.0},{"source":"index_fn_playorb","target":"index_fn_fadeout","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"fadeOutAndStop(_spotifyAudio)","weight":1.0},{"source":"index_fn_searchspotify","target":"api_spotify","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"fetch('https://api.spotify.com/v1/search')","weight":1.0},{"source":"index_fn_searchspotify","target":"index_fn_getspotifytoken","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"const token = await getSpotifyToken()","weight":1.0},{"source":"index_fn_getspotifytoken","target":"api_spotify","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"fetch('https://accounts.spotify.com/api/token')","weight":1.0},{"source":"index_fn_searchanime","target":"api_jikan","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"fetch('https://api.jikan.moe/v4/anime')","weight":1.0},{"source":"index_fn_searchwiki","target":"api_wikipedia","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"fetch('https://en.wikipedia.org/w/api.php')","weight":1.0},{"source":"index_fn_searchgiphy","target":"api_giphy","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"fetch('https://api.giphy.com/v1/gifs/search')","weight":1.0},{"source":"index_fn_signinwithdisc","target":"api_supabase","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"supa.auth.signInWithOAuth({ provider: 'discord' })","weight":1.0},{"source":"index_fn_signinwithdisc","target":"api_discord_oauth","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"provider: 'discord', scopes: 'identify email connections guilds'","weight":1.0},{"source":"index_fn_userfromsupa","target":"api_supabase","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"session.user.user_metadata","weight":1.0},{"source":"index_fn_userfromsupa","target":"api_discord_oauth","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"cdn.discordapp.com/banners, cdn.discordapp.com/avatar-decoration-presets","weight":1.0},{"source":"index_fn_renderaccount","target":"index_fn_refreshboostui","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"refreshBoostUI()","weight":1.0},{"source":"index_fn_renderaccount","target":"index_fn_renderuserorbs","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"renderUserOrbs()","weight":1.0},{"source":"index_fn_refreshboostui","target":"index_boost_system","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"const active = !!(state.user && state.user.boost)","weight":1.0},{"source":"index_fn_refreshboostui","target":"index_fn_rendergifstage","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"renderGifStage()","weight":1.0},{"source":"index_fn_refreshboostui","target":"index_fn_renderuserorbs","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"renderUserOrbs()","weight":1.0},{"source":"index_fn_startswipemusic","target":"index_swipe_music_player","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"box.setAttribute('data-show', 'true')","weight":1.0},{"source":"index_fn_startswipemusic","target":"api_spotify","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"state.user.swipeMusic.previewUrl (from Spotify)","weight":1.0},{"source":"index_fn_addorb","target":"index_fn_searchspotify","relation":"calls","confidence":"INFERRED","confidence_score":0.85,"source_file":"index.html","source_location":"live search triggers searchSpotifyTracks for music kind","weight":0.85},{"source":"index_fn_addorb","target":"index_fn_searchanime","relation":"calls","confidence":"INFERRED","confidence_score":0.85,"source_file":"index.html","source_location":"live search triggers searchAnime for anime kind","weight":0.85},{"source":"index_fn_addorb","target":"index_fn_searchwiki","relation":"calls","confidence":"INFERRED","confidence_score":0.85,"source_file":"index.html","source_location":"live search triggers searchWiki for game/film kind","weight":0.85},{"source":"index_fn_backfillcovers","target":"index_fn_searchspotify","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"await searchSpotifyTracks(o.title, 1)","weight":1.0},{"source":"index_fn_backfillcovers","target":"index_fn_searchanime","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"await searchAnime(o.title)","weight":1.0},{"source":"index_fn_backfillcovers","target":"index_fn_searchwiki","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"await searchWiki(o.title, o.kind)","weight":1.0},{"source":"index_screen_swipe","target":"index_swipe_stage","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":".swipe-stage inside #screen-swipe","weight":1.0},{"source":"index_swipe_stage","target":"index_swipe_wrap","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":".swipe-stage .swipe-wrap","weight":1.0},{"source":"index_swipe_stage","target":"index_orbit","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":".swipe-stage .orbit","weight":1.0},{"source":"index_swipe_wrap","target":"index_swipe_card","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"swipe-wrap contains .swipe-card","weight":1.0},{"source":"index_screen_swipe","target":"index_swipe_tools","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":".swipe-tools in screen-swipe","weight":1.0},{"source":"index_screen_swipe","target":"index_my_status","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"body[data-screen='swipe'] .my-status","weight":1.0},{"source":"index_screen_swipe","target":"index_swipe_music_player","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"body[data-screen='swipe'] .swipe-music","weight":1.0},{"source":"index_screen_account","target":"index_acc_tabs","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"#accTabs inside #screen-account","weight":1.0},{"source":"index_boost_system","target":"index_liked_panel","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"Boost required for Liked-Me panel","weight":1.0},{"source":"index_boost_system","target":"index_gif_system","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"Boost required for GIF feature","weight":1.0},{"source":"index_boost_system","target":"index_swipe_music_player","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"Boost required for ambient music","weight":1.0},{"source":"index_state_obj","target":"index_profile_structure","relation":"shares_data_with","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"state.profile","weight":1.0},{"source":"index_state_obj","target":"index_orb_structure","relation":"shares_data_with","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"state.profile.userOrbs","weight":1.0},{"source":"index_orb_structure","target":"api_spotify","relation":"shares_data_with","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"orb.previewUrl, orb.cover from Spotify","weight":1.0},{"source":"index_orb_structure","target":"api_jikan","relation":"shares_data_with","confidence":"INFERRED","confidence_score":0.85,"source_file":"index.html","source_location":"orb.cover for anime kind from Jikan","weight":0.85},{"source":"index_orb_structure","target":"api_wikipedia","relation":"shares_data_with","confidence":"INFERRED","confidence_score":0.85,"source_file":"index.html","source_location":"orb.cover for game/film kind from Wikipedia","weight":0.85},{"source":"index_fn_rendermsglist","target":"index_convos_data","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"CONVOS.forEach(c => ...)","weight":1.0},{"source":"index_fn_openconvo","target":"index_msg_panel","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"panel.setAttribute('data-view', 'chat')","weight":1.0},{"source":"index_fn_renderlikedme","target":"index_liked_me_data","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"LIKED_ME.forEach(p => ...)","weight":1.0},{"source":"index_fn_renderlikedme","target":"index_boost_system","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"const unlocked = !!(state.user && state.user.boost)","weight":1.0},{"source":"index_fn_rendergifstage","target":"index_gif_system","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"renderGifStage() renders .gif-item in #gifStage","weight":1.0},{"source":"index_fn_rendergifstage","target":"api_giphy","relation":"references","confidence":"INFERRED","confidence_score":0.85,"source_file":"index.html","source_location":"GIF data sourced from Giphy via searchGiphy","weight":0.85},{"source":"index_fn_explode","target":"index_bubble_layer","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"layer.appendChild(flash/ring/shard/spark)","weight":1.0},{"source":"index_fn_spawn","target":"index_bubble_layer","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"layer.appendChild(el)","weight":1.0},{"source":"index_fn_step","target":"index_bubble_layer","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"physics loop on bubbles array","weight":1.0},{"source":"index_tindord_app","target":"index_i18n","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"const I18N = { FR: {...}, EN: {...} }","weight":1.0},{"source":"index_screen_landing","target":"index_bubble_layer","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"<div class='bubbles' id='bubbles'>","weight":1.0},{"source":"index_screen_landing","target":"index_scene_bg","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":".scene .blob elements","weight":1.0},{"source":"index_fn_backfillcovers","target":"index_orb_structure","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"for (const o of orbs) { if (o.cover) continue; }","weight":1.0},{"source":"index_screen_onboarding","target":"index_onb_draft","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"const draft = { gender, age, looking }","weight":1.0},{"source":"index_onb_draft","target":"index_state_obj","relation":"shares_data_with","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"state.profile = { gender: draft.gender, ... }","weight":1.0},{"source":"index_auth_modal","target":"index_fn_signinwithdisc","relation":"calls","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"authDiscord click -> signInWithDiscord()","weight":1.0},{"source":"v2_tindord_app","target":"v2_screen_landing","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"v2/index.html","source_location":"#screen-landing (only screen)","weight":1.0},{"source":"v2_tindord_app","target":"v2_auth_modal","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"v2/index.html","source_location":"#authModal","weight":1.0},{"source":"v2_tindord_app","target":"v2_bubble_layer","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"v2/index.html","source_location":".bubbles","weight":1.0},{"source":"v2_tindord_app","target":"api_discord_oauth","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"v2/index.html","source_location":"DISCORD_URL = discord.com/oauth2/authorize","weight":1.0},{"source":"v2_tindord_app","target":"api_google_oauth","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"v2/index.html","source_location":"GOOGLE_URL = accounts.google.com/o/oauth2/v2/auth","weight":1.0},{"source":"v2_auth_modal","target":"api_google_oauth","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"v2/index.html","source_location":"authGoogle click -> GOOGLE_URL","weight":1.0},{"source":"v2_tindord_app","target":"v2_i18n","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"v2/index.html","source_location":"const I18N = {...}","weight":1.0},{"source":"v2_tindord_app","target":"v2_lang_switcher","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"v2/index.html","source_location":"#langSwitch","weight":1.0},{"source":"v2_bubble_layer","target":"index_bubble_layer","relation":"semantically_similar_to","confidence":"INFERRED","confidence_score":0.95,"source_file":"v2/index.html","source_location":"same bubble physics engine, identical implementation","weight":0.95},{"source":"v2_i18n","target":"index_i18n","relation":"semantically_similar_to","confidence":"INFERRED","confidence_score":0.95,"source_file":"v2/index.html","source_location":"same FR/EN keys for landing, v2 is subset of v1","weight":0.95},{"source":"v2_lang_switcher","target":"index_lang_switcher","relation":"semantically_similar_to","confidence":"INFERRED","confidence_score":0.95,"source_file":"v2/index.html","source_location":"identical widget implementation","weight":0.95},{"source":"rationale_v1_vs_v2","target":"index_tindord_app","relation":"rationale_for","confidence":"INFERRED","confidence_score":0.85,"source_file":"v2/index.html","source_location":null,"weight":0.85},{"source":"rationale_v1_vs_v2","target":"v2_tindord_app","relation":"rationale_for","confidence":"INFERRED","confidence_score":0.85,"source_file":"v2/index.html","source_location":null,"weight":0.85},{"source":"rationale_boost_design","target":"index_boost_system","relation":"rationale_for","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"bm-compare: Basic vs Boost columns","weight":1.0},{"source":"rationale_orb_system","target":"index_orb_structure","relation":"rationale_for","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":".orbit .orb-wrap orbital layout","weight":1.0},{"source":"rationale_discord_aesthetic","target":"index_swipe_card","relation":"rationale_for","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":".swipe-card .banner, .avatar-wrap, .nitro-badge, .status-dot","weight":1.0},{"source":"index_fn_refreshswipetools","target":"index_swipe_tools","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"stoolViewed, stoolLikesGiven, stoolRate, stoolLikesCount","weight":1.0},{"source":"index_fn_refreshswipetools","target":"index_boost_system","relation":"references","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"if (!state.user || !state.user.boost) openBoostModal()","weight":1.0},{"source":"index_fn_refreshmystatusui","target":"index_my_status","relation":"implements","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"myStatusBtn.setAttribute('data-look', cur)","weight":1.0},{"source":"index_fn_refreshmystatusui","target":"index_state_obj","relation":"shares_data_with","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html","source_location":"state.profile.looking","weight":1.0}],"hyperedges":[{"id":"swipe_flow","label":"Swipe Flow: drag -> commit -> advance deck -> render orbs","nodes":["index_fn_attachdrag","index_fn_commitswipe","index_fn_ensuredeck","index_fn_renderorbs"],"relation":"implement","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html"},{"id":"orb_media_pipeline","label":"Orb Media Pipeline: search APIs -> orb data -> playback","nodes":["index_fn_searchspotify","index_fn_searchanime","index_fn_searchwiki","index_fn_playorb","index_orb_structure"],"relation":"participate_in","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html"},{"id":"boost_gate_features","label":"Boost Gate: premium features locked behind state.user.boost","nodes":["index_boost_system","index_liked_panel","index_gif_system","index_swipe_music_player"],"relation":"form","confidence":"EXTRACTED","confidence_score":1.0,"source_file":"index.html"}],"input_tokens":18000,"output_tokens":4500}
+{
+  "nodes": [
+    {
+      "id": "index_voice_memo_recorder",
+      "label": "Voice Memo Recorder (5s MediaRecorder)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#accVoiceFab L2572-2596",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_acc_voice_player",
+      "label": "Account Voice Player Widget",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": ".acc-voice-player L1713-1766",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_card_voice_widget",
+      "label": "Swipe Card Voice Memo Widget",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": ".card-voice L1055-1075",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_state_user_profile_voice",
+      "label": "state.user.profileVoice (audio blob URL)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "localStorage tindord_archived_profiles",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_msg_fab",
+      "label": "Messages FAB (bottom-left)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#msgFab L2821-2823",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_heart_fab",
+      "label": "Heart FAB (likes received)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#heartFab L2827-2829",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_badge_fab",
+      "label": "Badge FAB (looking_for picker)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#badgeFab L2831-2840",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_badge_fab_popup",
+      "label": "Badge FAB Popup (chill/game/talk/sleep)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": ".badge-fab-pop L493-515",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_boost_fab_banner",
+      "label": "Boost Banner (outside acc-card)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#boostBanner L2732-2739",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_acc_discord_fab",
+      "label": "Discord FAB (account screen)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#accDiscordFab L2743 L1700-1710",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_looking_for_selector",
+      "label": "looking_for Selector (4 values)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "data-look chill|game|talk|sleep",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_match_overlay",
+      "label": "Match Animation Overlay",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#matchOverlay L2800 playMatchAnimation L5179",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_fly_to_fab",
+      "label": "Fly-to-FAB Animation Pattern",
+      "file_type": "rationale",
+      "source_file": "index.html",
+      "source_location": "L5203-5239 #matchFly",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_create_match_from_liker",
+      "label": "createMatchFromLiker() Function",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L5160-5177",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_liker_overlay",
+      "label": "Liker Full-Profile Overlay",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#likerOverlay L2790-2797 openLikerProfile L5810",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_liked_me_panel",
+      "label": "Liked-Me List (blurred non-boost)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "renderLikedMe L5859-5905",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_bulles_orbit_fullscreen",
+      "label": "Bulles Fullscreen Orbit Module",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#swipeOrbit L2448 L4400-4500",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_bulles_physics",
+      "label": "Bulles Physics Simulation (drift+repulsion+collision)",
+      "file_type": "rationale",
+      "source_file": "index.html",
+      "source_location": "L4402-4700",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_bulles_mouse_repulsion",
+      "label": "Bulles Mouse Repulsion",
+      "file_type": "rationale",
+      "source_file": "index.html",
+      "source_location": "L4503 L4595 L3315",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_bulles_pairwise_collision",
+      "label": "Bulles Pairwise Collision (elastic)",
+      "file_type": "rationale",
+      "source_file": "index.html",
+      "source_location": "L3360 L4655 'Elastic collision (hard)'",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_forbidden_zones",
+      "label": "Forbidden UI Zones (nav/FAB exclusion)",
+      "file_type": "rationale",
+      "source_file": "index.html",
+      "source_location": "forbiddenRects() L4515-4560",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_wikidata_cover_fetch",
+      "label": "Wikidata Cover Fetcher (P18/P154/P2716)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "wikidataImage L5388 wikidataCover L5407",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_image_transparency_check",
+      "label": "Image Transparency Detection",
+      "file_type": "rationale",
+      "source_file": "index.html",
+      "source_location": "imageHasTransparency L5430-5457 gameCoverOpaque L5483",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_game_cover_overrides",
+      "label": "GAME_COVER_OVERRIDES Map",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L5462-5467",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_spotify_token",
+      "label": "Spotify Client Credentials Token",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "getSpotifyToken L4710-4723",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_deezer_preview",
+      "label": "Deezer Preview Fallback (JSONP)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "deezerPreview L4757-4766",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_itunes_preview",
+      "label": "iTunes Preview Fallback",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "itunesPreview L4725-4737",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_preview_fallback_chain",
+      "label": "Preview Fallback Chain (Spotify->Deezer->iTunes)",
+      "file_type": "rationale",
+      "source_file": "index.html",
+      "source_location": "L4783-4786",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_archive_restore",
+      "label": "Archive/Restore on Discord Reconnect",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "localStorage tindord_archived_profiles L3869-3886 L6684-6711",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_onboarding_gender",
+      "label": "Onboarding Genre (3 options + skip link)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L2367-2379 #onbGenderSkip",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_card_age_badge",
+      "label": "Age+Gender Badge Below Banner",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": ".card-age-badge L1003-1033",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_my_status_btn",
+      "label": "My Status Button + Popup",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#myStatusBtn L2419-2427 .my-status L1261-1295",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_boost_modal",
+      "label": "Boost Modal (2-col upsell)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": ".boost-modal L1944-1987",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_boost_tab",
+      "label": "Boost Tab (2-col layout)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L1591-1594 #boostSection L2638-2660",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_swipe_card",
+      "label": "Swipe Card (preview-mode capable)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": ".swipe-card",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_acc_preview",
+      "label": "Account Live Profile Preview",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "#accPreview L2480",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_dirty_state_tracking",
+      "label": "Dirty-State Tracking Pattern",
+      "file_type": "rationale",
+      "source_file": "index.html",
+      "source_location": "discord/auth merge logic",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_msg_fab_pulse",
+      "label": "msg-fab Pulse Animation",
+      "file_type": "rationale",
+      "source_file": "index.html",
+      "source_location": ".msg-fab.pulse-match L436",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_state_user",
+      "label": "state.user (live user model)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L5190 u.displayName u.avatarUrl",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_convos_array",
+      "label": "CONVOS Array (chat threads)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L5166 CONVOS.unshift",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_liked_me_array",
+      "label": "LIKED_ME Array",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L5163-5164 L5860",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "index_card_voice_state",
+      "label": "Card Voice Playing State (data-playing)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L1069 .card-voice[data-playing=true]",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "index_voice_memo_recorder",
+      "target": "index_acc_voice_player",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "#accVoicePreview",
+      "weight": 1.0
+    },
+    {
+      "source": "index_voice_memo_recorder",
+      "target": "index_state_user_profile_voice",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_card_voice_widget",
+      "target": "index_state_user_profile_voice",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_card_voice_widget",
+      "target": "index_card_voice_state",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_badge_fab",
+      "target": "index_badge_fab_popup",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "data-open=true toggle",
+      "weight": 1.0
+    },
+    {
+      "source": "index_badge_fab",
+      "target": "index_looking_for_selector",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "data-look",
+      "weight": 1.0
+    },
+    {
+      "source": "index_badge_fab_popup",
+      "target": "index_looking_for_selector",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "data-val chill|game|talk|sleep",
+      "weight": 1.0
+    },
+    {
+      "source": "index_my_status_btn",
+      "target": "index_looking_for_selector",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_swipe_card",
+      "target": "index_looking_for_selector",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": ".lookfor[data-look]",
+      "weight": 1.0
+    },
+    {
+      "source": "index_create_match_from_liker",
+      "target": "index_match_overlay",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "playMatchAnimation",
+      "weight": 1.0
+    },
+    {
+      "source": "index_match_overlay",
+      "target": "index_fly_to_fab",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L5203-5239",
+      "weight": 1.0
+    },
+    {
+      "source": "index_fly_to_fab",
+      "target": "index_msg_fab",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "getElementById('msgFab')",
+      "weight": 1.0
+    },
+    {
+      "source": "index_fly_to_fab",
+      "target": "index_msg_fab_pulse",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "classList.add('pulse-match')",
+      "weight": 1.0
+    },
+    {
+      "source": "index_liker_overlay",
+      "target": "index_create_match_from_liker",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "createMatchFromLiker(p)",
+      "weight": 1.0
+    },
+    {
+      "source": "index_liked_me_panel",
+      "target": "index_liker_overlay",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "openLikerProfile L5898",
+      "weight": 1.0
+    },
+    {
+      "source": "index_liked_me_panel",
+      "target": "index_liked_me_array",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L5860",
+      "weight": 1.0
+    },
+    {
+      "source": "index_heart_fab",
+      "target": "index_liked_me_panel",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": "#likedPanel",
+      "weight": 1.0
+    },
+    {
+      "source": "index_create_match_from_liker",
+      "target": "index_convos_array",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "CONVOS.unshift",
+      "weight": 1.0
+    },
+    {
+      "source": "index_create_match_from_liker",
+      "target": "index_liked_me_array",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "LIKED_ME.splice",
+      "weight": 1.0
+    },
+    {
+      "source": "index_match_overlay",
+      "target": "index_state_user",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "u.displayName u.avatarUrl",
+      "weight": 1.0
+    },
+    {
+      "source": "index_bulles_orbit_fullscreen",
+      "target": "index_bulles_physics",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_bulles_physics",
+      "target": "index_bulles_mouse_repulsion",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_bulles_physics",
+      "target": "index_bulles_pairwise_collision",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_bulles_physics",
+      "target": "index_forbidden_zones",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "forbiddenRects()",
+      "weight": 1.0
+    },
+    {
+      "source": "index_forbidden_zones",
+      "target": "index_msg_fab",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_forbidden_zones",
+      "target": "index_heart_fab",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_forbidden_zones",
+      "target": "index_badge_fab",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_wikidata_cover_fetch",
+      "target": "index_image_transparency_check",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "gameCoverOpaque",
+      "weight": 1.0
+    },
+    {
+      "source": "index_wikidata_cover_fetch",
+      "target": "index_game_cover_overrides",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "GAME_COVER_OVERRIDES[title]",
+      "weight": 1.0
+    },
+    {
+      "source": "index_bulles_orbit_fullscreen",
+      "target": "index_wikidata_cover_fetch",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": "ensureCoverThenAdd",
+      "weight": 1.0
+    },
+    {
+      "source": "index_preview_fallback_chain",
+      "target": "index_spotify_token",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_preview_fallback_chain",
+      "target": "index_deezer_preview",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L4785",
+      "weight": 1.0
+    },
+    {
+      "source": "index_preview_fallback_chain",
+      "target": "index_itunes_preview",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L4786",
+      "weight": 1.0
+    },
+    {
+      "source": "index_bulles_orbit_fullscreen",
+      "target": "index_preview_fallback_chain",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "index.html",
+      "source_location": "previewUrl plays in orb",
+      "weight": 1.0
+    },
+    {
+      "source": "index_archive_restore",
+      "target": "index_state_user",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "merge user_metadata extras",
+      "weight": 1.0
+    },
+    {
+      "source": "index_archive_restore",
+      "target": "index_state_user_profile_voice",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": "voice extra L3877",
+      "weight": 1.0
+    },
+    {
+      "source": "index_archive_restore",
+      "target": "index_dirty_state_tracking",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_onboarding_gender",
+      "target": "index_state_user",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": "gender field",
+      "weight": 1.0
+    },
+    {
+      "source": "index_card_age_badge",
+      "target": "index_state_user",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": "data-g gender",
+      "weight": 1.0
+    },
+    {
+      "source": "index_card_age_badge",
+      "target": "index_onboarding_gender",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_swipe_card",
+      "target": "index_card_age_badge",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": ".card-age-badge",
+      "weight": 1.0
+    },
+    {
+      "source": "index_swipe_card",
+      "target": "index_card_voice_widget",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": ".swipe-card .card-voice",
+      "weight": 1.0
+    },
+    {
+      "source": "index_acc_preview",
+      "target": "index_swipe_card",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": ".swipe-card.preview-mode",
+      "weight": 1.0
+    },
+    {
+      "source": "index_acc_voice_player",
+      "target": "index_acc_preview",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_boost_fab_banner",
+      "target": "index_boost_modal",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": "boostBanner click",
+      "weight": 1.0
+    },
+    {
+      "source": "index_boost_tab",
+      "target": "index_boost_modal",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "index_liked_me_panel",
+      "target": "index_boost_tab",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "index.html",
+      "source_location": "non-boost blur",
+      "weight": 1.0
+    },
+    {
+      "source": "index_liker_overlay",
+      "target": "index_boost_tab",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": "Boost-only feature L5810",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "nodes": [
+        "index_msg_fab",
+        "index_heart_fab",
+        "index_badge_fab"
+      ],
+      "label": "Bottom-row FAB stack (auth=in only)",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "body[data-auth=in] .bf-fab"
+    },
+    {
+      "nodes": [
+        "index_liked_me_panel",
+        "index_liker_overlay",
+        "index_create_match_from_liker",
+        "index_match_overlay"
+      ],
+      "label": "Liker-to-Match Flow Pipeline",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L5160-5239 L5810-5905"
+    },
+    {
+      "nodes": [
+        "index_bulles_mouse_repulsion",
+        "index_bulles_pairwise_collision",
+        "index_forbidden_zones"
+      ],
+      "label": "Bulles Physics Forces (3 systems)",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L4500-4700"
+    }
+  ],
+  "input_tokens": 70083,
+  "output_tokens": 0
+}

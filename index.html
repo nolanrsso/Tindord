@@ -6902,6 +6902,32 @@
     }
     window.sendDiscordNotif = sendDiscordNotif;
 
+    /* Sync notif prefs to Supabase so the server-side Edge Function can read them.
+       When Tindord runs against the real backend (likes/matches/messages tables +
+       database webhooks → Edge Function "notify"), this is what makes the Discord
+       webhook fire even when the user's tab is closed. */
+    async function syncNotifPrefsToSupabase(){
+      try {
+        if (!window.__supa) return;
+        const { data: { user } } = await window.__supa.auth.getUser();
+        if (!user) return;
+        const u = state.user || {};
+        const t = u.notifTypes || {};
+        await window.__supa.from('user_notif_prefs').upsert({
+          user_id:         user.id,
+          discord_webhook: u.discordWebhook || null,
+          notif_like:      !!t.like,
+          notif_match:     !!t.match,
+          notif_message:   !!t.message,
+          display_name:    u.displayName || null,
+          avatar_url:      u.avatarUrl || null,
+          c1:              u.profileColor || '#9146FF',
+          updated_at:      new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+      } catch (e) { console.warn('[Tindord] syncNotifPrefs failed (table user_notif_prefs missing?):', e?.message || e); }
+    }
+    window.__syncNotifPrefs = syncNotifPrefsToSupabase;
+
     /* Bind the Paramètres → Notifications Discord panel */
     (function bindDiscordNotifs(){
       const urlEl = document.getElementById('accDiscordWebhook');
@@ -6920,16 +6946,24 @@
       }
       hydrate();
       window.__hydrateDiscordNotifs = hydrate;
+      // Debounced sync (URL field fires lots of input events)
+      let _syncTimer = null;
+      function scheduleSync(){
+        clearTimeout(_syncTimer);
+        _syncTimer = setTimeout(syncNotifPrefsToSupabase, 600);
+      }
       urlEl.addEventListener('input', () => {
         state.user = state.user || {};
         state.user.discordWebhook = urlEl.value.trim();
         save();
+        scheduleSync();
       });
       Object.entries(tg).forEach(([k, el]) => {
         el.addEventListener('change', () => {
           state.user = state.user || {};
           state.user.notifTypes = Object.assign({}, state.user.notifTypes || {}, { [k]: el.checked });
           save();
+          scheduleSync();
         });
       });
       testBtn.addEventListener('click', async () => {
