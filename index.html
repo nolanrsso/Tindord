@@ -2325,51 +2325,80 @@
   <header data-screen-label="Header">
     <a href="/" class="brand" id="brandHome" aria-label="Recharger la page">
       <div class="mark">
-        <!-- Tindord logo : casque gaming chunky avec dégradé rose→magenta→violet
-             et boutons PlayStation (△ □ ○ ✕) sur le coussinet droit. -->
-        <svg class="tindord-logo" viewBox="0 0 200 220" width="36" height="40" xmlns="http://www.w3.org/2000/svg" aria-label="Tindord">
+        <!-- Tindord logo : casque gaming en perspective 3/4 — coussinet gauche montre
+             l'intérieur (mousse + driver), coussinet droit montre les boutons PS,
+             arceau épais avec highlight glossy. -->
+        <svg class="tindord-logo" viewBox="0 0 1000 1100" width="40" height="44" xmlns="http://www.w3.org/2000/svg" aria-label="Tindord">
           <defs>
             <linearGradient id="tdHp" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%"   stop-color="#FF1F9E"/>
-              <stop offset="45%"  stop-color="#C61DD8"/>
-              <stop offset="100%" stop-color="#6B1EE3"/>
+              <stop offset="40%"  stop-color="#C921D8"/>
+              <stop offset="100%" stop-color="#5E1FE0"/>
             </linearGradient>
-            <linearGradient id="tdHpDark" x1="50%" y1="0%" x2="50%" y2="100%">
-              <stop offset="0%"   stop-color="#5A0E50"/>
-              <stop offset="100%" stop-color="#2A0B60"/>
+            <linearGradient id="tdHpHL" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%"   stop-color="#FFBFE0" stop-opacity=".95"/>
+              <stop offset="100%" stop-color="#FF4FB8" stop-opacity="0"/>
             </linearGradient>
-            <linearGradient id="tdHpShine" x1="50%" y1="0%" x2="50%" y2="100%">
-              <stop offset="0%"   stop-color="#FFCDE8" stop-opacity=".95"/>
-              <stop offset="100%" stop-color="#FF66C8" stop-opacity="0"/>
+            <linearGradient id="tdHpD" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%"   stop-color="#5A0E55"/>
+              <stop offset="100%" stop-color="#280B70"/>
             </linearGradient>
+            <radialGradient id="tdSpeaker" cx="40%" cy="40%" r="65%">
+              <stop offset="0%"   stop-color="#3A0860"/>
+              <stop offset="65%"  stop-color="#1A0440"/>
+              <stop offset="100%" stop-color="#0F022E"/>
+            </radialGradient>
           </defs>
-          <!-- Headband (arc épais avec rounded caps) -->
-          <path d="M35 150 C 35 60 75 22 100 22 C 125 22 165 60 165 150"
-                fill="none" stroke="url(#tdHp)" stroke-width="26" stroke-linecap="round"/>
-          <!-- Highlight intérieur du headband -->
-          <path d="M52 100 C 60 55 80 38 100 38 C 120 38 140 55 148 100"
-                fill="none" stroke="url(#tdHpShine)" stroke-width="6" stroke-linecap="round"/>
-          <!-- Coussinet gauche (vue intérieure : driver/speaker) -->
-          <ellipse cx="38" cy="160" rx="32" ry="44" fill="url(#tdHp)"/>
-          <ellipse cx="42" cy="162" rx="22" ry="32" fill="url(#tdHpDark)"/>
-          <ellipse cx="46" cy="164" rx="11" ry="20" fill="#2A0B60" opacity=".7"/>
-          <!-- Coussinet droit (vue extérieure : avec les boutons PS) -->
-          <ellipse cx="162" cy="160" rx="34" ry="46" fill="url(#tdHp)"/>
-          <!-- PS buttons en losange sur le coussinet droit -->
+
+          <!-- Headband : arche épaisse, creuse au centre (vue 3/4) -->
+          <path d="M 220 720
+                   C 220 260, 380 100, 500 100
+                   C 620 100, 780 260, 780 720
+                   L 700 740
+                   C 700 330, 600 210, 500 210
+                   C 400 210, 300 330, 300 740 Z"
+                fill="url(#tdHp)" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
+          <!-- Highlight glossy sur l'intérieur supérieur de l'arceau -->
+          <path d="M 290 380
+                   C 300 230, 390 175, 500 175
+                   C 610 175, 700 230, 710 380
+                   L 678 370
+                   C 665 260, 585 225, 500 225
+                   C 415 225, 335 260, 322 370 Z"
+                fill="url(#tdHpHL)"/>
+          <!-- Petit notch (fente d'ajustement) sur le coté gauche de l'arceau -->
+          <rect x="245" y="490" width="12" height="36" rx="3" fill="rgba(0,0,0,.25)"/>
+          <rect x="743" y="490" width="12" height="36" rx="3" fill="rgba(0,0,0,.25)"/>
+
+          <!-- Coussinet droit (vue extérieure — coque avec boutons PS) -->
+          <ellipse cx="720" cy="800" rx="210" ry="250" fill="url(#tdHp)" stroke="#fff" stroke-width="6"/>
+          <!-- Subtle outer ring -->
+          <ellipse cx="720" cy="800" rx="165" ry="205" fill="none" stroke="rgba(255,255,255,.20)" stroke-width="4"/>
+
+          <!-- 4 boutons PS en losange (sur le coussinet droit, vers le bas-droit) -->
           <g>
             <!-- Triangle (haut) -->
-            <circle cx="170" cy="139" r="7" fill="#fff"/>
-            <path d="M170 135.6 L174 142.4 L166 142.4 Z" fill="none" stroke="#0D0B1E" stroke-width="1.4" stroke-linejoin="round"/>
+            <circle cx="785" cy="745" r="40" fill="#fff" stroke="rgba(0,0,0,.10)" stroke-width="2"/>
+            <path d="M785 720 L808 760 L762 760 Z" fill="none" stroke="#0D0B1E" stroke-width="4.5" stroke-linejoin="round"/>
             <!-- Carré (gauche) -->
-            <circle cx="158" cy="156" r="7" fill="#fff"/>
-            <rect x="154.2" y="152.2" width="7.6" height="7.6" fill="none" stroke="#0D0B1E" stroke-width="1.4"/>
+            <circle cx="725" cy="815" r="40" fill="#fff" stroke="rgba(0,0,0,.10)" stroke-width="2"/>
+            <rect x="703" y="793" width="44" height="44" fill="none" stroke="#0D0B1E" stroke-width="4.5"/>
             <!-- Rond (droite) -->
-            <circle cx="182" cy="156" r="7" fill="#fff"/>
-            <circle cx="182" cy="156" r="3.2" fill="none" stroke="#0D0B1E" stroke-width="1.4"/>
+            <circle cx="845" cy="815" r="40" fill="#fff" stroke="rgba(0,0,0,.10)" stroke-width="2"/>
+            <circle cx="845" cy="815" r="18" fill="none" stroke="#0D0B1E" stroke-width="4.5"/>
             <!-- Croix (bas) -->
-            <circle cx="170" cy="173" r="7" fill="#fff"/>
-            <path d="M166.2 169.2 L173.8 176.8 M173.8 169.2 L166.2 176.8" stroke="#0D0B1E" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="785" cy="885" r="40" fill="#fff" stroke="rgba(0,0,0,.10)" stroke-width="2"/>
+            <path d="M763 863 L807 907 M807 863 L763 907" stroke="#0D0B1E" stroke-width="4.5" stroke-linecap="round"/>
           </g>
+
+          <!-- Coussinet gauche (vue intérieure — mousse + speaker) -->
+          <ellipse cx="220" cy="800" rx="195" ry="245" fill="url(#tdHp)" stroke="#fff" stroke-width="6"/>
+          <!-- Mousse intérieure (anneau plus foncé) -->
+          <ellipse cx="245" cy="815" rx="140" ry="190" fill="url(#tdHpD)"/>
+          <!-- Driver speaker au centre -->
+          <ellipse cx="270" cy="830" rx="80" ry="115" fill="url(#tdSpeaker)"/>
+          <!-- Petit reflet circulaire sur le driver -->
+          <ellipse cx="240" cy="775" rx="22" ry="32" fill="rgba(255,255,255,.18)"/>
         </svg>
       </div>
       <span class="word" style="width: 92px; font-size: 22px; letter-spacing: -0.2px; padding: 0px; margin: -9.23071px">Tindord</span>
@@ -2608,34 +2637,45 @@
       <!-- Tabs bar -->
       <div class="acc-tabs" id="accTabs">
         <button type="button" class="acc-tab-btn acc-tab-btn--boost" data-tab="boost"><span class="boost-star">
-          <svg viewBox="0 0 200 220" width="20" height="22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <svg viewBox="0 0 1000 1100" width="22" height="24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <defs>
               <linearGradient id="tdGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%"   stop-color="#FFE17A"/>
-                <stop offset="45%"  stop-color="#F5C040"/>
-                <stop offset="100%" stop-color="#B27B14"/>
+                <stop offset="0%"   stop-color="#FFE988"/>
+                <stop offset="40%"  stop-color="#F5C040"/>
+                <stop offset="100%" stop-color="#A4690D"/>
               </linearGradient>
-              <linearGradient id="tdGoldDark" x1="50%" y1="0%" x2="50%" y2="100%">
-                <stop offset="0%"   stop-color="#7A5210"/>
-                <stop offset="100%" stop-color="#3A2602"/>
-              </linearGradient>
-              <linearGradient id="tdGoldShine" x1="50%" y1="0%" x2="50%" y2="100%">
+              <linearGradient id="tdGoldHL" x1="50%" y1="0%" x2="50%" y2="100%">
                 <stop offset="0%"   stop-color="#FFF7C8" stop-opacity=".95"/>
                 <stop offset="100%" stop-color="#FFD56A" stop-opacity="0"/>
               </linearGradient>
+              <linearGradient id="tdGoldD" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%"   stop-color="#7A5210"/>
+                <stop offset="100%" stop-color="#3A2602"/>
+              </linearGradient>
+              <radialGradient id="tdGoldSpk" cx="40%" cy="40%" r="65%">
+                <stop offset="0%"   stop-color="#5A3E08"/>
+                <stop offset="65%"  stop-color="#2E1E02"/>
+                <stop offset="100%" stop-color="#1A0F00"/>
+              </radialGradient>
             </defs>
-            <path d="M35 150 C 35 60 75 22 100 22 C 125 22 165 60 165 150" fill="none" stroke="url(#tdGold)" stroke-width="26" stroke-linecap="round"/>
-            <path d="M52 100 C 60 55 80 38 100 38 C 120 38 140 55 148 100" fill="none" stroke="url(#tdGoldShine)" stroke-width="6" stroke-linecap="round"/>
-            <ellipse cx="38" cy="160" rx="32" ry="44" fill="url(#tdGold)"/>
-            <ellipse cx="42" cy="162" rx="22" ry="32" fill="url(#tdGoldDark)"/>
-            <ellipse cx="46" cy="164" rx="11" ry="20" fill="#3A2602" opacity=".7"/>
-            <ellipse cx="162" cy="160" rx="34" ry="46" fill="url(#tdGold)"/>
+            <path d="M 220 720 C 220 260, 380 100, 500 100 C 620 100, 780 260, 780 720 L 700 740 C 700 330, 600 210, 500 210 C 400 210, 300 330, 300 740 Z"
+                  fill="url(#tdGold)" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
+            <path d="M 290 380 C 300 230, 390 175, 500 175 C 610 175, 700 230, 710 380 L 678 370 C 665 260, 585 225, 500 225 C 415 225, 335 260, 322 370 Z"
+                  fill="url(#tdGoldHL)"/>
+            <rect x="245" y="490" width="12" height="36" rx="3" fill="rgba(0,0,0,.30)"/>
+            <rect x="743" y="490" width="12" height="36" rx="3" fill="rgba(0,0,0,.30)"/>
+            <ellipse cx="720" cy="800" rx="210" ry="250" fill="url(#tdGold)" stroke="#fff" stroke-width="6"/>
+            <ellipse cx="720" cy="800" rx="165" ry="205" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="4"/>
             <g>
-              <circle cx="170" cy="139" r="7" fill="#fff"/><path d="M170 135.6 L174 142.4 L166 142.4 Z" fill="none" stroke="#3A2602" stroke-width="1.4" stroke-linejoin="round"/>
-              <circle cx="158" cy="156" r="7" fill="#fff"/><rect x="154.2" y="152.2" width="7.6" height="7.6" fill="none" stroke="#3A2602" stroke-width="1.4"/>
-              <circle cx="182" cy="156" r="7" fill="#fff"/><circle cx="182" cy="156" r="3.2" fill="none" stroke="#3A2602" stroke-width="1.4"/>
-              <circle cx="170" cy="173" r="7" fill="#fff"/><path d="M166.2 169.2 L173.8 176.8 M173.8 169.2 L166.2 176.8" stroke="#3A2602" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="785" cy="745" r="40" fill="#fff" stroke="rgba(0,0,0,.10)" stroke-width="2"/><path d="M785 720 L808 760 L762 760 Z" fill="none" stroke="#3A2602" stroke-width="4.5" stroke-linejoin="round"/>
+              <circle cx="725" cy="815" r="40" fill="#fff" stroke="rgba(0,0,0,.10)" stroke-width="2"/><rect x="703" y="793" width="44" height="44" fill="none" stroke="#3A2602" stroke-width="4.5"/>
+              <circle cx="845" cy="815" r="40" fill="#fff" stroke="rgba(0,0,0,.10)" stroke-width="2"/><circle cx="845" cy="815" r="18" fill="none" stroke="#3A2602" stroke-width="4.5"/>
+              <circle cx="785" cy="885" r="40" fill="#fff" stroke="rgba(0,0,0,.10)" stroke-width="2"/><path d="M763 863 L807 907 M807 863 L763 907" stroke="#3A2602" stroke-width="4.5" stroke-linecap="round"/>
             </g>
+            <ellipse cx="220" cy="800" rx="195" ry="245" fill="url(#tdGold)" stroke="#fff" stroke-width="6"/>
+            <ellipse cx="245" cy="815" rx="140" ry="190" fill="url(#tdGoldD)"/>
+            <ellipse cx="270" cy="830" rx="80" ry="115" fill="url(#tdGoldSpk)"/>
+            <ellipse cx="240" cy="775" rx="22" ry="32" fill="rgba(255,255,255,.25)"/>
           </svg>
         </span> Boost</button>
         <button type="button" class="acc-tab-btn active" data-tab="profil">Profil</button>
