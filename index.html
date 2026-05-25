@@ -2064,6 +2064,71 @@
   /* ===== Boost modal ===== */
   .boost-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:18px}
 
+  /* ===== Orb edit overlay (fullscreen profile preview + floating "+" bubble) ===== */
+  .oeo{position:fixed;inset:0;z-index:330;display:none;align-items:center;justify-content:center}
+  .oeo[data-show="true"]{display:flex;animation:fadeInOverlay .25s ease-out}
+  .oeo-backdrop{position:absolute;inset:0;background:rgba(8,9,14,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);cursor:pointer}
+  .oeo-close{
+    position:fixed;top:18px;right:18px;z-index:3;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;
+    display:grid;place-items:center;color:#fff;background:rgba(20,21,26,.95);
+    border:1px solid rgba(255,255,255,.10);box-shadow:0 8px 22px rgba(0,0,0,.6);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .oeo-close:hover{transform:scale(1.06);background:rgba(255,79,160,.18);border-color:rgba(255,79,160,.45)}
+  .oeo-stage{
+    position:relative;z-index:1;
+    width:min(96vw,460px);height:min(92vh,720px);
+    display:grid;place-items:center;
+  }
+  .oeo-card-wrap{
+    position:relative;width:100%;height:100%;border-radius:20px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.7);
+    animation:likerPop .35s cubic-bezier(.2,.7,.3,1.1);
+  }
+  .oeo-card-wrap .swipe-card{position:absolute !important;inset:0 !important;transform:none !important;cursor:default !important}
+  .oeo-card-wrap .swipe-card .badge-stamp{display:none !important}
+  .oeo-add-fab{
+    position:absolute;right:-20px;bottom:34px;z-index:2;
+    width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(145,70,255,.18);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:2px dashed rgba(145,70,255,.65);
+    color:#fff;display:grid;place-items:center;
+    box-shadow:0 14px 40px rgba(145,70,255,.45), 0 0 0 1px rgba(255,255,255,.08) inset;
+    transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
+    animation:oeoFabFloat 3.6s ease-in-out infinite;
+  }
+  .oeo-add-fab:hover{
+    transform:scale(1.10) translateY(-4px);
+    background:rgba(145,70,255,.36);
+    box-shadow:0 18px 50px rgba(145,70,255,.70), 0 0 0 1px rgba(255,255,255,.15) inset;
+  }
+  .oeo-plus{font-size:38px;line-height:1;font-weight:300;font-family:"Clash Display",sans-serif;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+  @keyframes oeoFabFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+  .oeo-add-panel{
+    position:fixed;top:0;right:0;height:100vh;width:min(380px,92vw);z-index:4;
+    background:#1c1d22;border-left:1px solid rgba(255,255,255,.08);
+    transform:translateX(105%);transition:.28s cubic-bezier(.2,.7,.3,1);
+    display:flex;flex-direction:column;padding:18px 18px 22px;
+    box-shadow:-20px 0 60px rgba(0,0,0,.65);
+  }
+  .oeo-add-panel[data-open="true"]{transform:translateX(0)}
+  .oeo-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .oeo-panel-head h3{margin:0;font-family:"Clash Display",sans-serif;font-size:18px;color:#fff;font-weight:700}
+  .oeo-panel-close{width:30px;height:30px;border:none;background:rgba(255,255,255,.06);color:#fff;border-radius:50%;cursor:pointer;font-size:18px;line-height:1}
+  .oeo-panel-close:hover{background:rgba(255,255,255,.14)}
+  .oeo-cats{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .oeo-cats button{
+    padding:8px 12px;border-radius:999px;border:1.5px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.04);color:#b9bbbe;cursor:pointer;
+    font-family:inherit;font-size:13px;font-weight:600;transition:.15s;
+  }
+  .oeo-cats button:hover{background:rgba(255,255,255,.08);color:#fff}
+  .oeo-cats button.active{border-color:#9146FF;background:rgba(145,70,255,.18);color:#fff}
+  .oeo-sugg{flex:1;overflow:auto;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+  .oeo-sugg .sp-item{cursor:pointer}
+
   /* Game meta modal (rank + clip after adding a game bubble) */
   .gmm-modal{position:fixed;inset:0;z-index:320;display:none;align-items:center;justify-content:center;padding:18px}
   .gmm-modal[data-open="true"]{display:flex}
@@ -2768,8 +2833,7 @@
         <div class="acc-orb-cats" id="accOrbCats">
           <button type="button" class="acc-orb-cat active" data-kind="music">Musique</button>
           <button type="button" class="acc-orb-cat" data-kind="game">Jeu</button>
-          <button type="button" class="acc-orb-cat" data-kind="anime">Anime</button>
-          <button type="button" class="acc-orb-cat" data-kind="film">Film·Série</button>
+          <button type="button" class="acc-orb-cat" data-kind="film">Série·Film</button>
         </div>
         <div class="acc-orb-form">
           <div class="acc-orb-input-wrap">
@@ -3055,6 +3119,33 @@
   </aside>
 
   <!-- ✨ Boost pricing modal -->
+  <!-- Orb edit overlay : aperçu profil grand + bulle "+" pour ajouter facilement -->
+  <div class="oeo" id="orbEditOverlay" data-show="false" aria-hidden="true">
+    <div class="oeo-backdrop" id="oeoBackdrop"></div>
+    <button class="oeo-close" id="oeoClose" type="button" aria-label="Fermer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="oeo-stage">
+      <div class="oeo-card-wrap" id="oeoCardWrap"></div>
+      <button class="oeo-add-fab" id="oeoAddFab" type="button" title="Ajouter une bulle">
+        <span class="oeo-plus">+</span>
+      </button>
+    </div>
+    <aside class="oeo-add-panel" id="oeoAddPanel" data-open="false" aria-label="Ajouter une bulle">
+      <div class="oeo-panel-head">
+        <h3>Ajouter une bulle</h3>
+        <button class="oeo-panel-close" id="oeoPanelClose" type="button" aria-label="Fermer">×</button>
+      </div>
+      <div class="oeo-cats" id="oeoCats">
+        <button type="button" data-kind="music" class="active">🎵 Musique</button>
+        <button type="button" data-kind="game">🎮 Jeu</button>
+        <button type="button" data-kind="film">📺 Série·Film</button>
+      </div>
+      <input class="acc-input" id="oeoSearch" type="text" placeholder="Recherche…" autocomplete="off" />
+      <div class="oeo-sugg" id="oeoSugg"></div>
+    </aside>
+  </div>
+
   <!-- Game meta modal — ouvre après ajout d'une bulle game pour demander rank + clip -->
   <div class="gmm-modal" id="gameMetaModal" data-open="false" aria-hidden="true">
     <div class="gmm-backdrop" id="gmmBackdrop"></div>
@@ -4202,7 +4293,7 @@
           {kind:'music', title:'Sicko Mode',         sub:'Travis Scott',     emoji:'🎵', voice:null},
           {kind:'voice', title:'Note vocale',        sub:"« Yo c'est Alex »", emoji:'🎤', voice:"Yo, c'est Alex. On tryhard CS ce soir ?"},
           {kind:'game',  title:'Counter-Strike 2',    sub:'2 134 h de jeu',   emoji:'🎮', rank:'Global Elite', clipUrl:'https://www.youtube.com/watch?v=dQw4w9WgXcQ'},
-          {kind:'anime', title:'One Piece',           sub:'Anime préféré',     emoji:'📺'},
+          {kind:'film', title:'One Piece',           sub:'Anime préféré',     emoji:'📺'},
           {kind:'music', title:'Mo Bamba',           sub:'Sheck Wes',         emoji:'🎵'},
           {kind:'game',  title:'Valorant',            sub:'Immortal 2',        emoji:'🎮', rank:'Immortal', clipUrl:'https://www.youtube.com/watch?v=oavMtUWDBTM'},
         ] },
@@ -4214,10 +4305,10 @@
         orbs:[
           {kind:'music', title:'Sweater Weather',    sub:'The Neighbourhood', emoji:'🎵'},
           {kind:'voice', title:'Note vocale',        sub:"« Salut toi »",     emoji:'🎤', voice:"Coucou, moi c'est Léa, ravie de te rencontrer !"},
-          {kind:'anime', title:'Studio Ghibli',       sub:'Pokoyo, Totoro',    emoji:'📺'},
+          {kind:'film', title:'Studio Ghibli',       sub:'Pokoyo, Totoro',    emoji:'📺'},
           {kind:'game',  title:'Stardew Valley',     sub:'400h+ de farm',     emoji:'🎮'},
           {kind:'music', title:'Strawberries & Cigarettes', sub:'Troye Sivan', emoji:'🎵'},
-          {kind:'anime', title:'Demon Slayer',       sub:'En cours',          emoji:'📺'},
+          {kind:'film', title:'Demon Slayer',       sub:'En cours',          emoji:'📺'},
         ] },
       { name:'Mo', tag:'mo.zzz', age:23, gender:'male', looking:'sleep', status:'dnd', nitro:false,
         joinedOn:'21 août 2025',
@@ -4228,7 +4319,7 @@
           {kind:'voice', title:'Note vocale',        sub:"« Bonne nuit »",    emoji:'🎤', voice:"Hey, si tu galères à dormir, je suis dispo en sleepcall."},
           {kind:'music', title:'Drown',              sub:'Cuco',              emoji:'🎵'},
           {kind:'game',  title:'Minecraft',          sub:'Realm chill',       emoji:'🎮'},
-          {kind:'anime', title:'Cowboy Bebop',       sub:'Anime culte',       emoji:'📺'},
+          {kind:'film', title:'Cowboy Bebop',       sub:'Anime culte',       emoji:'📺'},
         ] },
       { name:'Sam', tag:'sam.exe', age:20, gender:'other', looking:'talk', status:'online', nitro:true,
         joinedOn:'5 nov. 2025',
@@ -4239,7 +4330,7 @@
           {kind:'game',  title:'League of Legends', sub:'Soraka one-trick',   emoji:'🎮'},
           {kind:'music', title:'Industry Baby',      sub:'Lil Nas X',         emoji:'🎵'},
           {kind:'voice', title:'Note vocale',        sub:"« Duo maintenant ? »", emoji:'🎤', voice:"Yo, t'es chaud pour un duo ranked maintenant ?"},
-          {kind:'anime', title:'Jujutsu Kaisen',     sub:'Saison 2',          emoji:'📺'},
+          {kind:'film', title:'Jujutsu Kaisen',     sub:'Saison 2',          emoji:'📺'},
         ] },
       { name:'Nora', tag:'noraaa', age:22, gender:'female', looking:'chill', status:'online', nitro:false,
         joinedOn:'12 juil. 2025',
@@ -4247,7 +4338,7 @@
         games:['Phasmo','Stardew'], bio:"Films d'horreur + popcorn, t'es chaud ?",
         common:{friends:2, servers:2}, c1:'#A65BFF', c2:'#FF7EB6', initial:'N',
         orbs:[
-          {kind:'anime', title:'Junji Ito',          sub:'Tomié, Uzumaki',    emoji:'📺'},
+          {kind:'film', title:'Junji Ito',          sub:'Tomié, Uzumaki',    emoji:'📺'},
           {kind:'music', title:'Bury a Friend',       sub:'Billie Eilish',     emoji:'🎵'},
           {kind:'game',  title:'Phasmophobia',       sub:'Pro hunter',        emoji:'🎮'},
           {kind:'voice', title:'Note vocale',        sub:"« Halloween toute l'année »", emoji:'🎤', voice:"Hello, on regarde Insidious ensemble ?"},
@@ -4271,7 +4362,7 @@
         orbs:[
           {kind:'voice', title:'Note vocale',        sub:"« Bonsoir »",       emoji:'🎤', voice:"Bonsoir, je m'appelle Iris. Tu veux un sleepcall ?"},
           {kind:'music', title:'Lover',               sub:'Taylor Swift',      emoji:'🎵'},
-          {kind:'anime', title:'Your Name',          sub:'Makoto Shinkai',    emoji:'📺'},
+          {kind:'film', title:'Your Name',          sub:'Makoto Shinkai',    emoji:'📺'},
           {kind:'game',  title:'Minecraft',          sub:'Survie tranquille', emoji:'🎮'},
         ] },
       { name:'Kai', tag:'kai.lofi', age:24, gender:'other', looking:'chill', status:'online', nitro:false,
@@ -4281,7 +4372,7 @@
         common:{friends:0, servers:6}, c1:'#9146FF', c2:'#3BD17C', initial:'K',
         orbs:[
           {kind:'music', title:'lofi beats',          sub:'ChilledCow',        emoji:'🎵'},
-          {kind:'anime', title:'Mushishi',           sub:'Slow anime',        emoji:'📺'},
+          {kind:'film', title:'Mushishi',           sub:'Slow anime',        emoji:'📺'},
           {kind:'game',  title:'Disco Elysium',      sub:'3x rejoué',         emoji:'🎮'},
           {kind:'voice', title:'Note vocale',        sub:"« Hello »",         emoji:'🎤', voice:"Salut, je m'appelle Kai. On discute philo ce soir ?"},
         ] },
@@ -4303,7 +4394,7 @@
         common:{friends:2, servers:3}, c1:'#6B2BFF', c2:'#5BE9FF', initial:'H',
         orbs:[
           {kind:'game',  title:'Elden Ring',         sub:'NG+3',              emoji:'🎮'},
-          {kind:'anime', title:'Berserk',            sub:'Manga + anime',     emoji:'📺'},
+          {kind:'film', title:'Berserk',            sub:'Manga + anime',     emoji:'📺'},
           {kind:'music', title:'Mind Mischief',       sub:'Tame Impala',       emoji:'🎵'},
           {kind:'voice', title:'Note vocale',        sub:"« On stream ? »",   emoji:'🎤', voice:"Yo, je stream Resi 4 ce soir, t'es chaud pour venir ?"},
         ] },
@@ -4884,39 +4975,27 @@
             }
           }
 
-          // Wobble — random impulses every frame for organic, non-rectilinear motion.
-          // Non-music orbs get a strong, biased wobble + a slow curl so trajectories curve.
+          // Very gentle drift — orbs barely move on their own. Mouse repulsion + collisions
+          // are still active so the field reacts when you interact, but ambient motion is
+          // calm enough to read the labels comfortably.
           if (it.isMusic) {
-            it.vx += (Math.random() - 0.5) * 0.112;
-            it.vy += (Math.random() - 0.5) * 0.112;
+            it.vx += (Math.random() - 0.5) * 0.04;
+            it.vy += (Math.random() - 0.5) * 0.04;
           } else {
-            // Curl: rotate velocity slightly each frame
-            const curl = Math.sin(it.phase * 0.7) * 0.03;
-            const cs = Math.cos(curl), sn = Math.sin(curl);
-            const nvx = it.vx * cs - it.vy * sn;
-            const nvy = it.vx * sn + it.vy * cs;
-            it.vx = nvx; it.vy = nvy;
-            // Random jitter — halved
-            it.vx += (Math.random() - 0.5) * 0.175;
-            it.vy += (Math.random() - 0.5) * 0.175;
+            it.vx += (Math.random() - 0.5) * 0.03;
+            it.vy += (Math.random() - 0.5) * 0.03;
           }
 
-          // Damping — very light for free-floaters (keeps them moving fast)
-          const damp = it.isMusic ? 0.97 : 0.993;
+          // Strong damping so velocity decays quickly back to ~0
+          const damp = it.isMusic ? 0.93 : 0.92;
           it.vx *= damp;
           it.vy *= damp;
 
-          // Clamp max speed — non-music halved
+          // Hard cap max speed
           const sp = Math.hypot(it.vx, it.vy);
-          const maxSp = it.isMusic ? 2.24 : 2.75;
+          const maxSp = it.isMusic ? 1.0 : 0.9;
           if (sp > maxSp) { it.vx = it.vx / sp * maxSp; it.vy = it.vy / sp * maxSp; }
-
-          // Maintain a minimum drift for non-music orbs (halved)
-          if (!it.isMusic && sp < 0.5) {
-            const ang = Math.atan2(it.vy || (Math.random() - 0.5), it.vx || (Math.random() - 0.5));
-            it.vx = Math.cos(ang) * 0.7;
-            it.vy = Math.sin(ang) * 0.7;
-          }
+          // No forced minimum drift — let orbs settle
 
           it.x += it.vx;
           it.y += it.vy;
@@ -5789,8 +5868,7 @@
        demand via Wikipedia (game / film) or Jikan (anime). */
     const ORB_SUGGESTIONS = {
       game: ["Minecraft","Valorant","Rocket League","Fortnite","League of Legends","Counter-Strike 2","Grand Theft Auto V","Roblox","Apex Legends","Call of Duty: Warzone","Overwatch 2","Tom Clancy's Rainbow Six Siege","Dota 2","PUBG: Battlegrounds","Genshin Impact","World of Warcraft","Final Fantasy XIV","Destiny 2","Honkai: Star Rail","Diablo IV","The Sims 4","Stardew Valley","Terraria","Among Us","Fall Guys","Marvel Rivals","Sea of Thieves","Dead by Daylight","Phasmophobia","Warframe","Path of Exile 2","Hearthstone","Magic: The Gathering Arena","Elden Ring","Cyberpunk 2077","Baldur's Gate 3","The Witcher 3: Wild Hunt","Red Dead Redemption 2","The Elder Scrolls V: Skyrim","EA Sports FC 24","NBA 2K24","Forza Horizon 5","Mortal Kombat 1","Tekken 8","Street Fighter 6","Lethal Company","Helldivers 2","Lost Ark","New World","Hogwarts Legacy"],
-      anime: ["One Piece","Naruto","Dragon Ball Z","Dragon Ball Super","Bleach","Hunter x Hunter","Fullmetal Alchemist: Brotherhood","Attack on Titan","Jujutsu Kaisen","Demon Slayer","Chainsaw Man","My Hero Academia","Black Clover","Soul Eater","Fairy Tail","JoJo's Bizarre Adventure","YuYu Hakusho","Seven Deadly Sins","Dr. Stone","Fire Force","Death Note","Monster","Vinland Saga","Berserk","Psycho-Pass","Parasyte: The Maxim","Tokyo Ghoul","Erased","Steins;Gate","Death Parade","Elfen Lied","Hellsing Ultimate","Code Geass","Future Diary","Another","The Promised Neverland","Hajime no Ippo","Slam Dunk","Haikyuu!!","Kuroko's Basketball","Blue Lock","Your Lie in April","Clannad","Toradora","Golden Time","Kaguya-sama: Love is War","Nichijou","Great Teacher Onizuka","Saiki K","Spy x Family","Bocchi the Rock!","March Comes in Like a Lion","Neon Genesis Evangelion","Cowboy Bebop","Akira","Ghost in the Shell","Trigun","Samurai Champloo","FLCL","Tengen Toppa Gurren Lagann","Mobile Suit Gundam","Macross","Serial Experiments Lain","Paprika","Perfect Blue","Made in Abyss","Re:Zero","Konosuba","Overlord","That Time I Got Reincarnated as a Slime","Mushoku Tensei","Ranking of Kings","Mob Psycho 100","Ping Pong the Animation","Kill la Kill","Devilman Crybaby","Dorohedoro","Golden Kamuy","Nana","Fruits Basket","Ouran High School Host Club","Azumanga Daioh","Lucky Star","K-On!","Cardcaptor Sakura","Sailor Moon","Pokemon","Digimon","Yu-Gi-Oh!","Inuyasha","Ranma 1/2","Maison Ikkoku","City Hunter","Space Dandy"],
-      film: ["Breaking Bad","Better Call Saul","The Wire","The Sopranos","Peaky Blinders","Dexter","True Detective","Fargo","Sons of Anarchy","Narcos","Ozark","Mindhunter","Prison Break","The Shield","Boardwalk Empire","The Night Of","Game of Thrones","House of the Dragon","Stranger Things","The X-Files","Black Mirror","The Twilight Zone","Doctor Who","Battlestar Galactica","The Expanse","Westworld","Dark","The Boys","The Umbrella Academy","Lost","Fringe","Foundation","Silo","The Office","Friends","Seinfeld","The Simpsons","South Park","Rick and Morty","It's Always Sunny in Philadelphia","Parks and Recreation","Brooklyn Nine-Nine","How I Met Your Mother","Arrested Development","Community","Curb Your Enthusiasm","Ted Lasso","The Good Place","Silicon Valley","The Godfather","Pulp Fiction","Fight Club","Inception","Interstellar","The Dark Knight","The Matrix","Star Wars: A New Hope","The Empire Strikes Back","Return of the Jedi","The Lord of the Rings: The Fellowship of the Ring","The Two Towers","The Return of the King","Jurassic Park","Terminator","Terminator 2: Judgment Day","Blade Runner","Alien","The Shawshank Redemption","Forrest Gump","Saving Private Ryan","Gladiator","Se7en","Shutter Island","Parasite","Spirited Away","The Silence of the Lambs","The Shining","Psycho","Casablanca","Citizen Kane","2001: A Space Odyssey","Apocalypse Now","Taxi Driver","Goodfellas","Reservoir Dogs","The Big Lebowski","No Country for Old Men","There Will Be Blood","Whiplash","Birdman","The Grand Budapest Hotel","The Truman Show","Eternal Sunshine of the Spotless Mind","Memento","Donnie Darko","A Clockwork Orange","Full Metal Jacket","Dr. Strangelove","Lord of War","American Psycho","Scarface","Heat","Casino","The Departed","Dunkirk","Oppenheimer","Tenet","The Prestige","Batman Begins","The Dark Knight Rises","Joker","Logan","Mad Max: Fury Road","Braveheart","Troy","Kingdom of Heaven","300","Sin City","Watchmen","V for Vendetta","Children of Men","District 9","Arrival","Gravity","The Martian","Ad Astra","Moon","Ex Machina","Her","Up","Wall-E","Ratatouille","Finding Nemo","The Incredibles","Toy Story","The Lion King","Aladdin","Beauty and the Beast","Princess Mononoke","Howl's Moving Castle","My Neighbor Totoro","Grave of the Fireflies","Your Name","Weathering With You","Suzume"],
+      film: ["One Piece","Naruto","Dragon Ball Z","Bleach","Hunter x Hunter","Attack on Titan","Jujutsu Kaisen","Demon Slayer","Chainsaw Man","My Hero Academia","Fullmetal Alchemist: Brotherhood","Death Note","JoJo's Bizarre Adventure","Vinland Saga","Spy x Family","Cowboy Bebop","Neon Genesis Evangelion","Steins;Gate","Code Geass","Haikyuu!!","Blue Lock","Re:Zero","Mob Psycho 100","Made in Abyss","Tokyo Ghoul","Fire Force","Black Clover","Frieren","Solo Leveling","Bocchi the Rock!","Spirited Away","Princess Mononoke","Howl's Moving Castle","My Neighbor Totoro","Your Name","Akira","Ghost in the Shell","Breaking Bad","Better Call Saul","The Wire","The Sopranos","Peaky Blinders","Dexter","True Detective","Fargo","Sons of Anarchy","Narcos","Ozark","Mindhunter","Prison Break","The Shield","Boardwalk Empire","The Night Of","Game of Thrones","House of the Dragon","Stranger Things","The X-Files","Black Mirror","The Twilight Zone","Doctor Who","Battlestar Galactica","The Expanse","Westworld","Dark","The Boys","The Umbrella Academy","Lost","Fringe","Foundation","Silo","The Office","Friends","Seinfeld","The Simpsons","South Park","Rick and Morty","It's Always Sunny in Philadelphia","Parks and Recreation","Brooklyn Nine-Nine","How I Met Your Mother","Arrested Development","Community","Curb Your Enthusiasm","Ted Lasso","The Good Place","Silicon Valley","The Godfather","Pulp Fiction","Fight Club","Inception","Interstellar","The Dark Knight","The Matrix","Star Wars: A New Hope","The Empire Strikes Back","Return of the Jedi","The Lord of the Rings: The Fellowship of the Ring","The Two Towers","The Return of the King","Jurassic Park","Terminator","Terminator 2: Judgment Day","Blade Runner","Alien","The Shawshank Redemption","Forrest Gump","Saving Private Ryan","Gladiator","Se7en","Shutter Island","Parasite","Spirited Away","The Silence of the Lambs","The Shining","Psycho","Casablanca","Citizen Kane","2001: A Space Odyssey","Apocalypse Now","Taxi Driver","Goodfellas","Reservoir Dogs","The Big Lebowski","No Country for Old Men","There Will Be Blood","Whiplash","Birdman","The Grand Budapest Hotel","The Truman Show","Eternal Sunshine of the Spotless Mind","Memento","Donnie Darko","A Clockwork Orange","Full Metal Jacket","Dr. Strangelove","Lord of War","American Psycho","Scarface","Heat","Casino","The Departed","Dunkirk","Oppenheimer","Tenet","The Prestige","Batman Begins","The Dark Knight Rises","Joker","Logan","Mad Max: Fury Road","Braveheart","Troy","Kingdom of Heaven","300","Sin City","Watchmen","V for Vendetta","Children of Men","District 9","Arrival","Gravity","The Martian","Ad Astra","Moon","Ex Machina","Her","Up","Wall-E","Ratatouille","Finding Nemo","The Incredibles","Toy Story","The Lion King","Aladdin","Beauty and the Beast","Princess Mononoke","Howl's Moving Castle","My Neighbor Totoro","Grave of the Fireflies","Your Name","Weathering With You","Suzume"],
     };
     /* Cache: kind+title -> coverUrl */
     const _suggCoverCache = new Map();
@@ -5955,7 +6033,13 @@
           cover = await wikidataCover(title, ['P18', 'P154']);
           if (!cover) cover = await wikidataCover(title + ' (film)', ['P18', 'P154']);
           if (!cover) cover = await wikidataCover(title + ' (TV series)', ['P18', 'P154']);
+          if (!cover) cover = await wikidataCover(title + ' (anime)', ['P154', 'P18']);
           if (!cover) cover = await wikiPageSummary(title);
+          // Last resort : Jikan anime DB (animes that aren't in Wikidata)
+          if (!cover) {
+            const r = await searchAnime(title);
+            cover = (r && r[0] && r[0].cover) || null;
+          }
         }
       } catch {}
       _suggCoverCache.set(k, cover);
@@ -7155,10 +7239,134 @@
       });
     })();
 
-    document.getElementById('orbPreviewBtn').addEventListener('click', () => {
-      const profilBtn = document.querySelector('#accTabs .acc-tab-btn[data-tab="profil"]');
-      if (profilBtn) profilBtn.click();
-    });
+    /* ===== Orb edit overlay (fullscreen profile preview + "+" bubble to add) ===== */
+    function openOrbEditOverlay(){
+      const overlay = document.getElementById('orbEditOverlay');
+      const wrap    = document.getElementById('oeoCardWrap');
+      if (!overlay || !wrap) return;
+      // Re-render the profile card big inside the overlay
+      const myP = (typeof buildUserProfile === 'function') ? buildUserProfile() : null;
+      wrap.innerHTML = '';
+      if (myP) {
+        const card = buildCard(myP, false);
+        card.style.cssText += ';position:absolute !important;inset:0 !important;opacity:1 !important;transform:none !important;cursor:default !important;pointer-events:auto';
+        wrap.appendChild(card);
+      } else {
+        wrap.innerHTML = '<div style="padding:40px;text-align:center;color:#b9bbbe">Pas encore de profil — connecte-toi d\'abord.</div>';
+      }
+      overlay.setAttribute('data-show', 'true');
+      // Reset add panel
+      document.getElementById('oeoAddPanel').setAttribute('data-open', 'false');
+      document.getElementById('oeoSugg').innerHTML = '';
+      document.getElementById('oeoSearch').value = '';
+    }
+    function closeOrbEditOverlay(){
+      document.getElementById('orbEditOverlay').setAttribute('data-show', 'false');
+      document.getElementById('oeoAddPanel').setAttribute('data-open', 'false');
+    }
+    window.openOrbEditOverlay = openOrbEditOverlay;
+
+    (function bindOrbEditOverlay(){
+      const overlay = document.getElementById('orbEditOverlay');
+      if (!overlay) return;
+      document.getElementById('oeoBackdrop').addEventListener('click', closeOrbEditOverlay);
+      document.getElementById('oeoClose').addEventListener('click', closeOrbEditOverlay);
+      document.getElementById('oeoPanelClose').addEventListener('click', () => {
+        document.getElementById('oeoAddPanel').setAttribute('data-open', 'false');
+      });
+      // Floating "+" bubble → open add panel
+      document.getElementById('oeoAddFab').addEventListener('click', () => {
+        document.getElementById('oeoAddPanel').setAttribute('data-open', 'true');
+        setTimeout(() => document.getElementById('oeoSearch').focus(), 200);
+        // Trigger an initial search render with current kind
+        runOeoSearch('');
+      });
+      // Category tabs
+      let oeoKind = 'music';
+      document.querySelectorAll('#oeoCats button').forEach(b => {
+        b.addEventListener('click', () => {
+          document.querySelectorAll('#oeoCats button').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+          oeoKind = b.dataset.kind;
+          const ph = { music:'Recherche un son Spotify…', game:'ex: Valorant, Minecraft…', film:'ex: One Piece, Inception…' };
+          document.getElementById('oeoSearch').placeholder = ph[oeoKind] || 'Tape ici…';
+          runOeoSearch(document.getElementById('oeoSearch').value);
+        });
+      });
+      // Live search (reuses the curated lists + cover fetcher already in the app)
+      let _oeoDebounce = null;
+      async function runOeoSearch(q){
+        clearTimeout(_oeoDebounce);
+        _oeoDebounce = setTimeout(async () => {
+          const sugg = document.getElementById('oeoSugg');
+          sugg.innerHTML = '<div style="color:#72767d;font-size:12.5px;padding:8px">Chargement…</div>';
+          let results = [];
+          if (oeoKind === 'music') {
+            if (!q.trim()) { sugg.innerHTML = '<div style="color:#72767d;font-size:12.5px;padding:8px">Tape le nom d\'un son…</div>'; return; }
+            const items = await searchSpotifyTracks(q, 8);
+            results = (items || []).map(it => ({
+              name: it.name, sub: it.artist, cover: it.cover,
+              orb: { kind:'music', title: it.name, sub: it.artist, cover: it.cover, previewUrl: it.previewUrl || null },
+            }));
+          } else {
+            const titles = curatedMatches(q, oeoKind, 10);
+            results = titles.map(t => ({ name:t, sub:'', cover:null, orb:{ kind: oeoKind, title: t } }));
+            // Fire-and-forget : prefetch covers
+            results.forEach(async (r, i) => {
+              const cv = await fetchSuggCover(oeoKind, r.orb.title);
+              if (cv) {
+                r.cover = cv; r.orb.cover = cv;
+                const node = sugg.children[i];
+                if (node) {
+                  const img = node.querySelector('img');
+                  if (img) img.src = cv;
+                }
+              }
+            });
+          }
+          if (!results.length) {
+            sugg.innerHTML = '<div style="color:#72767d;font-size:12.5px;padding:8px">Aucun résultat</div>';
+            return;
+          }
+          sugg.innerHTML = '';
+          const fallbackIcon = {music:'🎵', game:'🎮', film:'🎬'}[oeoKind] || '✨';
+          results.forEach(r => {
+            const item = document.createElement('div');
+            item.className = 'sp-item';
+            item.innerHTML =
+              (r.cover ? `<img src="${r.cover}" alt="">` : `<div class="sp-no-cover">${fallbackIcon}</div>`) +
+              `<div class="sp-info"><div class="sp-title">${escapeHtmlMini(r.name)}</div>` +
+              `<div class="sp-artist">${escapeHtmlMini(r.sub || '')}</div></div>`;
+            item.addEventListener('click', async () => {
+              // Make sure we have a cover before adding
+              if (!r.cover && oeoKind !== 'music') {
+                r.cover = await fetchSuggCover(oeoKind, r.orb.title);
+                r.orb.cover = r.cover;
+              }
+              if (!r.cover && oeoKind !== 'music') { showToast('⚠️','Pas d\'image','Choisis un autre titre'); return; }
+              state.profile = state.profile || {};
+              state.profile.userOrbs = state.profile.userOrbs || [];
+              if (orbsUsed() >= orbBudget()) { showToast('🫧','Limite atteinte', orbBudget()+' bulles max'); return; }
+              state.profile.userOrbs.push(r.orb);
+              save();
+              renderUserOrbs();
+              showToast(fallbackIcon, 'Bulle ajoutée', r.orb.title);
+              // Re-render the overlay card to reflect the new bubble
+              openOrbEditOverlay();
+              if (r.orb.kind === 'game') openGameMetaModal(r.orb);
+            });
+            sugg.appendChild(item);
+          });
+        }, 220);
+      }
+      document.getElementById('oeoSearch').addEventListener('input', e => runOeoSearch(e.target.value));
+      // Esc closes the overlay
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && overlay.getAttribute('data-show') === 'true') closeOrbEditOverlay();
+      });
+    })();
+
+    document.getElementById('orbPreviewBtn').addEventListener('click', openOrbEditOverlay);
     document.getElementById('accountChip').addEventListener('click', (e) => {
       e.preventDefault();
       const cur = document.body.getAttribute('data-screen');
