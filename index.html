@@ -2063,6 +2063,45 @@
 
   /* ===== Boost modal ===== */
   .boost-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:18px}
+
+  /* Game meta modal (rank + clip after adding a game bubble) */
+  .gmm-modal{position:fixed;inset:0;z-index:320;display:none;align-items:center;justify-content:center;padding:18px}
+  .gmm-modal[data-open="true"]{display:flex}
+  .gmm-backdrop{position:absolute;inset:0;background:rgba(8,9,14,.78);backdrop-filter:blur(8px)}
+  .gmm-card{
+    position:relative;z-index:1;width:min(420px,96vw);
+    background:#1c1d22;border:1px solid rgba(255,255,255,.08);border-radius:16px;
+    padding:22px 22px 18px;box-shadow:0 24px 60px rgba(0,0,0,.65);
+    animation:authCardIn .25s cubic-bezier(.2,.7,.3,1);
+  }
+  .gmm-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,.06);color:#fff;cursor:pointer;display:grid;place-items:center}
+  .gmm-close:hover{background:rgba(255,255,255,.14)}
+  .gmm-title{margin:0 0 4px;font-family:"Clash Display",sans-serif;font-weight:700;font-size:20px;color:#fff}
+  .gmm-sub{margin:0 0 16px;font-size:13px;color:#b9bbbe}
+  .gmm-field{margin-bottom:12px}
+  .gmm-field label{display:block;font-size:12.5px;font-weight:600;color:#dcddde;margin-bottom:6px}
+  .gmm-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+  /* Clip overlay (click on a game bubble → embed plays) */
+  .clip-overlay{position:fixed;inset:0;z-index:340;display:none;align-items:center;justify-content:center;padding:24px}
+  .clip-overlay[data-show="true"]{display:flex;animation:fadeInOverlay .25s ease-out}
+  .clip-backdrop{position:absolute;inset:0;background:rgba(8,9,14,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:pointer}
+  .clip-close{position:fixed;top:18px;right:18px;z-index:2;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;display:grid;place-items:center;color:#fff;background:rgba(20,21,26,.95);border:1px solid rgba(255,255,255,.10);box-shadow:0 8px 22px rgba(0,0,0,.6)}
+  .clip-close:hover{background:rgba(255,79,160,.18);border-color:rgba(255,79,160,.45);transform:scale(1.06)}
+  .clip-content{position:relative;z-index:1;width:min(96vw,960px);max-height:88vh;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+  .clip-content iframe,
+  .clip-content video{width:100%;aspect-ratio:16/9;height:auto;display:block;border:none}
+  .clip-empty{padding:60px 30px;text-align:center;color:#b9bbbe;font-size:14px}
+
+  /* Rank badge on a game orb */
+  .orb-rank{
+    position:absolute;bottom:-4px;right:-4px;z-index:4;
+    min-width:24px;height:24px;padding:0 8px;border-radius:13px;
+    background:linear-gradient(135deg,#FFD83D,#FF9A3D);color:#1c1d22;
+    font-size:10.5px;font-weight:800;line-height:24px;text-align:center;
+    border:2px solid #0d0b1e;box-shadow:0 4px 12px rgba(0,0,0,.5);
+    text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;
+  }
   .boost-modal[data-open="true"]{display:flex}
   .bm-backdrop{position:absolute;inset:0;background:rgba(8,9,14,.78);backdrop-filter:blur(8px)}
   .bm-card{
@@ -3016,6 +3055,42 @@
   </aside>
 
   <!-- ✨ Boost pricing modal -->
+  <!-- Game meta modal — ouvre après ajout d'une bulle game pour demander rank + clip -->
+  <div class="gmm-modal" id="gameMetaModal" data-open="false" aria-hidden="true">
+    <div class="gmm-backdrop" id="gmmBackdrop"></div>
+    <div class="gmm-card" role="dialog" aria-labelledby="gmmTitle">
+      <button class="gmm-close" id="gmmClose" type="button" aria-label="Fermer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <h3 class="gmm-title"><span id="gmmGameName">Jeu</span></h3>
+      <p class="gmm-sub">Ajoute des infos à cette bulle (optionnel)</p>
+      <div class="gmm-field" id="gmmRankField" hidden>
+        <label>Ton rang</label>
+        <select class="acc-select" id="gmmRankSelect">
+          <option value="">Pas classé</option>
+        </select>
+      </div>
+      <div class="gmm-field">
+        <label>Lien d'un clip <small style="color:#b9bbbe;font-weight:400">(YouTube, Twitch, Streamable, MP4)</small></label>
+        <input type="text" class="acc-input" id="gmmClipInput" placeholder="https://youtube.com/watch?v=…" autocomplete="off" />
+        <p style="font-size:11.5px;color:#72767d;margin:6px 0 0">Quand quelqu'un clique sur ta bulle, ton clip se lance.</p>
+      </div>
+      <div class="gmm-actions">
+        <button type="button" class="acc-btn acc-btn--ghost" id="gmmSkip">Passer</button>
+        <button type="button" class="acc-btn acc-btn--primary" id="gmmSave">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clip overlay — shows when someone clicks a game bubble that has a clipUrl -->
+  <div class="clip-overlay" id="clipOverlay" data-show="false" aria-hidden="true">
+    <div class="clip-backdrop" id="clipBackdrop"></div>
+    <button class="clip-close" id="clipClose" type="button" aria-label="Fermer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="clip-content" id="clipContent"></div>
+  </div>
+
   <div class="boost-modal" id="boostModal" data-open="false" aria-hidden="true">
     <div class="bm-backdrop" id="boostModalBackdrop"></div>
     <div class="bm-card" role="dialog" aria-labelledby="bmTitle">
@@ -4126,10 +4201,10 @@
         orbs:[
           {kind:'music', title:'Sicko Mode',         sub:'Travis Scott',     emoji:'🎵', voice:null},
           {kind:'voice', title:'Note vocale',        sub:"« Yo c'est Alex »", emoji:'🎤', voice:"Yo, c'est Alex. On tryhard CS ce soir ?"},
-          {kind:'game',  title:'Counter-Strike 2',    sub:'2 134 h de jeu',   emoji:'🎮'},
+          {kind:'game',  title:'Counter-Strike 2',    sub:'2 134 h de jeu',   emoji:'🎮', rank:'Global Elite', clipUrl:'https://www.youtube.com/watch?v=dQw4w9WgXcQ'},
           {kind:'anime', title:'One Piece',           sub:'Anime préféré',     emoji:'📺'},
           {kind:'music', title:'Mo Bamba',           sub:'Sheck Wes',         emoji:'🎵'},
-          {kind:'game',  title:'Valorant',            sub:'Immortal 2',        emoji:'🎮'},
+          {kind:'game',  title:'Valorant',            sub:'Immortal 2',        emoji:'🎮', rank:'Immortal', clipUrl:'https://www.youtube.com/watch?v=oavMtUWDBTM'},
         ] },
       { name:'Léa', tag:'leah_', age:19, gender:'female', looking:'chill', status:'idle', nitro:true,
         joinedOn:'2 sept. 2025',
@@ -4243,8 +4318,10 @@
       const emoByKind  = {music:'🎵', game:'🎮', anime:'📺', film:'🎬'};
       const orbs = (p.userOrbs || []).map(o => ({
         kind: o.kind, title: o.title,
-        sub: subByKind[o.kind] || '', emoji: emoByKind[o.kind] || '✨',
+        sub: (o.kind === 'game' && o.rank) ? o.rank : (subByKind[o.kind] || ''),
+        emoji: emoByKind[o.kind] || '✨',
         cover: o.cover || null, previewUrl: o.previewUrl || null,
+        rank: o.rank || null, clipUrl: o.clipUrl || null,
       }));
       return {
         name: u.displayName || u.email?.split('@')[0] || 'Moi',
@@ -4638,6 +4715,13 @@
         btn.dataset.kind = o.kind;
         btn.title = `${o.title} · ${o.sub || ''}${isCommon ? ' · En commun ✨' : ''}`;
         btn.innerHTML = orbInner(o);
+        // Rank badge for ranked games
+        if (o.kind === 'game' && o.rank) {
+          const rb = document.createElement('span');
+          rb.className = 'orb-rank';
+          rb.textContent = o.rank;
+          btn.appendChild(rb);
+        }
         btn.addEventListener('click', (ev) => {
           ev.stopPropagation();
           // Sound-wave ripple on music orbs only
@@ -5055,7 +5139,107 @@
       clearTimeout(showToast._h);
       showToast._h = setTimeout(() => t.setAttribute('data-show', 'false'), 3200);
     }
+    /* ===== Game meta modal (rank + clip URL after a game bubble is added) ===== */
+    let _editingGameOrb = null;
+    function openGameMetaModal(orb){
+      _editingGameOrb = orb;
+      const modal     = document.getElementById('gameMetaModal');
+      const nameEl    = document.getElementById('gmmGameName');
+      const rankWrap  = document.getElementById('gmmRankField');
+      const rankSel   = document.getElementById('gmmRankSelect');
+      const clipInput = document.getElementById('gmmClipInput');
+      if (!modal) return;
+      nameEl.textContent = orb.title;
+      const ranks = RANKED_GAMES[orb.title];
+      if (ranks) {
+        rankWrap.hidden = false;
+        rankSel.innerHTML = '<option value="">Pas classé</option>' + ranks.map(r => `<option value="${r}">${r}</option>`).join('');
+        rankSel.value = orb.rank || '';
+      } else {
+        rankWrap.hidden = true;
+        rankSel.value = '';
+      }
+      clipInput.value = orb.clipUrl || '';
+      modal.setAttribute('data-open', 'true');
+      setTimeout(() => clipInput.focus(), 60);
+    }
+    function closeGameMetaModal(){
+      _editingGameOrb = null;
+      document.getElementById('gameMetaModal').setAttribute('data-open', 'false');
+    }
+    window.openGameMetaModal = openGameMetaModal;
+    (function bindGameMetaModal(){
+      const modal = document.getElementById('gameMetaModal');
+      if (!modal) return;
+      document.getElementById('gmmClose').addEventListener('click', closeGameMetaModal);
+      document.getElementById('gmmBackdrop').addEventListener('click', closeGameMetaModal);
+      document.getElementById('gmmSkip').addEventListener('click', closeGameMetaModal);
+      document.getElementById('gmmSave').addEventListener('click', () => {
+        if (!_editingGameOrb) { closeGameMetaModal(); return; }
+        const rank = document.getElementById('gmmRankSelect').value.trim();
+        const clip = document.getElementById('gmmClipInput').value.trim();
+        if (rank) _editingGameOrb.rank = rank; else delete _editingGameOrb.rank;
+        if (clip) _editingGameOrb.clipUrl = clip; else delete _editingGameOrb.clipUrl;
+        save();
+        renderUserOrbs();
+        if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
+        closeGameMetaModal();
+        showToast('🎮', 'Bulle mise à jour', `${_editingGameOrb?.title || ''} ${rank ? '· ' + rank : ''}`);
+      });
+    })();
+
+    /* ===== Clip overlay (plays when a game orb is clicked) ===== */
+    function clipUrlToEmbed(url){
+      if (!url) return null;
+      const u = url.trim();
+      // YouTube watch / short / shorts
+      let m = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/i);
+      if (m) return { type:'iframe', src:`https://www.youtube-nocookie.com/embed/${m[1]}?autoplay=1&rel=0` };
+      // Twitch clip (https://clips.twitch.tv/<slug> or https://www.twitch.tv/<chan>/clip/<slug>)
+      m = u.match(/clips\.twitch\.tv\/([\w-]+)/i) || u.match(/twitch\.tv\/\w+\/clip\/([\w-]+)/i);
+      if (m) return { type:'iframe', src:`https://clips.twitch.tv/embed?clip=${m[1]}&parent=${location.hostname}&autoplay=true` };
+      // Streamable
+      m = u.match(/streamable\.com\/([\w-]+)/i);
+      if (m) return { type:'iframe', src:`https://streamable.com/e/${m[1]}?autoplay=1` };
+      // Direct video file
+      if (/\.(mp4|webm|mov)(\?.*)?$/i.test(u)) return { type:'video', src:u };
+      // Fallback: assume it's an embeddable URL
+      return { type:'iframe', src:u };
+    }
+    function openClipOverlay(orb){
+      const overlay = document.getElementById('clipOverlay');
+      const content = document.getElementById('clipContent');
+      if (!overlay || !content) return;
+      const url = orb && orb.clipUrl;
+      const embed = clipUrlToEmbed(url);
+      if (!embed) {
+        content.innerHTML = `<div class="clip-empty">Pas de clip associé à ${orb?.title || 'cette bulle'}.<br><small>Le propriétaire du profil n'a rien partagé pour le moment.</small></div>`;
+      } else if (embed.type === 'video') {
+        content.innerHTML = `<video src="${embed.src}" autoplay controls playsinline></video>`;
+      } else {
+        content.innerHTML = `<iframe src="${embed.src}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+      }
+      overlay.setAttribute('data-show', 'true');
+    }
+    function closeClipOverlay(){
+      const overlay = document.getElementById('clipOverlay');
+      if (!overlay) return;
+      overlay.setAttribute('data-show', 'false');
+      // Stop the video by emptying the iframe
+      document.getElementById('clipContent').innerHTML = '';
+    }
+    (function bindClipOverlay(){
+      const overlay = document.getElementById('clipOverlay');
+      if (!overlay) return;
+      document.getElementById('clipClose').addEventListener('click', closeClipOverlay);
+      document.getElementById('clipBackdrop').addEventListener('click', closeClipOverlay);
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.getAttribute('data-show') === 'true') closeClipOverlay(); });
+    })();
+    window.openClipOverlay = openClipOverlay;
+
     function playOrb(o, el){
+      // Game orb → open the associated clip (if any)
+      if (o.kind === 'game') { openClipOverlay(o); return; }
       if (o.kind === 'voice' && 'speechSynthesis' in window) {
         try {
           window.speechSynthesis.cancel();
@@ -5483,9 +5667,20 @@
         circle.className = 'acc-orb-circle';
         circle.dataset.kind = o.kind;
         circle.innerHTML = orbInner(o);
+        if (o.kind === 'game' && o.rank) {
+          const rb = document.createElement('span');
+          rb.className = 'orb-rank';
+          rb.textContent = o.rank;
+          circle.appendChild(rb);
+        }
+        // Click on a game orb tile → re-open the rank+clip modal to edit
+        if (o.kind === 'game') {
+          circle.style.cursor = 'pointer';
+          circle.addEventListener('click', () => openGameMetaModal(o));
+        }
         const lbl = document.createElement('span');
         lbl.className = 'acc-orb-lbl';
-        lbl.textContent = o.title;
+        lbl.textContent = o.title + (o.rank ? ` · ${o.rank}` : '');
         const del = document.createElement('button');
         del.className = 'acc-orb-del';
         del.type = 'button';
@@ -5547,6 +5742,10 @@
       renderUserOrbs();
       refreshAccountPreview();
       showToast(({music:'🎵',anime:'📺',game:'🎮',film:'🎬'}[orb.kind]||'✨'), 'Bulle ajoutée', orb.title);
+      // For game bubbles, open the rank+clip modal right after adding
+      if (orb.kind === 'game' && typeof openGameMetaModal === 'function') {
+        openGameMetaModal(orb);
+      }
     }
 
     // Free-text adding is disabled — orbs can only be created by clicking a suggestion
@@ -5563,11 +5762,33 @@
       }
     });
 
+    /* Games that have a ranked / competitive ladder → we ask the user which
+       rank they're at when they add the bubble. The rank shows as a small
+       badge on the orb and on the profile card. */
+    const RANKED_GAMES = {
+      'Valorant':                       ['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal','Radiant'],
+      'League of Legends':              ['Iron','Bronze','Silver','Gold','Platinum','Emerald','Diamond','Master','Grandmaster','Challenger'],
+      'Counter-Strike 2':               ['Silver','Gold Nova','Master Guardian','DMG','LE','LEM','Supreme','Global Elite','Premier'],
+      'Rocket League':                  ['Bronze','Silver','Gold','Platinum','Diamond','Champion','Grand Champion','Supersonic Legend'],
+      'Apex Legends':                   ['Rookie','Bronze','Silver','Gold','Platinum','Diamond','Master','Apex Predator'],
+      'Overwatch 2':                    ['Bronze','Silver','Gold','Platinum','Diamond','Master','Grandmaster','Top 500'],
+      "Tom Clancy's Rainbow Six Siege": ['Copper','Bronze','Silver','Gold','Platinum','Emerald','Diamond','Champion'],
+      'Dota 2':                         ['Herald','Guardian','Crusader','Archon','Legend','Ancient','Divine','Immortal'],
+      'Fortnite':                       ['Bronze','Silver','Gold','Platinum','Diamond','Elite','Champion','Unreal'],
+      'PUBG: Battlegrounds':            ['Bronze','Silver','Gold','Platinum','Diamond','Crown','Ace','Master'],
+      'Marvel Rivals':                  ['Bronze','Silver','Gold','Platinum','Diamond','Grandmaster','Celestial','Eternity','One Above All'],
+      'Call of Duty: Warzone':          ['Bronze','Silver','Gold','Platinum','Diamond','Crimson','Iridescent','Top 250'],
+      'Mortal Kombat 1':                ['Apprentice','Novice','Warrior','Kombatant','Elite','Champion','Demigod','Elder God'],
+      'Tekken 8':                       ['Beginner','Vanquisher','Cavalry','Warrior','Fighter','Eliminator','Vindicator','Tekken King','Tekken God'],
+      'Street Fighter 6':               ['Rookie','Iron','Bronze','Silver','Gold','Platinum','Diamond','Master'],
+    };
+    function isRankedGame(title){ return !!RANKED_GAMES[title]; }
+
     /* Curated suggestion lists by category — used as the primary set of
        suggestions for game / anime / film bubbles. Covers are fetched on
        demand via Wikipedia (game / film) or Jikan (anime). */
     const ORB_SUGGESTIONS = {
-      game: ["Chess","Minecraft","Roblox","Fortnite","Dead by Daylight","League of Legends","Counter-Strike 2","Dota 2","Valorant","Grand Theft Auto V","Red Dead Redemption 2","Elden Ring","The Witcher 3: Wild Hunt","The Elder Scrolls V: Skyrim","Cyberpunk 2077","Baldur's Gate 3","World of Warcraft","Final Fantasy XIV","Rocket League","Overwatch 2","Apex Legends","PUBG: Battlegrounds","Call of Duty: Warzone","Call of Duty: Modern Warfare","Call of Duty: Black Ops","Tom Clancy's Rainbow Six Siege","Destiny 2","Terraria","Stardew Valley","Hollow Knight","Hades","Celeste","Dead Cells","Slay the Spire","The Binding of Isaac","Factorio","RimWorld","Cities: Skylines","Kerbal Space Program","Microsoft Flight Simulator","Euro Truck Simulator 2","The Sims 4","Animal Crossing: New Horizons","Super Smash Bros. Ultimate","Mario Kart 8 Deluxe","The Legend of Zelda: Breath of the Wild","The Legend of Zelda: Tears of the Kingdom","Super Mario Odyssey","Dark Souls","Dark Souls II","Dark Souls III","Bloodborne","Sekiro: Shadows Die Twice","God of War","God of War Ragnarök","The Last of Us Part I","The Last of Us Part II","Uncharted 4: A Thief's End","Half-Life 2","Portal","Portal 2","BioShock","BioShock Infinite","Fallout 3","Fallout 4","Fallout: New Vegas","Mass Effect Legendary Edition","Dragon Age: Origins","Persona 5 Royal","Chrono Trigger","Undertale","Disco Elysium","Deus Ex","Vampire: The Masquerade – Bloodlines","Kenshi","Rust","DayZ","Garry's Mod","Team Fortress 2","Left 4 Dead 2","Payday 2","StarCraft","StarCraft II","Warcraft III","Age of Empires II","Civilization VI","Crusader Kings III","Hearts of Iron IV","Total War: Warhammer III","XCOM 2","Frostpunk","Into the Breach","Hearthstone","Magic: The Gathering Arena","Street Fighter 6","Tekken 8","Mortal Kombat 1","Dragon Ball FighterZ","Guilty Gear Strive","FIFA 23","EA Sports FC 24","NBA 2K24","NHL 24","Madden NFL 24","Gran Turismo 7","Forza Horizon 5","Need for Speed Unbound","Burnout Paradise","DOOM Eternal","Wolfenstein: The New Order","Titanfall 2","Borderlands 2","Far Cry 3","Assassin's Creed II","Assassin's Creed IV: Black Flag","Assassin's Creed Odyssey","Batman: Arkham Asylum","Batman: Arkham City","Batman: Arkham Knight","Marvel's Spider-Man","Horizon Zero Dawn","Heavy Rain","Beyond: Two Souls","Detroit: Become Human","Life is Strange","The Walking Dead","Among Us","Fall Guys"],
+      game: ["Minecraft","Valorant","Rocket League","Fortnite","League of Legends","Counter-Strike 2","Grand Theft Auto V","Roblox","Apex Legends","Call of Duty: Warzone","Overwatch 2","Tom Clancy's Rainbow Six Siege","Dota 2","PUBG: Battlegrounds","Genshin Impact","World of Warcraft","Final Fantasy XIV","Destiny 2","Honkai: Star Rail","Diablo IV","The Sims 4","Stardew Valley","Terraria","Among Us","Fall Guys","Marvel Rivals","Sea of Thieves","Dead by Daylight","Phasmophobia","Warframe","Path of Exile 2","Hearthstone","Magic: The Gathering Arena","Elden Ring","Cyberpunk 2077","Baldur's Gate 3","The Witcher 3: Wild Hunt","Red Dead Redemption 2","The Elder Scrolls V: Skyrim","EA Sports FC 24","NBA 2K24","Forza Horizon 5","Mortal Kombat 1","Tekken 8","Street Fighter 6","Lethal Company","Helldivers 2","Lost Ark","New World","Hogwarts Legacy"],
       anime: ["One Piece","Naruto","Dragon Ball Z","Dragon Ball Super","Bleach","Hunter x Hunter","Fullmetal Alchemist: Brotherhood","Attack on Titan","Jujutsu Kaisen","Demon Slayer","Chainsaw Man","My Hero Academia","Black Clover","Soul Eater","Fairy Tail","JoJo's Bizarre Adventure","YuYu Hakusho","Seven Deadly Sins","Dr. Stone","Fire Force","Death Note","Monster","Vinland Saga","Berserk","Psycho-Pass","Parasyte: The Maxim","Tokyo Ghoul","Erased","Steins;Gate","Death Parade","Elfen Lied","Hellsing Ultimate","Code Geass","Future Diary","Another","The Promised Neverland","Hajime no Ippo","Slam Dunk","Haikyuu!!","Kuroko's Basketball","Blue Lock","Your Lie in April","Clannad","Toradora","Golden Time","Kaguya-sama: Love is War","Nichijou","Great Teacher Onizuka","Saiki K","Spy x Family","Bocchi the Rock!","March Comes in Like a Lion","Neon Genesis Evangelion","Cowboy Bebop","Akira","Ghost in the Shell","Trigun","Samurai Champloo","FLCL","Tengen Toppa Gurren Lagann","Mobile Suit Gundam","Macross","Serial Experiments Lain","Paprika","Perfect Blue","Made in Abyss","Re:Zero","Konosuba","Overlord","That Time I Got Reincarnated as a Slime","Mushoku Tensei","Ranking of Kings","Mob Psycho 100","Ping Pong the Animation","Kill la Kill","Devilman Crybaby","Dorohedoro","Golden Kamuy","Nana","Fruits Basket","Ouran High School Host Club","Azumanga Daioh","Lucky Star","K-On!","Cardcaptor Sakura","Sailor Moon","Pokemon","Digimon","Yu-Gi-Oh!","Inuyasha","Ranma 1/2","Maison Ikkoku","City Hunter","Space Dandy"],
       film: ["Breaking Bad","Better Call Saul","The Wire","The Sopranos","Peaky Blinders","Dexter","True Detective","Fargo","Sons of Anarchy","Narcos","Ozark","Mindhunter","Prison Break","The Shield","Boardwalk Empire","The Night Of","Game of Thrones","House of the Dragon","Stranger Things","The X-Files","Black Mirror","The Twilight Zone","Doctor Who","Battlestar Galactica","The Expanse","Westworld","Dark","The Boys","The Umbrella Academy","Lost","Fringe","Foundation","Silo","The Office","Friends","Seinfeld","The Simpsons","South Park","Rick and Morty","It's Always Sunny in Philadelphia","Parks and Recreation","Brooklyn Nine-Nine","How I Met Your Mother","Arrested Development","Community","Curb Your Enthusiasm","Ted Lasso","The Good Place","Silicon Valley","The Godfather","Pulp Fiction","Fight Club","Inception","Interstellar","The Dark Knight","The Matrix","Star Wars: A New Hope","The Empire Strikes Back","Return of the Jedi","The Lord of the Rings: The Fellowship of the Ring","The Two Towers","The Return of the King","Jurassic Park","Terminator","Terminator 2: Judgment Day","Blade Runner","Alien","The Shawshank Redemption","Forrest Gump","Saving Private Ryan","Gladiator","Se7en","Shutter Island","Parasite","Spirited Away","The Silence of the Lambs","The Shining","Psycho","Casablanca","Citizen Kane","2001: A Space Odyssey","Apocalypse Now","Taxi Driver","Goodfellas","Reservoir Dogs","The Big Lebowski","No Country for Old Men","There Will Be Blood","Whiplash","Birdman","The Grand Budapest Hotel","The Truman Show","Eternal Sunshine of the Spotless Mind","Memento","Donnie Darko","A Clockwork Orange","Full Metal Jacket","Dr. Strangelove","Lord of War","American Psycho","Scarface","Heat","Casino","The Departed","Dunkirk","Oppenheimer","Tenet","The Prestige","Batman Begins","The Dark Knight Rises","Joker","Logan","Mad Max: Fury Road","Braveheart","Troy","Kingdom of Heaven","300","Sin City","Watchmen","V for Vendetta","Children of Men","District 9","Arrival","Gravity","The Martian","Ad Astra","Moon","Ex Machina","Her","Up","Wall-E","Ratatouille","Finding Nemo","The Incredibles","Toy Story","The Lion King","Aladdin","Beauty and the Beast","Princess Mononoke","Howl's Moving Castle","My Neighbor Totoro","Grave of the Fireflies","Your Name","Weathering With You","Suzume"],
     };
