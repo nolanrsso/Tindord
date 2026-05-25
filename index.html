@@ -5536,15 +5536,23 @@
       document.getElementById('gmmSkip').addEventListener('click', closeGameMetaModal);
       document.getElementById('gmmSave').addEventListener('click', () => {
         if (!_editingGameOrb) { closeGameMetaModal(); return; }
+        const editedOrb = _editingGameOrb; // capture before close nulls the ref
         const rank = document.getElementById('gmmRankSelect').value.trim();
         const clip = document.getElementById('gmmClipInput').value.trim();
-        if (rank) _editingGameOrb.rank = rank; else delete _editingGameOrb.rank;
-        if (clip) _editingGameOrb.clipUrl = clip; else delete _editingGameOrb.clipUrl;
+        if (rank) editedOrb.rank = rank; else delete editedOrb.rank;
+        if (clip) editedOrb.clipUrl = clip; else delete editedOrb.clipUrl;
         save();
         renderUserOrbs();
         if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
+        // Re-render the bubble layout(s) so the new rank icon shows immediately
+        if (typeof renderOrbEditLayout === 'function' && document.getElementById('orbEditOverlay')?.getAttribute('data-show') === 'true') {
+          renderOrbEditLayout();
+        }
+        if (typeof ensureDeck === 'function' && document.body.getAttribute('data-screen') === 'swipe') {
+          ensureDeck();
+        }
         closeGameMetaModal();
-        showToast('🎮', 'Bulle mise à jour', `${_editingGameOrb?.title || ''} ${rank ? '· ' + rank : ''}`);
+        showToast('🎮', 'Bulle mise à jour', `${editedOrb.title || ''} ${rank ? '· ' + rank : ''}`);
       });
     })();
 
