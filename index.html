@@ -6242,7 +6242,7 @@
     };
     /* Cache: kind+title -> coverUrl. Mirrored in localStorage so covers fetched
        in a previous session are instantly available — no Wikipedia/Wikidata round-trip. */
-    const COVER_CACHE_KEY = 'tindord_cover_cache_v1';
+    const COVER_CACHE_KEY = 'tindord_cover_cache_v2';
     const _suggCoverCache = (() => {
       try {
         const raw = localStorage.getItem(COVER_CACHE_KEY);
@@ -6363,9 +6363,8 @@
        transparent logo or a bad asset. Either a forced URL, or "logo:true" to
        accept a transparent logo for that game (e.g. Dead by Daylight). */
     const GAME_COVER_OVERRIDES = {
-      // Minecraft : use the Wikipedia cover page via Special:FilePath (redirects
-      // to upload.wikimedia.org with proper CORS).
-      'Minecraft': 'https://en.wikipedia.org/wiki/Special:FilePath/Minecraft_cover.png?width=500',
+      // Custom covers (local assets) — replace each entry as we get the artwork
+      'Minecraft': 'assets/games/minecraft.png',
       'Dead by Daylight': { logo: true }, // allow transparent logo
     };
 
