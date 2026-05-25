@@ -6057,6 +6057,10 @@
       state.profile.userOrbs = state.profile.userOrbs || [];
       if (orbsUsed() >= orbBudget()) { showToast('🫧', 'Limite atteinte', orbBudget() + ' bulles max — Boost pour +10'); return; }
       const orb = orbOverride || _pendingSpotifyOrb || {kind: selectedOrbKind, title: val};
+      // Empêche les doublons (même kind + même titre normalisé)
+      const normTitle = (orb.title || '').toLowerCase().trim();
+      const dup = (state.profile.userOrbs || []).some(o => o.kind === orb.kind && (o.title || '').toLowerCase().trim() === normTitle);
+      if (dup) { showToast('⚠️', 'Déjà ajoutée', orb.title); return; }
       state.profile.userOrbs.push(orb);
       _pendingSpotifyOrb = null;
       input.value = '';
@@ -7885,6 +7889,10 @@
               state.profile = state.profile || {};
               state.profile.userOrbs = state.profile.userOrbs || [];
               if (orbsUsed() >= orbBudget()) { showToast('🫧','Limite atteinte', orbBudget()+' bulles max'); return; }
+              // Empêche les doublons (même kind + même titre normalisé)
+              const dupKey = (r.orb.title || '').toLowerCase().trim();
+              const isDup = state.profile.userOrbs.some(o => o.kind === r.orb.kind && (o.title || '').toLowerCase().trim() === dupKey);
+              if (isDup) { showToast('⚠️','Déjà ajoutée', r.orb.title); return; }
               state.profile.userOrbs.push(r.orb);
               save();
               renderUserOrbs();
