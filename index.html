@@ -2325,40 +2325,50 @@
   <header data-screen-label="Header">
     <a href="/" class="brand" id="brandHome" aria-label="Recharger la page">
       <div class="mark">
-        <!-- Tindord logo: gaming headphones with PlayStation face buttons on the right cup.
-             Reads as 'gaming × music × chat'. -->
-        <svg class="tindord-logo" viewBox="0 0 100 100" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Tindord">
+        <!-- Tindord logo : casque gaming chunky avec dégradé rose→magenta→violet
+             et boutons PlayStation (△ □ ○ ✕) sur le coussinet droit. -->
+        <svg class="tindord-logo" viewBox="0 0 200 220" width="36" height="40" xmlns="http://www.w3.org/2000/svg" aria-label="Tindord">
           <defs>
-            <linearGradient id="tdHeadphone" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%"  stop-color="#FF2EA0"/>
-              <stop offset="55%" stop-color="#B23BFF"/>
-              <stop offset="100%" stop-color="#5B19E0"/>
+            <linearGradient id="tdHp" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stop-color="#FF1F9E"/>
+              <stop offset="45%"  stop-color="#C61DD8"/>
+              <stop offset="100%" stop-color="#6B1EE3"/>
             </linearGradient>
-            <linearGradient id="tdHeadphoneDark" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%"  stop-color="#6B1452"/>
-              <stop offset="100%" stop-color="#2A0B5A"/>
+            <linearGradient id="tdHpDark" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%"   stop-color="#5A0E50"/>
+              <stop offset="100%" stop-color="#2A0B60"/>
+            </linearGradient>
+            <linearGradient id="tdHpShine" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%"   stop-color="#FFCDE8" stop-opacity=".95"/>
+              <stop offset="100%" stop-color="#FF66C8" stop-opacity="0"/>
             </linearGradient>
           </defs>
-          <!-- headband -->
-          <path d="M20 50 C20 22 40 12 50 12 C60 12 80 22 80 50"
-                fill="none" stroke="url(#tdHeadphone)" stroke-width="9" stroke-linecap="round"/>
-          <!-- left ear cup -->
-          <path d="M14 50 C14 44 18 40 24 40 H30 C32.2 40 34 41.8 34 44 V72 C34 74.2 32.2 76 30 76 H24 C18 76 14 72 14 66 Z"
-                fill="url(#tdHeadphone)"/>
-          <circle cx="24" cy="58" r="6" fill="url(#tdHeadphoneDark)" opacity=".55"/>
-          <!-- right ear cup -->
-          <path d="M86 50 C86 44 82 40 76 40 H70 C67.8 40 66 41.8 66 44 V72 C66 74.2 67.8 76 70 76 H76 C82 76 86 72 86 66 Z"
-                fill="url(#tdHeadphone)"/>
-          <!-- PS face buttons on right cup -->
+          <!-- Headband (arc épais avec rounded caps) -->
+          <path d="M35 150 C 35 60 75 22 100 22 C 125 22 165 60 165 150"
+                fill="none" stroke="url(#tdHp)" stroke-width="26" stroke-linecap="round"/>
+          <!-- Highlight intérieur du headband -->
+          <path d="M52 100 C 60 55 80 38 100 38 C 120 38 140 55 148 100"
+                fill="none" stroke="url(#tdHpShine)" stroke-width="6" stroke-linecap="round"/>
+          <!-- Coussinet gauche (vue intérieure : driver/speaker) -->
+          <ellipse cx="38" cy="160" rx="32" ry="44" fill="url(#tdHp)"/>
+          <ellipse cx="42" cy="162" rx="22" ry="32" fill="url(#tdHpDark)"/>
+          <ellipse cx="46" cy="164" rx="11" ry="20" fill="#2A0B60" opacity=".7"/>
+          <!-- Coussinet droit (vue extérieure : avec les boutons PS) -->
+          <ellipse cx="162" cy="160" rx="34" ry="46" fill="url(#tdHp)"/>
+          <!-- PS buttons en losange sur le coussinet droit -->
           <g>
-            <circle cx="76" cy="50" r="3.3" fill="#fff"/>
-            <path d="M76 48.4 L77.2 50.6 H74.8 Z" fill="#0D0B1E"/>
-            <circle cx="70" cy="56" r="3.3" fill="#fff"/>
-            <rect x="68.6" y="54.6" width="2.8" height="2.8" fill="none" stroke="#0D0B1E" stroke-width="1"/>
-            <circle cx="82" cy="56" r="3.3" fill="#fff"/>
-            <circle cx="82" cy="56" r="1.2" fill="none" stroke="#0D0B1E" stroke-width="1"/>
-            <circle cx="76" cy="62" r="3.3" fill="#fff"/>
-            <path d="M74.7 60.7 L77.3 63.3 M77.3 60.7 L74.7 63.3" stroke="#0D0B1E" stroke-width="1" stroke-linecap="round"/>
+            <!-- Triangle (haut) -->
+            <circle cx="170" cy="139" r="7" fill="#fff"/>
+            <path d="M170 135.6 L174 142.4 L166 142.4 Z" fill="none" stroke="#0D0B1E" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- Carré (gauche) -->
+            <circle cx="158" cy="156" r="7" fill="#fff"/>
+            <rect x="154.2" y="152.2" width="7.6" height="7.6" fill="none" stroke="#0D0B1E" stroke-width="1.4"/>
+            <!-- Rond (droite) -->
+            <circle cx="182" cy="156" r="7" fill="#fff"/>
+            <circle cx="182" cy="156" r="3.2" fill="none" stroke="#0D0B1E" stroke-width="1.4"/>
+            <!-- Croix (bas) -->
+            <circle cx="170" cy="173" r="7" fill="#fff"/>
+            <path d="M166.2 169.2 L173.8 176.8 M173.8 169.2 L166.2 176.8" stroke="#0D0B1E" stroke-width="1.4" stroke-linecap="round"/>
           </g>
         </svg>
       </div>
@@ -2598,27 +2608,33 @@
       <!-- Tabs bar -->
       <div class="acc-tabs" id="accTabs">
         <button type="button" class="acc-tab-btn acc-tab-btn--boost" data-tab="boost"><span class="boost-star">
-          <svg viewBox="0 0 100 100" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <svg viewBox="0 0 200 220" width="20" height="22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <defs>
               <linearGradient id="tdGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%"  stop-color="#FFE17A"/>
-                <stop offset="45%" stop-color="#F5C040"/>
+                <stop offset="0%"   stop-color="#FFE17A"/>
+                <stop offset="45%"  stop-color="#F5C040"/>
                 <stop offset="100%" stop-color="#B27B14"/>
               </linearGradient>
-              <linearGradient id="tdGoldDark" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%"  stop-color="#7A5210"/>
+              <linearGradient id="tdGoldDark" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%"   stop-color="#7A5210"/>
                 <stop offset="100%" stop-color="#3A2602"/>
               </linearGradient>
+              <linearGradient id="tdGoldShine" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%"   stop-color="#FFF7C8" stop-opacity=".95"/>
+                <stop offset="100%" stop-color="#FFD56A" stop-opacity="0"/>
+              </linearGradient>
             </defs>
-            <path d="M20 50 C20 22 40 12 50 12 C60 12 80 22 80 50" fill="none" stroke="url(#tdGold)" stroke-width="9" stroke-linecap="round"/>
-            <path d="M14 50 C14 44 18 40 24 40 H30 C32.2 40 34 41.8 34 44 V72 C34 74.2 32.2 76 30 76 H24 C18 76 14 72 14 66 Z" fill="url(#tdGold)"/>
-            <circle cx="24" cy="58" r="6" fill="url(#tdGoldDark)" opacity=".55"/>
-            <path d="M86 50 C86 44 82 40 76 40 H70 C67.8 40 66 41.8 66 44 V72 C66 74.2 67.8 76 70 76 H76 C82 76 86 72 86 66 Z" fill="url(#tdGold)"/>
+            <path d="M35 150 C 35 60 75 22 100 22 C 125 22 165 60 165 150" fill="none" stroke="url(#tdGold)" stroke-width="26" stroke-linecap="round"/>
+            <path d="M52 100 C 60 55 80 38 100 38 C 120 38 140 55 148 100" fill="none" stroke="url(#tdGoldShine)" stroke-width="6" stroke-linecap="round"/>
+            <ellipse cx="38" cy="160" rx="32" ry="44" fill="url(#tdGold)"/>
+            <ellipse cx="42" cy="162" rx="22" ry="32" fill="url(#tdGoldDark)"/>
+            <ellipse cx="46" cy="164" rx="11" ry="20" fill="#3A2602" opacity=".7"/>
+            <ellipse cx="162" cy="160" rx="34" ry="46" fill="url(#tdGold)"/>
             <g>
-              <circle cx="76" cy="50" r="3.3" fill="#fff"/><path d="M76 48.4 L77.2 50.6 H74.8 Z" fill="#3A2602"/>
-              <circle cx="70" cy="56" r="3.3" fill="#fff"/><rect x="68.6" y="54.6" width="2.8" height="2.8" fill="none" stroke="#3A2602" stroke-width="1"/>
-              <circle cx="82" cy="56" r="3.3" fill="#fff"/><circle cx="82" cy="56" r="1.2" fill="none" stroke="#3A2602" stroke-width="1"/>
-              <circle cx="76" cy="62" r="3.3" fill="#fff"/><path d="M74.7 60.7 L77.3 63.3 M77.3 60.7 L74.7 63.3" stroke="#3A2602" stroke-width="1" stroke-linecap="round"/>
+              <circle cx="170" cy="139" r="7" fill="#fff"/><path d="M170 135.6 L174 142.4 L166 142.4 Z" fill="none" stroke="#3A2602" stroke-width="1.4" stroke-linejoin="round"/>
+              <circle cx="158" cy="156" r="7" fill="#fff"/><rect x="154.2" y="152.2" width="7.6" height="7.6" fill="none" stroke="#3A2602" stroke-width="1.4"/>
+              <circle cx="182" cy="156" r="7" fill="#fff"/><circle cx="182" cy="156" r="3.2" fill="none" stroke="#3A2602" stroke-width="1.4"/>
+              <circle cx="170" cy="173" r="7" fill="#fff"/><path d="M166.2 169.2 L173.8 176.8 M173.8 169.2 L166.2 176.8" stroke="#3A2602" stroke-width="1.4" stroke-linecap="round"/>
             </g>
           </svg>
         </span> Boost</button>
