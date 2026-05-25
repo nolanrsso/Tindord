@@ -2283,6 +2283,14 @@
     backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
   }
   .oeo-orb-rank-orbit .oeo-orb-rank-ico{font-size:16px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.85)) drop-shadow(0 0 5px var(--rc1, #fff))}
+  .oeo-orb-rank-orbit .oeo-orb-rank-ball--img{
+    background:transparent;border:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+    width:38px;height:38px;
+  }
+  .oeo-orb-rank-orbit .oeo-orb-rank-img{
+    width:100%;height:100%;object-fit:contain;display:block;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.6)) drop-shadow(0 0 6px var(--rc1, rgba(255,255,255,.4)));
+  }
   @keyframes oeoRankOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
   @keyframes oeoRankCounter{from{transform:translateX(-50%) rotate(0deg)}to{transform:translateX(-50%) rotate(-360deg)}}
 
@@ -2364,6 +2372,15 @@
     backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
   }
   .swipe-stage .orbit .orb .orb-rank-orbit .orb-rank-ico{font-size:18px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.85)) drop-shadow(0 0 6px var(--rc1, #fff))}
+  /* When a real rank PNG is available, drop the round backplate so the icon stands free */
+  .swipe-stage .orbit .orb .orb-rank-orbit .orb-rank-ball--img{
+    background:transparent;border:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+    width:44px;height:44px;
+  }
+  .swipe-stage .orbit .orb .orb-rank-orbit .orb-rank-img{
+    width:100%;height:100%;object-fit:contain;display:block;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.6)) drop-shadow(0 0 8px var(--rc1, rgba(255,255,255,.4)));
+  }
   @keyframes orbRankOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
   @keyframes orbRankCounter{from{transform:translateX(-50%) rotate(0deg)}to{transform:translateX(-50%) rotate(-360deg)}}
   /* Mini "+" button next to a game orb (only on MY card) — opens rank/clip modal */
@@ -5030,9 +5047,13 @@
         // Rank as a round mini-bubble (with the tier icon) orbiting around the game orb
         if (o.kind === 'game' && o.rank) {
           const v = rankVisual(o.rank);
+          const iconUrl = rankIconUrl(o.title, o.rank);
+          const iconHtml = iconUrl
+            ? `<img class="orb-rank-img" src="${iconUrl}" alt="${escapeHtmlMini(o.rank)}" loading="lazy" decoding="async">`
+            : `<span class="orb-rank-ico">${v.ico}</span>`;
           const rk = document.createElement('span');
           rk.className = 'orb-rank-orbit';
-          rk.innerHTML = `<span class="orb-rank-ball" style="--rc1:${v.c1};--rc2:${v.c2}" title="${escapeHtmlMini(o.rank)}"><span class="orb-rank-ico">${v.ico}</span></span>`;
+          rk.innerHTML = `<span class="orb-rank-ball${iconUrl ? ' orb-rank-ball--img' : ''}" style="--rc1:${v.c1};--rc2:${v.c2}" title="${escapeHtmlMini(o.rank)}">${iconHtml}</span>`;
           btn.appendChild(rk);
         }
         // Mini "+" for game orbs on MY OWN card → opens the rank/clip modal
@@ -6252,6 +6273,59 @@
     function rankVisual(rank){
       if (!rank) return null;
       return RANK_VISUAL[rank] || { ico:'⭐', c1:'#FFD83D', c2:'#8c6e0a' };
+    }
+
+    /* Real rank icons (cropped from official rank charts). Keyed by game → rank → URL.
+       When present, the orbiting rank bubble displays this image instead of an emoji. */
+    const RANK_ICONS = {
+      'Valorant': {
+        'Iron':       'assets/ranks/valorant/iron.png',
+        'Bronze':     'assets/ranks/valorant/bronze.png',
+        'Silver':     'assets/ranks/valorant/silver.png',
+        'Gold':       'assets/ranks/valorant/gold.png',
+        'Platinum':   'assets/ranks/valorant/platinum.png',
+        'Diamond':    'assets/ranks/valorant/diamond.png',
+        'Ascendant':  'assets/ranks/valorant/ascendant.png',
+        'Immortal':   'assets/ranks/valorant/immortal.png',
+        'Radiant':    'assets/ranks/valorant/radiant.png',
+      },
+      'Fortnite': {
+        'Bronze':   'assets/ranks/fortnite/bronze.png',
+        'Silver':   'assets/ranks/fortnite/silver.png',
+        'Gold':     'assets/ranks/fortnite/gold.png',
+        'Platinum': 'assets/ranks/fortnite/platinum.png',
+        'Diamond':  'assets/ranks/fortnite/diamond.png',
+        'Elite':    'assets/ranks/fortnite/elite.png',
+        'Champion': 'assets/ranks/fortnite/champion.png',
+        'Unreal':   'assets/ranks/fortnite/unreal.png',
+      },
+      'Rocket League': {
+        'Bronze':             'assets/ranks/rocket-league/bronze.png',
+        'Silver':             'assets/ranks/rocket-league/silver.png',
+        'Gold':               'assets/ranks/rocket-league/gold.png',
+        'Platinum':           'assets/ranks/rocket-league/platinum.png',
+        'Diamond':            'assets/ranks/rocket-league/diamond.png',
+        'Champion':           'assets/ranks/rocket-league/champion.png',
+        'Grand Champion':     'assets/ranks/rocket-league/grand_champion.png',
+        'Supersonic Legend':  'assets/ranks/rocket-league/supersonic_legend.png',
+      },
+      'League of Legends': {
+        'Iron':         'assets/ranks/league-of-legends/iron.png',
+        'Bronze':       'assets/ranks/league-of-legends/bronze.png',
+        'Silver':       'assets/ranks/league-of-legends/silver.png',
+        'Gold':         'assets/ranks/league-of-legends/gold.png',
+        'Platinum':     'assets/ranks/league-of-legends/platinum.png',
+        'Emerald':      'assets/ranks/league-of-legends/emerald.png',
+        'Diamond':      'assets/ranks/league-of-legends/diamond.png',
+        'Master':       'assets/ranks/league-of-legends/master.png',
+        'Grandmaster':  'assets/ranks/league-of-legends/grandmaster.png',
+        'Challenger':   'assets/ranks/league-of-legends/challenger.png',
+      },
+    };
+    function rankIconUrl(game, rank){
+      if (!game || !rank) return null;
+      const g = RANK_ICONS[game];
+      return (g && g[rank]) || null;
     }
 
     /* Curated suggestion lists by category — used as the primary set of
@@ -7829,9 +7903,13 @@
       // Rank as a round mini-bubble (with the tier icon) orbiting the game orb
       if (o.kind === 'game' && o.rank){
         const v = rankVisual(o.rank);
+        const iconUrl = rankIconUrl(o.title, o.rank);
+        const iconHtml = iconUrl
+          ? `<img class="oeo-orb-rank-img" src="${iconUrl}" alt="${escapeHtmlMini(o.rank)}" loading="lazy" decoding="async">`
+          : `<span class="oeo-orb-rank-ico">${v.ico}</span>`;
         const rk = document.createElement('span');
         rk.className = 'oeo-orb-rank-orbit';
-        rk.innerHTML = `<span class="oeo-orb-rank-ball" style="--rc1:${v.c1};--rc2:${v.c2}" title="${escapeHtmlMini(o.rank)}"><span class="oeo-orb-rank-ico">${v.ico}</span></span>`;
+        rk.innerHTML = `<span class="oeo-orb-rank-ball${iconUrl ? ' oeo-orb-rank-ball--img' : ''}" style="--rc1:${v.c1};--rc2:${v.c2}" title="${escapeHtmlMini(o.rank)}">${iconHtml}</span>`;
         el.appendChild(rk);
       }
       // Delete (×) chip
