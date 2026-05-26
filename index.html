@@ -5455,16 +5455,20 @@
       tick();
     }
 
-    /* Jikan API for anime covers (free, no auth) */
+    /* Jikan API for anime covers (free, no auth). Prefer large/HD image variants. */
     async function searchAnime(query){
       try {
-        const resp = await withTimeout(fetch('https://api.jikan.moe/v4/anime?q=' + encodeURIComponent(query) + '&limit=6&sfw=true'), 2500);
+        const resp = await withTimeout(fetch('https://api.jikan.moe/v4/anime?q=' + encodeURIComponent(query) + '&limit=6&sfw=true&order_by=popularity&sort=asc'), 2500);
         if (!resp) return [];
         const d = await resp.json();
         return (d.data || []).map(a => ({
           name:   a.title_english || a.title,
           sub:    a.title_japanese || (a.type || '') + (a.year ? ' · ' + a.year : ''),
-          cover:  a.images?.webp?.image_url || a.images?.jpg?.image_url || null,
+          cover:  a.images?.webp?.large_image_url
+                || a.images?.jpg?.large_image_url
+                || a.images?.webp?.image_url
+                || a.images?.jpg?.image_url
+                || null,
         }));
       } catch(_){ return []; }
     }
@@ -6374,7 +6378,32 @@
     };
     /* Cache: kind+title -> coverUrl. Mirrored in localStorage so covers fetched
        in a previous session are instantly available — no Wikipedia/Wikidata round-trip. */
-    const COVER_CACHE_KEY = 'tindord_cover_cache_v2';
+    const COVER_CACHE_KEY = 'tindord_cover_cache_v3';
+    /* Titres reconnus comme anime → on fetch via Jikan (artwork de qualité) au lieu
+       de Wikipedia/Wikidata qui retournent souvent des posters moches ou des covers
+       de tome 1 de manga. Liste à étendre quand on ajoute des animes dans ORB_SUGGESTIONS.film. */
+    const ANIME_TITLES = new Set([
+      'One Piece','Naruto','Dragon Ball Z','Bleach','Hunter x Hunter','Attack on Titan',
+      'Jujutsu Kaisen','Demon Slayer','Chainsaw Man','My Hero Academia','Fullmetal Alchemist: Brotherhood',
+      'Death Note',"JoJo's Bizarre Adventure",'Vinland Saga','Spy x Family','Cowboy Bebop',
+      'Neon Genesis Evangelion','Steins;Gate','Code Geass','Haikyuu!!','Blue Lock','Re:Zero',
+      'Mob Psycho 100','Made in Abyss','Tokyo Ghoul','Fire Force','Black Clover','Frieren',
+      'Solo Leveling','Bocchi the Rock!','Spirited Away','Princess Mononoke',"Howl's Moving Castle",
+      'My Neighbor Totoro','Your Name','Akira','Ghost in the Shell','Dragon Ball Super',
+      'Hellsing Ultimate','Death Parade','Erased','Monster','Berserk','Psycho-Pass',
+      'Parasyte: The Maxim','Future Diary','Another','The Promised Neverland','Hajime no Ippo',
+      'Slam Dunk',"Kuroko's Basketball",'Your Lie in April','Clannad','Toradora','Golden Time',
+      'Kaguya-sama: Love is War','Nichijou','Great Teacher Onizuka','Saiki K','March Comes in Like a Lion',
+      'Trigun','Samurai Champloo','FLCL','Tengen Toppa Gurren Lagann','Mobile Suit Gundam',
+      'Macross','Serial Experiments Lain','Paprika','Perfect Blue','Konosuba','Overlord',
+      'That Time I Got Reincarnated as a Slime','Mushoku Tensei','Ranking of Kings',
+      'Ping Pong the Animation','Kill la Kill','Devilman Crybaby','Dorohedoro','Golden Kamuy',
+      'Nana','Fruits Basket','Ouran High School Host Club','Azumanga Daioh','Lucky Star',
+      'K-On!','Cardcaptor Sakura','Sailor Moon','Pokemon','Digimon','Yu-Gi-Oh!','Inuyasha',
+      'Ranma 1/2','Maison Ikkoku','City Hunter','Space Dandy','Soul Eater','Fairy Tail',
+      'YuYu Hakusho','Seven Deadly Sins','Dr. Stone','Tokyo Revengers','Elfen Lied','Mushishi',
+      "Junji Ito",'Studio Ghibli','Weathering With You','Suzume','Grave of the Fireflies',
+    ]);
     const _suggCoverCache = (() => {
       try {
         const raw = localStorage.getItem(COVER_CACHE_KEY);
@@ -6570,15 +6599,27 @@
           // Fallback REST thumbnail if nothing opaque found
           if (!cover) cover = await wikiPageSummary(title);
         } else if (kind === 'film') {
-          cover = await wikidataCover(title, ['P18', 'P154']);
-          if (!cover) cover = await wikidataCover(title + ' (film)', ['P18', 'P154']);
-          if (!cover) cover = await wikidataCover(title + ' (TV series)', ['P18', 'P154']);
-          if (!cover) cover = await wikidataCover(title + ' (anime)', ['P154', 'P18']);
-          if (!cover) cover = await wikiPageSummary(title);
-          // Last resort : Jikan anime DB (animes that aren't in Wikidata)
-          if (!cover) {
+          // For known anime titles, prefer Jikan (much better artwork than Wikipedia)
+          if (ANIME_TITLES.has(title)) {
             const r = await searchAnime(title);
             cover = (r && r[0] && r[0].cover) || null;
+            if (!cover) {
+              const r2 = await searchAnime(title + ' anime');
+              cover = (r2 && r2[0] && r2[0].cover) || null;
+            }
+            if (!cover) cover = await wikidataCover(title + ' (anime)', ['P18', 'P154']);
+            if (!cover) cover = await wikidataCover(title, ['P18', 'P154']);
+          } else {
+            // Real films / TV series : Wikipedia/Wikidata first
+            cover = await wikidataCover(title, ['P18', 'P154']);
+            if (!cover) cover = await wikidataCover(title + ' (film)', ['P18', 'P154']);
+            if (!cover) cover = await wikidataCover(title + ' (TV series)', ['P18', 'P154']);
+            if (!cover) cover = await wikiPageSummary(title);
+            // Last resort : maybe it's actually an anime we don't know about
+            if (!cover) {
+              const r = await searchAnime(title);
+              cover = (r && r[0] && r[0].cover) || null;
+            }
           }
         }
       } catch {}
