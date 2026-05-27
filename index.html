@@ -3069,12 +3069,13 @@
         <h3>Tindord Boost</h3>
 
         <div class="acc-field">
-          <label>Fake Nitro <small style="color:#b9bbbe;font-weight:400">(anneau animé + badge NITRO sur ton avatar)</small></label>
+          <label>Fake Nitro <small style="color:#b9bbbe;font-weight:400">(anneau animé + bannière custom)</small></label>
           <label class="toggle"><input type="checkbox" id="boostFakeNitro" /><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
         </div>
 
-        <div class="acc-field">
-          <label>Bannière personnalisée <small style="color:#b9bbbe;font-weight:400">(image, max 2 Mo — Boost only)</small></label>
+        <!-- Bannière apparait dès que Fake Nitro est activé -->
+        <div class="acc-field" id="boostBannerField" hidden>
+          <label>Bannière personnalisée <small style="color:#b9bbbe;font-weight:400">(image, max 2 Mo)</small></label>
           <div class="acc-banner-row">
             <div class="acc-banner-prev" id="accBannerPrev" aria-label="Aperçu bannière"></div>
             <div class="acc-banner-actions">
@@ -3085,96 +3086,22 @@
           </div>
         </div>
 
-        <div class="acc-field" id="accDecoBlock">
-          <label>Décoration d'avatar <small style="color:#b9bbbe;font-weight:400">(effet animé autour de ta photo)</small></label>
-          <div class="acc-deco-grid" id="accDecoGrid">
-            <button type="button" class="acc-deco-tile" data-deco="none" title="Aucune">
-              <span class="deco-avi" id="decoAviPreview-none">A</span>
-              <span class="deco-name">Aucune</span>
-            </button>
-            <button type="button" class="acc-deco-tile" data-deco="rainbow" title="Arc-en-ciel">
-              <span class="deco-effect deco-rainbow"></span>
-              <span class="deco-avi">A</span>
-              <span class="deco-name">Arc-en-ciel</span>
-            </button>
-            <button type="button" class="acc-deco-tile" data-deco="gold" title="Doré">
-              <span class="deco-effect deco-gold"></span>
-              <span class="deco-avi">A</span>
-              <span class="deco-name">Doré</span>
-            </button>
-            <button type="button" class="acc-deco-tile" data-deco="fire" title="Flammes">
-              <span class="deco-effect deco-fire"></span>
-              <span class="deco-avi">A</span>
-              <span class="deco-name">Flammes</span>
-            </button>
-            <button type="button" class="acc-deco-tile" data-deco="stars" title="Étoiles">
-              <span class="deco-effect deco-stars"></span>
-              <span class="deco-avi">A</span>
-              <span class="deco-name">Étoiles</span>
-            </button>
-            <button type="button" class="acc-deco-tile" data-deco="electric" title="Électrique">
-              <span class="deco-effect deco-electric"></span>
-              <span class="deco-avi">A</span>
-              <span class="deco-name">Électrique</span>
-            </button>
-            <button type="button" class="acc-deco-tile" data-deco="bubbles" title="Bulles">
-              <span class="deco-effect deco-bubbles"></span>
-              <span class="deco-avi">A</span>
-              <span class="deco-name">Bulles</span>
-            </button>
-            <button type="button" class="acc-deco-tile" data-deco="heart" title="Cœur">
-              <span class="deco-effect deco-heart"></span>
-              <span class="deco-avi">A</span>
-              <span class="deco-name">Cœur</span>
-            </button>
-            <button type="button" class="acc-deco-tile" data-deco="aurora" title="Aurore">
-              <span class="deco-effect deco-aurora"></span>
-              <span class="deco-avi">A</span>
-              <span class="deco-name">Aurore</span>
-            </button>
-            <button type="button" class="acc-deco-tile" data-deco="pixel" title="Pixel">
-              <span class="deco-effect deco-pixel"></span>
-              <span class="deco-avi">A</span>
-              <span class="deco-name">Pixel</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="acc-field" style="margin-top:14px">
-          <label>Musique d'entrée de profil <small style="color:#b9bbbe;font-weight:400">(joue automatiquement quand quelqu'un arrive sur ton profil)</small></label>
-          <div id="swipeMusicCurrent" class="swipe-music-current" hidden></div>
-          <div class="acc-orb-form" id="swipeMusicForm">
-            <div class="acc-orb-input-wrap">
-              <input class="acc-input" id="swipeMusicInput" type="text" placeholder="Recherche un son Spotify…" autocomplete="off" />
-              <div class="spotify-sugg" id="swipeMusicSugg"></div>
+        <!-- Éléments cachés : DOM gardé pour le JS legacy (filtres, GIFs, musique d'entrée…) -->
+        <div style="display:none">
+          <div id="accDecoBlock">
+            <div class="acc-deco-grid" id="accDecoGrid">
+              <button type="button" class="acc-deco-tile" data-deco="none"><span class="deco-avi">A</span></button>
             </div>
           </div>
-        </div>
-
-        <div class="acc-field" style="margin-top:14px">
-          <label>Recherche par genre</label>
-          <div class="acc-grid2">
-            <select class="acc-select" id="boostGenderFilter">
-              <option value="all">Tous</option>
-              <option value="il">🙋‍♂️ Hommes (Il)</option>
-              <option value="elle">🙋‍♀️ Femmes (Elle)</option>
-            </select>
-            <button type="button" class="acc-btn acc-btn--ghost" id="openLikedMe" style="margin:0;display:none" hidden>Voir qui m'a liké</button>
-          </div>
-        </div>
-
-        <div class="acc-field" style="margin-top:14px">
-          <label>Mes GIFs <span id="gifCounterPill" class="pill" style="margin-left:6px">0/5</span></label>
-          <small style="color:#b9bbbe;font-weight:400;display:block;margin-bottom:8px">Cherche un GIF puis fais-le glisser autour de ta carte. Ils apparaissent sur ton profil de swipe.</small>
-          <div class="acc-orb-form">
-            <div class="acc-orb-input-wrap">
-              <input class="acc-input" id="gifInput" type="text" placeholder="Recherche un GIF sur Giphy…" autocomplete="off" />
-              <div class="spotify-sugg" id="gifSugg"></div>
-            </div>
-          </div>
-          <div class="gif-stage" id="gifStage" aria-label="Zone de placement des GIFs">
-            <div class="gif-stage-card"><span>👤</span><small>Ta carte</small></div>
-          </div>
+          <input id="swipeMusicInput" type="text" />
+          <div id="swipeMusicCurrent"></div>
+          <div id="swipeMusicSugg"></div>
+          <select id="boostGenderFilter"><option value="all">Tous</option><option value="il">il</option><option value="elle">elle</option></select>
+          <button id="openLikedMe" type="button"></button>
+          <span id="gifCounterPill"></span>
+          <input id="gifInput" type="text" />
+          <div id="gifSugg"></div>
+          <div id="gifStage"></div>
         </div>
       </div>
 
@@ -4514,10 +4441,10 @@
         orbs:[
           {kind:'music', title:'Sicko Mode',         sub:'Travis Scott',     emoji:'🎵', voice:null},
           {kind:'voice', title:'Note vocale',        sub:"« Yo c'est Alex »", emoji:'🎤', voice:"Yo, c'est Alex. On tryhard CS ce soir ?"},
-          {kind:'game',  title:'Counter-Strike 2',    sub:'2 134 h de jeu',   emoji:'🎮', rank:'Global Elite', clipUrl:'https://www.youtube.com/watch?v=dQw4w9WgXcQ'},
+          {kind:'game',  title:'Counter-Strike 2',    sub:'2 134 h de jeu',   emoji:'🎮', rank:'Global Elite'},
           {kind:'film', title:'One Piece',           sub:'Anime préféré',     emoji:'📺'},
           {kind:'music', title:'Mo Bamba',           sub:'Sheck Wes',         emoji:'🎵'},
-          {kind:'game',  title:'Valorant',            sub:'Immortal 2',        emoji:'🎮', rank:'Immortal', clipUrl:'https://www.youtube.com/watch?v=oavMtUWDBTM'},
+          {kind:'game',  title:'Valorant',            sub:'Immortal 2',        emoji:'🎮', rank:'Immortal'},
         ] },
       { name:'Léa', tag:'leah_', age:19, gender:'female', looking:'chill', status:'idle', nitro:true,
         joinedOn:'2 sept. 2025',
@@ -5072,20 +4999,9 @@
           rk.innerHTML = `<span class="orb-rank-ball${iconUrl ? ' orb-rank-ball--img' : ''}" style="--rc1:${v.c1};--rc2:${v.c2}" title="${escapeHtmlMini(o.rank)}">${iconHtml}</span>`;
           btn.appendChild(rk);
         }
-        // Mini "+" for game orbs on MY OWN card → opens the rank/clip modal
-        if (o.kind === 'game' && p.isMe) {
-          const meta = document.createElement('button');
-          meta.type = 'button';
-          meta.className = 'orb-meta';
-          meta.setAttribute('aria-label', o.rank || o.clipUrl ? 'Modifier rank/clip' : 'Ajouter rank/clip');
-          meta.title = o.rank || o.clipUrl ? 'Modifier rank/clip' : 'Ajouter rank/clip';
-          meta.innerHTML = '+';
-          meta.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            if (typeof openGameMetaModal === 'function') openGameMetaModal(o);
-          });
-          btn.appendChild(meta);
-        }
+        // (Le "+" pour ajouter rank/clip n'apparaît PLUS sur la carte de swipe —
+        // il reste accessible uniquement via l'overlay d'édition des bulles.
+        // Empêche le clic accidentel "+" en bord de bulle pendant le swipe.)
         btn.addEventListener('click', (ev) => {
           ev.stopPropagation();
           // Sound-wave ripple on music orbs only
@@ -6907,15 +6823,24 @@
       });
     });
 
+    function _toggleBoostBannerField(show){
+      const f = document.getElementById('boostBannerField');
+      if (f) f.hidden = !show;
+    }
     document.getElementById('boostFakeNitro').addEventListener('change', e => {
       if (!state.user || !state.user.boost) { e.target.checked = false; openBoostModal(); return; }
       state.user.fakeNitro = e.target.checked;
       save();
+      _toggleBoostBannerField(e.target.checked);
       if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
-      // Refresh the in-game deck so the current card reflects fakeNitro instantly
       if (typeof ensureDeck === 'function' && document.body.getAttribute('data-screen') === 'swipe') ensureDeck();
       showToast('👑', e.target.checked ? 'Fake Nitro activé' : 'Fake Nitro désactivé', 'Apparence sur ton profil');
     });
+    // Init banner visibility from state on load
+    setTimeout(() => {
+      const tg = document.getElementById('boostFakeNitro');
+      _toggleBoostBannerField(!!(tg && tg.checked));
+    }, 0);
 
     /* ===== Boost: Gender filter ===== */
     document.getElementById('boostGenderFilter').addEventListener('change', e => {
