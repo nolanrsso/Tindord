@@ -4393,7 +4393,13 @@
     // Hand-off used by login/signup handlers
     window.__tindord = {
       onLogin(user){
-        state.user = Object.assign({}, state.user || {}, user);
+        // Préserve les assets custom (Boost) avant le merge Discord
+        const prev = state.user || {};
+        const keepBanner = prev.bannerCustom && prev.bannerUrl;
+        const keepDeco   = prev.decoCustom && prev.decorationUrl;
+        state.user = Object.assign({}, prev, user);
+        if (keepBanner) { state.user.bannerUrl = prev.bannerUrl; state.user.bannerCustom = true; }
+        if (keepDeco)   { state.user.decorationUrl = prev.decorationUrl; state.user.decoCustom = true; state.user.decorationHash = prev.decorationHash || null; }
         // Restore an archived profile if we have one for this Discord ID
         try {
           const key = state.user.discordId || state.user.email || state.user.discordTag;
@@ -7504,17 +7510,23 @@
           return;
         }
 
-        // Merge fresh Discord data into state.user
+        // Merge fresh Discord data into state.user — Boost user's custom assets are preserved.
         state.user = state.user || {};
         const u = state.user;
         u.discordId    = d.id || u.discordId;
         u.displayName  = d.global_name || d.username || u.displayName;
         u.discordTag   = (d.username || '').replace(/#0$/, '') || u.discordTag;
         u.avatarUrl    = d.avatar ? discordAvatarUrl(d.id, d.avatar) : u.avatarUrl;
-        u.bannerUrl    = d.banner ? discordBannerUrl(d.id, d.banner) : null;
-        u.decorationUrl = d.avatar_decoration_data?.asset
-          ? discordDecorationUrl(d.avatar_decoration_data.asset)
-          : null;
+        // Bannière : si l'utilisateur a importé sa propre bannière (bannerCustom), on la garde
+        if (!u.bannerCustom) {
+          u.bannerUrl = d.banner ? discordBannerUrl(d.id, d.banner) : null;
+        }
+        // Décoration : si l'utilisateur a choisi une déco custom (decoCustom), on la garde
+        if (!u.decoCustom) {
+          u.decorationUrl = d.avatar_decoration_data?.asset
+            ? discordDecorationUrl(d.avatar_decoration_data.asset)
+            : null;
+        }
         u.publicFlags  = (typeof d.public_flags === 'number') ? d.public_flags : (u.publicFlags || 0);
         u.premiumType  = (typeof d.premium_type === 'number') ? d.premium_type : (u.premiumType || 0);
         u.accentColor  = (typeof d.accent_color === 'number') ? d.accent_color : (u.accentColor || null);
@@ -8542,6 +8554,49 @@
             if (u) window.__tindord.onLogin(u);
           }
         });
+
+        /* === Auto-resync avec Discord ===
+           Re-fetch le profil Discord (avatar/banner/déco/flags/etc.) toutes les 5min
+           et à chaque fois que l'onglet redevient visible. Préserve bannerCustom +
+           decoCustom (les Boost users qui ont une bannière/déco custom ne sont pas
+           écrasés). */
+        async function autoResyncDiscord(){
+          try {
+            const stored = localStorage.getItem('tindord_discord_token');
+            const ts = parseInt(localStorage.getItem('tindord_discord_token_ts') || '0', 10);
+            if (!stored || (Date.now() - ts) > 7 * 24 * 3600 * 1000) return;
+            const d = await fetchDiscordProfile(stored);
+            if (!d) return;
+            const u = state.user = state.user || {};
+            u.discordId    = d.id || u.discordId;
+            u.displayName  = d.global_name || d.username || u.displayName;
+            u.discordTag   = (d.username || '').replace(/#0$/, '') || u.discordTag;
+            u.avatarUrl    = d.avatar ? discordAvatarUrl(d.id, d.avatar) : u.avatarUrl;
+            if (!u.bannerCustom) u.bannerUrl = d.banner ? discordBannerUrl(d.id, d.banner) : null;
+            if (!u.decoCustom) {
+              u.decorationUrl = d.avatar_decoration_data?.asset
+                ? discordDecorationUrl(d.avatar_decoration_data.asset)
+                : null;
+            }
+            u.publicFlags  = (typeof d.public_flags === 'number') ? d.public_flags : (u.publicFlags || 0);
+            u.premiumType  = (typeof d.premium_type === 'number') ? d.premium_type : (u.premiumType || 0);
+            u.accentColor  = (typeof d.accent_color === 'number') ? d.accent_color : (u.accentColor || null);
+            save();
+            if (typeof updateChip === 'function') updateChip();
+            if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
+            if (typeof ensureDeck === 'function' && document.body.getAttribute('data-screen') === 'swipe') ensureDeck();
+            console.log('[Tindord] auto-resync Discord OK');
+          } catch (e) { console.warn('[Tindord] auto-resync failed', e); }
+        }
+        // Toutes les 5 minutes
+        setInterval(autoResyncDiscord, 5 * 60 * 1000);
+        // Quand l'onglet redevient visible (user revient sur l'app)
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') autoResyncDiscord();
+        });
+        // Au chargement initial (après quelques secondes pour ne pas bloquer le init)
+        setTimeout(autoResyncDiscord, 3000);
+        window.__autoResyncDiscord = autoResyncDiscord;
       } catch (e) { console.warn('Supabase session error', e); }
     })();
   })();
