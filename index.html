@@ -2197,11 +2197,20 @@
     animation:oeoFloat 4.2s ease-in-out infinite;
   }
   .oeo-orb{
-    cursor:pointer;
+    cursor:grab;
     border:2px solid rgba(255,255,255,.25);
     background:#1c1d22;
     box-shadow:0 12px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06) inset;
     overflow:visible;
+    touch-action:none;
+    user-select:none;-webkit-user-select:none;
+  }
+  .oeo-orb:active{cursor:grabbing}
+  .oeo-orb--dragging{
+    cursor:grabbing !important;
+    transform:scale(1.10);
+    box-shadow:0 20px 50px rgba(0,0,0,.8), 0 0 0 2px rgba(255,255,255,.25) inset !important;
+    transition:none !important;
   }
   /* Clip the cover image with clip-path so the round shape stays clean
      without clipping the overflowing × / + / rank-orbit children. */
@@ -5028,9 +5037,16 @@
       colPositions(leftItems,  leftXPos).forEach((p, k) => anchors[leftIdx[k]]  = p);
       colPositions(rightItems, rightXPos).forEach((p, k) => anchors[rightIdx[k]] = p);
       function pickPos(orbR, idx){
+        const o = list[idx];
+        // 1) Position custom (drag&drop) sauvegardée : prioritaire
+        if (o && typeof o.customX === 'number' && typeof o.customY === 'number') {
+          const x = (cardRect.left + cardRect.width / 2) + o.customX * cardRect.width;
+          const y = (cardRect.top  + cardRect.height / 2) + o.customY * cardRect.height;
+          return { x: Math.max(orbR + 6, Math.min(sw - orbR - 6, x)), y: Math.max(orbR + 6, Math.min(sh - orbR - 6, y)) };
+        }
+        // 2) Sinon : ancre auto (colonne gauche/droite)
         const a = anchors[idx];
         if (a) return { x: Math.max(orbR + 6, Math.min(sw - orbR - 6, a.x)), y: Math.max(orbR + 6, Math.min(sh - orbR - 6, a.y)) };
-        // Fallback — should not happen
         return { x: orbR + 24, y: sh/2 };
       }
 
@@ -5107,6 +5123,7 @@
         // Start at rest at the anchor — the spring keeps them locked unless interacted.
         _orbSim.items.push({
           el: wrap,
+          orb: o,
           ax: pos.x, ay: pos.y,
           x:  pos.x, y:  pos.y,
           vx: 0, vy: 0,
@@ -5249,8 +5266,8 @@
             const dx = it.x - m.x;
             const dy = it.y - m.y;
             const d2 = dx*dx + dy*dy;
-            const range = it.isMusic ? 70 : 240;
-            const fScale = it.isMusic ? 0.30 : 2.6;
+            const range  = it.isMusic ? 90 : 90;
+            const fScale = it.isMusic ? 0.55 : 0.40;
             if (d2 < range*range){
               const d = Math.sqrt(d2) || 1;
               const force = (1 - d/range);
@@ -7898,15 +7915,35 @@
       const stage = document.getElementById('oeoStage');
       const wrap  = document.getElementById('oeoCardWrap');
       if (!stage || !wrap) return;
-      // Clear previously injected orbs (keep the card)
       stage.querySelectorAll('.oeo-orb, .oeo-add-fab').forEach(el => el.remove());
       const orbs = (state.profile && state.profile.userOrbs) || [];
       const canAddMore = orbs.length < (typeof orbBudget === 'function' ? orbBudget() : 6);
+
+      const sRect = stage.getBoundingClientRect();
+      const cRect = wrap.getBoundingClientRect();
+      const cx = (cRect.left + cRect.width / 2) - sRect.left;
+      const cy = (cRect.top  + cRect.height / 2) - sRect.top;
+      const cardHalfW = cRect.width / 2;
+      const orbSize = 78;
+      const orbR    = orbSize / 2;
+
+      // Split : bulles avec position custom (drag&drop) vs bulles auto-positionnées
+      const isCustom = (o) => typeof o.customX === 'number' && typeof o.customY === 'number';
+      const customOrbs = orbs.filter(isCustom);
+      const autoOrbs   = orbs.filter(o => !isCustom(o));
+
+      // Render custom-positioned orbs : place at customX/customY (fraction of card size)
+      for (const o of customOrbs) {
+        const x = cx + o.customX * cRect.width;
+        const y = cy + o.customY * cRect.height;
+        stage.appendChild(makeMiniOrb(o, x - orbR, y - orbR, orbs.indexOf(o)));
+      }
+
+      // Auto-positioning algo for the remaining orbs (alternance gauche/droite,
+      // colonnes de 4 max, nouvelle colonne plus loin si pleine)
       const MAX_PER_COL = 4;
-      // Alternance gauche/droite : pair → gauche, impair → droite
-      const left  = orbs.filter((_, i) => i % 2 === 0);
-      const right = orbs.filter((_, i) => i % 2 === 1);
-      // Split chaque côté en colonnes de MAX_PER_COL (chunk 0 = près de la carte)
+      const left  = autoOrbs.filter((_, i) => i % 2 === 0);
+      const right = autoOrbs.filter((_, i) => i % 2 === 1);
       const chunkize = (arr) => {
         const out = [];
         for (let i = 0; i < arr.length; i += MAX_PER_COL) out.push(arr.slice(i, i + MAX_PER_COL));
@@ -7914,31 +7951,14 @@
       };
       const leftChunks  = chunkize(left);
       const rightChunks = chunkize(right);
-      // Un "+" est affiché EN BAS DE CHAQUE CÔTÉ (gauche + droite) tant qu'on peut
-      // encore ajouter. Si la dernière colonne d'un côté est pleine, on crée une
-      // nouvelle colonne plus loin pour porter le "+".
       if (canAddMore){
-        if (leftChunks.length === 0 || leftChunks[leftChunks.length - 1].length >= MAX_PER_COL){
-          leftChunks.push([]);
-        }
-        if (rightChunks.length === 0 || rightChunks[rightChunks.length - 1].length >= MAX_PER_COL){
-          rightChunks.push([]);
-        }
+        if (leftChunks.length === 0 || leftChunks[leftChunks.length - 1].length >= MAX_PER_COL) leftChunks.push([]);
+        if (rightChunks.length === 0 || rightChunks[rightChunks.length - 1].length >= MAX_PER_COL) rightChunks.push([]);
       }
-
-      const sRect = stage.getBoundingClientRect();
-      const cRect = wrap.getBoundingClientRect();
-      const cx = (cRect.left + cRect.width / 2) - sRect.left;
-      const cy = (cRect.top  + cRect.height / 2) - sRect.top;
-      const cardHalfW = cRect.width / 2;
-
-      const orbSize = 78;
-      const orbR    = orbSize / 2;
-      const gap     = 14;
-      const step    = orbSize + gap;
+      const gap = 14;
+      const step = orbSize + gap;
       const colMargin = 62;
-      const colGap    = 18;
-
+      const colGap = 18;
       function placeChunk(chunk, xPos, isLeftSide, isLastChunk){
         const showPlus = canAddMore && isLastChunk;
         const total = chunk.length + (showPlus ? 1 : 0);
@@ -7954,12 +7974,10 @@
           stage.appendChild(makeAddFab(xPos - orbR, y - orbR));
         }
       }
-      // Render left chunks (chunk 0 = près de la carte, chunk 1 = plus loin à gauche, etc.)
       leftChunks.forEach((chunk, c) => {
         const xPos = (cx - cardHalfW - colMargin - orbR) - c * (orbSize + colGap);
         placeChunk(chunk, xPos, true, c === leftChunks.length - 1);
       });
-      // Render right chunks (chunk 0 = près de la carte, chunk 1 = plus loin à droite, etc.)
       rightChunks.forEach((chunk, c) => {
         const xPos = (cx + cardHalfW + colMargin + orbR) + c * (orbSize + colGap);
         placeChunk(chunk, xPos, false, c === rightChunks.length - 1);
@@ -7971,10 +7989,10 @@
       el.dataset.kind = o.kind;
       el.style.left = leftPx + 'px';
       el.style.top  = topPx  + 'px';
-      el.title = `${o.title}${o.rank ? ' · ' + o.rank : ''}`;
+      el.title = `${o.title}${o.rank ? ' · ' + o.rank : ''} — glisse pour repositionner`;
       const fallback = {music:'🎵', game:'🎮', film:'🎬'}[o.kind] || '✨';
       if (o.cover) {
-        el.innerHTML = `<img src="${o.cover}" alt="${escapeHtmlMini(o.title)}">`;
+        el.innerHTML = `<img src="${o.cover}" alt="${escapeHtmlMini(o.title)}" draggable="false">`;
       } else {
         el.innerHTML = `<span class="oeo-orb-ico">${fallback}</span>`;
       }
@@ -8020,8 +8038,75 @@
         });
         el.appendChild(meta);
       }
+      // ===== Drag & drop pour positionner librement la bulle =====
+      // L'utilisateur peut attraper une bulle et la lâcher où il veut autour de la carte.
+      // La position est sauvegardée en fraction relative à la carte (customX, customY),
+      // et ré-appliquée à la fois dans cet overlay et sur la carte de swipe.
+      let dragMoved = false;
+      let dragData = null;
+      let recentDragEnd = 0;
+      el.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.oeo-orb-del') || e.target.closest('.oeo-orb-meta')) return;
+        if (e.button !== undefined && e.button !== 0) return;
+        try { el.setPointerCapture(e.pointerId); } catch(_){}
+        const stage = document.getElementById('oeoStage');
+        const wrap  = document.getElementById('oeoCardWrap');
+        if (!stage || !wrap) return;
+        const sRect  = stage.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        dragData = {
+          startMouseX: e.clientX, startMouseY: e.clientY,
+          startLeft: elRect.left - sRect.left,
+          startTop:  elRect.top  - sRect.top,
+          stage, wrap,
+        };
+        dragMoved = false;
+      });
+      el.addEventListener('pointermove', (e) => {
+        if (!dragData) return;
+        const dx = e.clientX - dragData.startMouseX;
+        const dy = e.clientY - dragData.startMouseY;
+        if (!dragMoved && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+          dragMoved = true;
+          el.classList.add('oeo-orb--dragging');
+          el.style.zIndex = '20';
+          el.style.transition = 'none';
+          el.style.cursor = 'grabbing';
+        }
+        if (dragMoved) {
+          el.style.left = (dragData.startLeft + dx) + 'px';
+          el.style.top  = (dragData.startTop  + dy) + 'px';
+        }
+      });
+      function endDrag(e){
+        if (!dragData) return;
+        try { el.releasePointerCapture(e.pointerId); } catch(_){}
+        el.classList.remove('oeo-orb--dragging');
+        el.style.zIndex = '';
+        el.style.transition = '';
+        el.style.cursor = '';
+        if (dragMoved) {
+          // Position finale : centre de la bulle relatif au centre de la carte, en fraction de la taille carte
+          const elRect   = el.getBoundingClientRect();
+          const cardRect = dragData.wrap.getBoundingClientRect();
+          const cx = (elRect.left + elRect.width / 2);
+          const cy = (elRect.top  + elRect.height / 2);
+          const ccx = cardRect.left + cardRect.width  / 2;
+          const ccy = cardRect.top  + cardRect.height / 2;
+          o.customX = (cx - ccx) / cardRect.width;
+          o.customY = (cy - ccy) / cardRect.height;
+          try { save(); } catch(_){}
+          if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
+          recentDragEnd = Date.now();
+        }
+        dragData = null;
+      }
+      el.addEventListener('pointerup', endDrag);
+      el.addEventListener('pointercancel', endDrag);
       // Click on the orb itself → play the content (clip for game, audio for music)
-      el.addEventListener('click', () => {
+      // Ignore le click si on vient juste de drag (évite ouvrir le clip après un déplacement)
+      el.addEventListener('click', (ev) => {
+        if (Date.now() - recentDragEnd < 250) { ev.preventDefault(); return; }
         if (typeof playOrb === 'function') playOrb(o, el);
       });
       return el;
