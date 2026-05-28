@@ -5592,9 +5592,10 @@
       } else {
         const f = document.createElement('iframe');
         f.src = embed.src;
-        f.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+        f.setAttribute('allow', 'autoplay; encrypted-media; fullscreen; picture-in-picture');
         f.setAttribute('allowfullscreen', '');
-        f.setAttribute('referrerpolicy', 'no-referrer');
+        // PAS de referrerpolicy no-referrer : YouTube a besoin du referrer pour valider
+        // le domaine, sinon erreur 153. On garde origin-when-cross-origin (défaut sûr).
         content.appendChild(f);
         // Fallback : lien externe en bas (utile si l'embed est bloqué par le créateur)
         if (embed.externalUrl) {
