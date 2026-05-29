@@ -4650,6 +4650,9 @@
         emoji: emoByKind[o.kind] || '✨',
         cover: o.cover || null, previewUrl: o.previewUrl || null,
         rank: o.rank || null, clipUrl: o.clipUrl || null,
+        // Conserver la position custom (drag&drop) pour que la carte de swipe
+        // place la bulle exactement là où l'utilisateur l'a posée dans l'éditeur.
+        customX: o.customX, customY: o.customY,
       }));
       return {
         name: u.displayName || u.email?.split('@')[0] || 'Moi',
@@ -4990,6 +4993,58 @@
       return ORB_SVG[o.kind] || ORB_SVG.music;
     }
 
+    /* ===== Source unique de vérité pour le placement des bulles =====
+       Calcule, pour une liste de bulles, une position NORMALISÉE {rx, ry} :
+         - rx = fraction de la LARGEUR de la carte, relative au centre carte (négatif = gauche)
+         - ry = fraction de la HAUTEUR de la carte, relative au centre carte (négatif = haut)
+       Cette même fonction est utilisée par l'éditeur (overlay) ET par la carte de swipe,
+       donc une bulle posée à gauche reste à gauche partout, au même emplacement relatif.
+       - Bulle avec customX/customY (drag&drop) → garde sa position exacte.
+       - Bulle sans position → slot par défaut : colonnes symétriques gauche/droite,
+         max 4 par colonne, nouvelle colonne plus loin si pleine.
+       Renvoie { rel: Map(orb -> {rx,ry}), plus: {rx,ry}|null } (plus = emplacement du "+"). */
+    const ORB_LAYOUT = { COL0: 0.735, COL_GAP: 0.42, ROW_STEP: 0.215, MAX_PER_COL: 4 };
+    function orbRelLayout(orbs, withPlus){
+      const { COL0, COL_GAP, ROW_STEP, MAX_PER_COL } = ORB_LAYOUT;
+      const isCustom = (o) => o && typeof o.customX === 'number' && typeof o.customY === 'number';
+      const rel = new Map();
+      // 1) Bulles custom : position sauvegardée prioritaire
+      orbs.forEach(o => { if (isCustom(o)) rel.set(o, { rx: o.customX, ry: o.customY }); });
+      // 2) Bulles auto : colonnes symétriques (alternance gauche/droite, 4 max/colonne).
+      //    Le "+" ne participe PAS au placement → les bulles auto tombent au même
+      //    endroit dans l'éditeur ET sur la carte de swipe (where withPlus=false).
+      const auto = orbs.filter(o => !isCustom(o));
+      const sides = [[], []]; // 0 = gauche, 1 = droite
+      auto.forEach((o, i) => sides[i % 2].push(o));
+      const cols = [[], []]; // par côté : [{rx, count, lastRy}]
+      sides.forEach((arr, s) => {
+        const sign = s === 0 ? -1 : 1;
+        for (let c = 0; c * MAX_PER_COL < arr.length; c++){
+          const chunk = arr.slice(c * MAX_PER_COL, c * MAX_PER_COL + MAX_PER_COL);
+          const rx = sign * (COL0 + c * COL_GAP);
+          const startRy = -((chunk.length - 1) * ROW_STEP) / 2;
+          chunk.forEach((o, r) => rel.set(o, { rx, ry: startRy + r * ROW_STEP }));
+          cols[s].push({ rx, count: chunk.length, lastRy: startRy + (chunk.length - 1) * ROW_STEP });
+        }
+      });
+      // 3) "+" : sous la colonne du côté le moins rempli (gauche en cas d'égalité),
+      //    sans déplacer les bulles existantes. Nouvelle colonne si la dernière est pleine.
+      let plus = null;
+      if (withPlus){
+        const s = sides[0].length <= sides[1].length ? 0 : 1;
+        const sign = s === 0 ? -1 : 1;
+        const sc = cols[s];
+        if (!sc.length) plus = { rx: sign * COL0, ry: 0 };
+        else {
+          const last = sc[sc.length - 1];
+          plus = last.count >= MAX_PER_COL
+            ? { rx: sign * (COL0 + sc.length * COL_GAP), ry: 0 }
+            : { rx: last.rx, ry: last.lastRy + ROW_STEP };
+        }
+      }
+      return { rel, plus };
+    }
+
     /* Render the orb constellation around the top card */
     /* Live physics state for the profile orbs (mouse repulsion + drift) */
     let _orbSim = { items: [], mouse: { x: -9999, y: -9999, has: false }, raf: null };
@@ -5015,55 +5070,31 @@
       const sw = window.innerWidth;
       const sh = window.innerHeight;
 
-      // Position the orbs in two symmetric columns around the visible profile card
-      // (same layout as the edit overlay). Even-index → left column, odd-index → right.
-      // Use the swipeWrap rect (stable, no transform) — the card itself may be in the
-      // middle of its `.entering` slide-in animation when this runs, so its rect is
-      // unreliable for the first frame.
+      // Position the orbs around the visible profile card using the SAME normalized
+      // layout as the edit overlay (orbRelLayout). Each position is a fraction of the
+      // card (rx of width, ry of height) relative to the card center — so a bubble the
+      // user dropped on the left in the editor stays on the left here, same spot.
+      // Use the swipeWrap rect (stable, no transform) — the card itself may be mid
+      // slide-in animation when this runs, so its own rect is unreliable for frame 1.
       const wrapEl = document.getElementById('swipeWrap');
       const cardRect = wrapEl
         ? wrapEl.getBoundingClientRect()
-        : { left: sw/2 - 210, top: sh/2 - 320, width: 420, height: 640 };
+        : { left: sw/2 - 190, top: sh/2 - 310, width: 380, height: 620 };
       const cardCx = cardRect.left + cardRect.width / 2;
-      const cardCy = cardRect.top + cardRect.height / 2;
-      const cardHalfW = cardRect.width / 2;
-      const colMargin = 30;
-
-      function orbRadius(o){ return 58; }
-      function colPositions(items, xPos) {
-        if (!items.length) return [];
-        const stepLocal = Math.max(...items.map(orbRadius)) * 2 + 18;
-        const colH = items.length * stepLocal - 18;
-        const startY = cardCy - colH / 2 + stepLocal / 2;
-        return items.map((_, i) => ({ x: xPos, y: startY + i * stepLocal }));
+      const cardCy = cardRect.top  + cardRect.height / 2;
+      const orbRadius = () => 58;
+      // Map orb -> {rx, ry} (custom drag positions + default columns), shared with editor
+      const { rel: orbRel } = orbRelLayout(list, false);
+      function relToPx(rel, orbR){
+        const r = rel || { rx: ORB_LAYOUT.COL0, ry: 0 };
+        const x = cardCx + r.rx * cardRect.width;
+        const y = cardCy + r.ry * cardRect.height;
+        return {
+          x: Math.max(orbR + 6, Math.min(sw - orbR - 6, x)),
+          y: Math.max(orbR + 6, Math.min(sh - orbR - 6, y)),
+        };
       }
-      // Build per-orb anchor positions in original list order
-      const anchors = new Array(n);
-      const leftIdx  = [];
-      const rightIdx = [];
-      list.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
-      const leftItems  = leftIdx.map(i => list[i]);
-      const rightItems = rightIdx.map(i => list[i]);
-      // Pick X for the columns based on the max orb radius in each side
-      const leftMaxR  = leftItems.length  ? Math.max(...leftItems.map(orbRadius))  : 54;
-      const rightMaxR = rightItems.length ? Math.max(...rightItems.map(orbRadius)) : 54;
-      const leftXPos  = Math.max(leftMaxR + 12, cardCx - cardHalfW - colMargin - leftMaxR);
-      const rightXPos = Math.min(sw - rightMaxR - 12, cardCx + cardHalfW + colMargin + rightMaxR);
-      colPositions(leftItems,  leftXPos).forEach((p, k) => anchors[leftIdx[k]]  = p);
-      colPositions(rightItems, rightXPos).forEach((p, k) => anchors[rightIdx[k]] = p);
-      function pickPos(orbR, idx){
-        const o = list[idx];
-        // 1) Position custom (drag&drop) sauvegardée : prioritaire
-        if (o && typeof o.customX === 'number' && typeof o.customY === 'number') {
-          const x = (cardRect.left + cardRect.width / 2) + o.customX * cardRect.width;
-          const y = (cardRect.top  + cardRect.height / 2) + o.customY * cardRect.height;
-          return { x: Math.max(orbR + 6, Math.min(sw - orbR - 6, x)), y: Math.max(orbR + 6, Math.min(sh - orbR - 6, y)) };
-        }
-        // 2) Sinon : ancre auto (colonne gauche/droite)
-        const a = anchors[idx];
-        if (a) return { x: Math.max(orbR + 6, Math.min(sw - orbR - 6, a.x)), y: Math.max(orbR + 6, Math.min(sh - orbR - 6, a.y)) };
-        return { x: orbR + 24, y: sh/2 };
-      }
+      function pickPos(orbR, idx){ return relToPx(orbRel.get(list[idx]), orbR); }
 
       list.forEach((o, i) => {
         const isCommon = !p.isMe && mineSet.has(`${o.kind}::${norm(o.title)}`);
@@ -5128,6 +5159,7 @@
         _orbSim.items.push({
           el: wrap,
           orb: o,
+          rel: orbRel.get(o) || { rx: ORB_LAYOUT.COL0, ry: 0 },
           ax: pos.x, ay: pos.y,
           x:  pos.x, y:  pos.y,
           vx: 0, vy: 0,
@@ -5141,7 +5173,8 @@
       _orbSim.items.forEach(it => { it.el.style.transform = `translate(${it.x - it.r}px, ${it.y - it.r}px)`; });
       orbSimStart();
     }
-    // Recompute anchors on viewport resize (keep bubbles aligned to the card)
+    // Recompute anchors on viewport resize from each orb's stored relative position
+    // (rx, ry) — keeps bubbles locked to the same spot relative to the card.
     window.addEventListener('resize', () => {
       if (!_orbSim.items.length) return;
       const wrapEl = document.getElementById('swipeWrap');
@@ -5149,28 +5182,12 @@
       const cardRect = wrapEl.getBoundingClientRect();
       const cardCx = cardRect.left + cardRect.width / 2;
       const cardCy = cardRect.top  + cardRect.height / 2;
-      const cardHalfW = cardRect.width / 2;
-      const items = _orbSim.items;
-      const n = items.length;
-      const colMargin = 30;
-      const leftIdx = [], rightIdx = [];
-      items.forEach((_, i) => (i % 2 === 0 ? leftIdx : rightIdx).push(i));
-      function placeCol(idxs, sideSign){
-        if (!idxs.length) return;
-        const maxR = Math.max(...idxs.map(k => items[k].r));
-        const stepLocal = 2 * maxR + 22;
-        const colH = idxs.length * stepLocal - 22;
-        const startY = cardCy - colH / 2 + stepLocal / 2;
-        const xPos = sideSign < 0
-          ? Math.max(maxR + 12, cardCx - cardHalfW - colMargin - maxR)
-          : Math.min(window.innerWidth - maxR - 12, cardCx + cardHalfW + colMargin + maxR);
-        idxs.forEach((k, j) => {
-          items[k].ax = xPos;
-          items[k].ay = startY + j * stepLocal;
-        });
+      const sw = window.innerWidth, sh = window.innerHeight;
+      for (const it of _orbSim.items){
+        const r = it.rel || { rx: ORB_LAYOUT.COL0, ry: 0 };
+        it.ax = Math.max(it.r + 6, Math.min(sw - it.r - 6, cardCx + r.rx * cardRect.width));
+        it.ay = Math.max(it.r + 6, Math.min(sh - it.r - 6, cardCy + r.ry * cardRect.height));
       }
-      placeCol(leftIdx,  -1);
-      placeCol(rightIdx, +1);
     });
 
     /* Mouse tracking on the WHOLE viewport (orbit is fullscreen) */
@@ -8030,65 +8047,24 @@
       const cRect = wrap.getBoundingClientRect();
       const cx = (cRect.left + cRect.width / 2) - sRect.left;
       const cy = (cRect.top  + cRect.height / 2) - sRect.top;
-      const cardHalfW = cRect.width / 2;
-      const orbSize = 78;
-      const orbR    = orbSize / 2;
+      const orbR = 39; // mini orb = 78px
+      // Clamp inside the stage so default columns never fall off a narrow viewport
+      const clampX = (x) => Math.max(orbR + 6, Math.min(sRect.width  - orbR - 6, x));
+      const clampY = (y) => Math.max(orbR + 6, Math.min(sRect.height - orbR - 6, y));
 
-      // Split : bulles avec position custom (drag&drop) vs bulles auto-positionnées
-      const isCustom = (o) => typeof o.customX === 'number' && typeof o.customY === 'number';
-      const customOrbs = orbs.filter(isCustom);
-      const autoOrbs   = orbs.filter(o => !isCustom(o));
+      // SAME normalized layout as the swipe card (orbRelLayout) → identical placement.
+      const { rel, plus } = orbRelLayout(orbs, canAddMore);
+      const toPx = (r) => ({ x: clampX(cx + r.rx * cRect.width), y: clampY(cy + r.ry * cRect.height) });
 
-      // Render custom-positioned orbs : place at customX/customY (fraction of card size)
-      for (const o of customOrbs) {
-        const x = cx + o.customX * cRect.width;
-        const y = cy + o.customY * cRect.height;
-        stage.appendChild(makeMiniOrb(o, x - orbR, y - orbR, orbs.indexOf(o)));
-      }
-
-      // Auto-positioning algo for the remaining orbs (alternance gauche/droite,
-      // colonnes de 4 max, nouvelle colonne plus loin si pleine)
-      const MAX_PER_COL = 4;
-      const left  = autoOrbs.filter((_, i) => i % 2 === 0);
-      const right = autoOrbs.filter((_, i) => i % 2 === 1);
-      const chunkize = (arr) => {
-        const out = [];
-        for (let i = 0; i < arr.length; i += MAX_PER_COL) out.push(arr.slice(i, i + MAX_PER_COL));
-        return out;
-      };
-      const leftChunks  = chunkize(left);
-      const rightChunks = chunkize(right);
-      if (canAddMore){
-        if (leftChunks.length === 0 || leftChunks[leftChunks.length - 1].length >= MAX_PER_COL) leftChunks.push([]);
-        if (rightChunks.length === 0 || rightChunks[rightChunks.length - 1].length >= MAX_PER_COL) rightChunks.push([]);
-      }
-      const gap = 14;
-      const step = orbSize + gap;
-      const colMargin = 62;
-      const colGap = 18;
-      function placeChunk(chunk, xPos, isLeftSide, isLastChunk){
-        const showPlus = canAddMore && isLastChunk;
-        const total = chunk.length + (showPlus ? 1 : 0);
-        if (!total) return;
-        const colH = total * step - gap;
-        const startY = cy - colH / 2 + orbR;
-        chunk.forEach((o, i) => {
-          const y = startY + i * step;
-          stage.appendChild(makeMiniOrb(o, xPos - orbR, y - orbR, orbs.indexOf(o)));
-        });
-        if (showPlus){
-          const y = startY + chunk.length * step;
-          stage.appendChild(makeAddFab(xPos - orbR, y - orbR));
-        }
-      }
-      leftChunks.forEach((chunk, c) => {
-        const xPos = (cx - cardHalfW - colMargin - orbR) - c * (orbSize + colGap);
-        placeChunk(chunk, xPos, true, c === leftChunks.length - 1);
+      orbs.forEach(o => {
+        const r = rel.get(o); if (!r) return;
+        const p = toPx(r);
+        stage.appendChild(makeMiniOrb(o, p.x - orbR, p.y - orbR, orbs.indexOf(o)));
       });
-      rightChunks.forEach((chunk, c) => {
-        const xPos = (cx + cardHalfW + colMargin + orbR) + c * (orbSize + colGap);
-        placeChunk(chunk, xPos, false, c === rightChunks.length - 1);
-      });
+      if (plus){
+        const p = toPx(plus);
+        stage.appendChild(makeAddFab(p.x - orbR, p.y - orbR));
+      }
     }
     function makeMiniOrb(o, leftPx, topPx, indexInUserOrbs){
       const el = document.createElement('div');
