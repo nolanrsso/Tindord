@@ -98,7 +98,9 @@
     z-index:2;
   }
   .brand .mark{width:96px;height:96px;display:grid;place-items:center;filter:drop-shadow(0 4px 20px rgba(145,70,255,.6))}
-  .nav{display:flex;align-items:center;gap:6px}
+  /* .brand est en position:absolute (hors flux) → on pousse la nav à droite
+     et on réserve la largeur du logo pour éviter tout chevauchement. */
+  .nav{display:flex;align-items:center;gap:6px;margin-left:auto;padding-left:120px}
   .nav a{color:var(--ink-dim);text-decoration:none;font-size:14px;font-weight:500;padding:8px 12px;border-radius:10px;transition:.18s ease}
   .nav a:hover{color:#fff;background:rgba(255,255,255,.04)}
   /* Floating corner controls */
@@ -350,6 +352,7 @@
     .login{padding:12px 18px;font-size:15px;border-radius:13px;gap:10px}
     .login .dot{width:8px;height:8px}
   }
+
 
   /* ============================================================
      SCREENS — landing / onboarding / swipe / account
@@ -1932,6 +1935,22 @@
     .acc-main{grid-template-columns:1fr;gap:14px}
     .acc-identity{order:0}
     .acc-identity .acc-avatar{width:96px;height:96px;font-size:38px}
+  }
+  /* Fenêtre étroite (≈ < moitié d'un écran standard) : tout l'onglet compte
+     scrolle d'un seul bloc au lieu d'être coupé/écrasé. On neutralise les
+     overflow internes pour éviter un double scroll. */
+  @media (max-width:960px){
+    #screen-account{
+      overflow-y:auto;overflow-x:hidden;
+      justify-content:flex-start;
+      -webkit-overflow-scrolling:touch;
+    }
+    /* Empêche la compression flex (min-height:0 partout) pour que le contenu
+       déborde réellement et déclenche le scroll du conteneur. */
+    #screen-account .acc-card{max-height:none;flex:0 0 auto;min-height:auto}
+    #screen-account .acc-main{min-height:auto}
+    #screen-account .acc-tab-body{overflow:visible;min-height:auto}
+    #screen-account .acc-tab{overflow:visible;padding-right:0}
   }
   /* Legacy avatar override - used in some non-account contexts */
   .acc-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
