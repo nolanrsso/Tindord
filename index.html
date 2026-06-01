@@ -90,9 +90,8 @@
     border-bottom:none;
     border-radius:18px;
   }
-  .brand{display:flex;align-items:center;gap:10px;font-family:"Clash Display",sans-serif;font-weight:700;font-size:20px;letter-spacing:-.01em;text-decoration:none;color:inherit;cursor:pointer}
-  .brand .mark{width:36px;height:36px;display:grid;place-items:center;filter:drop-shadow(0 4px 20px rgba(145,70,255,.6))}
-  .brand .word{background:linear-gradient(180deg,#fff 0%,#d9c6ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand{display:flex;align-items:center;gap:0;text-decoration:none;color:inherit;cursor:pointer}
+  .brand .mark{width:64px;height:64px;display:grid;place-items:center;filter:drop-shadow(0 4px 20px rgba(145,70,255,.6))}
   .nav{display:flex;align-items:center;gap:6px}
   .nav a{color:var(--ink-dim);text-decoration:none;font-size:14px;font-weight:500;padding:8px 12px;border-radius:10px;transition:.18s ease}
   .nav a:hover{color:#fff;background:rgba(255,255,255,.04)}
@@ -340,10 +339,7 @@
   /* Bigger nav on large screens */
   @media (min-width:1100px){
     header{margin:20px 44px 0;padding:14px 22px;border-radius:22px}
-    .brand{font-size:24px;gap:14px}
-    .brand .mark{width:44px;height:44px}
-    .brand .mark svg{width:36px !important;height:40px !important}
-    .brand .word{font-size:26px !important;letter-spacing:-.3px !important;margin:-9px !important;width:auto !important}
+    .brand .mark{width:80px;height:80px}
     .login{padding:12px 18px;font-size:15px;border-radius:13px;gap:10px}
     .login .dot{width:8px;height:8px}
   }
@@ -2730,9 +2726,8 @@
   <header data-screen-label="Header">
     <a href="/" class="brand" id="brandHome" aria-label="Recharger la page">
       <div class="mark">
-        <img src="assets/logo.svg" alt="Tindord" class="tindord-logo" style="width:44px;height:auto;display:block;filter:drop-shadow(0 4px 18px rgba(255,31,158,.55))" />
+        <img src="assets/logo.svg" alt="Tindord" class="tindord-logo" style="width:100%;height:auto;display:block;filter:drop-shadow(0 4px 18px rgba(255,31,158,.55))" />
       </div>
-      <span class="word" style="width: 92px; font-size: 22px; letter-spacing: -0.2px; padding: 0px; margin: -9.23071px">Tindord</span>
     </a>
     <nav class="nav" aria-label="Navigation">
       <a href="#" class="login" id="loginBtn"><span class="dot"></span><span data-i18n="login">Se connecter</span></a>
