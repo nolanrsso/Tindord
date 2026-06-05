@@ -17,7 +17,9 @@
       "mcp__Claude_in_Chrome__computer",
       "mcp__Claude_in_Chrome__navigate",
       "mcp__Claude_in_Chrome__javascript_tool",
-      "mcp__Claude_in_Chrome__resize_window"
+      "mcp__Claude_in_Chrome__resize_window",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:8090/\" -UseBasicParsing -TimeoutSec 5; Write-Host \"STATUS:\" $r.StatusCode \"LEN:\" $r.Content.Length } catch { Write-Host \"DOWN:\" $_.Exception.Message }; Get-NetTCPConnection -LocalPort 8090 -State Listen -ErrorAction SilentlyContinue | Select-Object LocalAddress,LocalPort | Format-Table)",
+      "mcp__Claude_in_Chrome__tabs_create_mcp"
     ]
   }
 }
