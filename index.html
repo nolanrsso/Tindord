@@ -1843,8 +1843,9 @@
   }
   /* CRITICAL: hidden tabs really hidden */
   .acc-tab[hidden]{display:none !important}
-  /* No-scroll: tabs fit on screen */
-  .acc-tab:not([hidden]){overflow:hidden !important;padding-right:0 !important}
+  /* No-scroll: tabs fit on screen (overflow visible pour ne pas rogner le
+     bouton "Mes bulles" ni son glow quand il s'agrandit au survol) */
+  .acc-tab:not([hidden]){overflow:visible !important;padding-right:0 !important}
   .acc-section{padding:6px 0 !important;margin-top:2px !important}
   .acc-section h3{margin:0 0 6px !important;font-size:13.5px !important}
   .acc-field{margin-top:6px !important}
