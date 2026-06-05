@@ -4673,10 +4673,37 @@
           }
         } catch (e) { console.warn('restore archive failed', e); }
         save(); setAuth(true);
+        try { window.__discordJoinDM && window.__discordJoinDM(); } catch(_){}
         setScreen(state.profile ? 'landing' : 'onboarding');
       },
       go(screen){ setScreen(screen); },
       hasProfile(){ return !!state.profile; },
+    };
+
+    /* Ajoute l'utilisateur au serveur Discord (scope guilds.join) puis lui envoie
+       un DM de bienvenue via le bot — appel à l'edge function Supabase.
+       Ne s'exécute qu'une fois par utilisateur Discord. */
+    window.__discordJoinDM = async function(){
+      try {
+        const u = state.user || {};
+        const token  = localStorage.getItem('tindord_discord_token');
+        const userId = u.discordId;
+        if (!token || !userId) return;
+        const doneKey = 'tindord_joindm_' + userId;
+        if (localStorage.getItem(doneKey) === '1') return;
+        const res = await fetch(SUPABASE_URL + '/functions/v1/discord-join-dm', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+            'apikey': SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ access_token: token, user_id: userId }),
+        });
+        const data = await res.json().catch(() => ({}));
+        console.log('[Tindord] discord join+DM:', data);
+        if (data && (data.joined || data.dm)) localStorage.setItem(doneKey, '1');
+      } catch (e) { console.warn('[Tindord] discord join+DM failed', e); }
     };
 
     // ---------- Onboarding (welcome → age → genre → pays → perso) ----------

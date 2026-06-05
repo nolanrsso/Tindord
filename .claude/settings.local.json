@@ -29,7 +29,8 @@
       "mcp__supabase__get_project_url",
       "mcp__supabase__get_publishable_keys",
       "mcp__supabase__deploy_edge_function",
-      "mcp__supabase__get_advisors"
+      "mcp__supabase__get_advisors",
+      "PowerShell(cd \"C:\\\\Users\\\\nolan.rso\\\\Documents\\\\ClaudeCode\\\\Tindord\"; $b='origin/claude/competent-dhawan-2483d2'; git show \"${b}:index.html\" | Select-Object -Skip 3159 -First 40)"
     ]
   }
 }
