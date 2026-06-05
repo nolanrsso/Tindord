@@ -1872,6 +1872,14 @@
   .acc-profil-top{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start;margin-bottom:6px}
   .acc-profil-col{display:flex;flex-direction:column;gap:8px;min-width:0}
   @media (max-width:780px){ .acc-profil-top{grid-template-columns:1fr} }
+  /* Anti-débordement : empêche le contenu de pousser hors de la carte
+     (sinon le fond sombre .scene apparaît derrière, p.ex. à gauche du bouton "Mes bulles") */
+  .acc-main{min-width:0}
+  .acc-tab-body{min-width:0}
+  .acc-tab{min-width:0}
+  .acc-social-row{min-width:0}
+  .acc-social-row input{min-width:0}
+  .acc-bulles-cta{position:relative;z-index:1}
 
   /* Preview-mode swipe-card — scale down everything proportionally for the mini preview */
   .acc-preview-wrap .swipe-card.preview-mode .banner{height:90px !important;max-height:90px !important}
