@@ -4993,7 +4993,7 @@
        - Bulle sans position → slot par défaut : colonnes symétriques gauche/droite,
          max 4 par colonne, nouvelle colonne plus loin si pleine.
        Renvoie { rel: Map(orb -> {rx,ry}), plus: {rx,ry}|null } (plus = emplacement du "+"). */
-    const ORB_LAYOUT = { COL0: 0.735, COL_GAP: 0.42, ROW_STEP: 0.215, MAX_PER_COL: 4 };
+    const ORB_LAYOUT = { COL0: 0.78, COL_GAP: 0.46, ROW_STEP: 0.27, MAX_PER_COL: 4 };
     function orbRelLayout(orbs, withPlus){
       const { COL0, COL_GAP, ROW_STEP, MAX_PER_COL } = ORB_LAYOUT;
       const isCustom = (o) => o && typeof o.customX === 'number' && typeof o.customY === 'number';
