@@ -2457,20 +2457,20 @@
   .oeo-orb[data-kind="film"]{border-color:rgba(199,165,255,.85);box-shadow:0 12px 30px rgba(139,92,246,.45)}
   .oeo-orb:hover{transform:scale(1.08);box-shadow:0 16px 40px rgba(0,0,0,.7)}
   .oeo-orb .oeo-orb-del{
-    position:absolute;top:-6px;right:-6px;width:30px;height:30px;border-radius:50%;
-    border:2.5px solid #0d0b1e;
+    position:absolute;top:-2px;right:-2px;width:20px;height:20px;border-radius:50%;
+    border:1.5px solid #0d0b1e;
     background:linear-gradient(135deg,#FF4FA0,#C92866);
-    color:#fff;font-size:18px;font-weight:800;line-height:1;
+    color:#fff;font-size:12px;font-weight:800;line-height:1;
     cursor:pointer;padding:0;
     display:grid;place-items:center;z-index:6;
-    box-shadow:0 6px 18px rgba(255,79,160,.6), 0 0 0 1px rgba(255,255,255,.20) inset;
-    opacity:.92;transition:transform .15s ease, opacity .15s ease, box-shadow .15s ease;
+    box-shadow:0 3px 9px rgba(255,79,160,.55), 0 0 0 1px rgba(255,255,255,.18) inset;
+    opacity:.85;transition:transform .15s ease, opacity .15s ease, box-shadow .15s ease;
   }
   .oeo-orb .oeo-orb-del:hover{
-    opacity:1;transform:scale(1.15);
-    box-shadow:0 10px 26px rgba(255,79,160,.85), 0 0 0 1px rgba(255,255,255,.30) inset;
+    opacity:1;transform:scale(1.18);
+    box-shadow:0 6px 16px rgba(255,79,160,.85), 0 0 0 1px rgba(255,255,255,.30) inset;
   }
-  .oeo-orb .oeo-orb-del svg{display:block}
+  .oeo-orb .oeo-orb-del svg{display:block;width:10px;height:10px}
   .oeo-add-fab{
     border:2px dashed rgba(145,70,255,.7);
     background:rgba(145,70,255,.14);
@@ -4776,7 +4776,7 @@
       document.body.setAttribute('data-screen', name);
       if (name === 'account') renderAccount();
       if (name === 'onboarding' && typeof window.__initOnboarding === 'function') window.__initOnboarding();
-      if (name === 'swipe')   { ensureDeck(); refreshMyStatusUI(); refreshSwipeTools(); }
+      if (name === 'swipe')   { deckIdx = 0; ensureDeck(); refreshMyStatusUI(); refreshSwipeTools(); }
       if (name !== 'swipe')   { stopSwipeMusic(); if (typeof orbSimStop === 'function') orbSimStop(); }
     }
     function setAuth(on){
@@ -8835,14 +8835,42 @@
         return { x: clampX(cx + r.rx * sx * cRect.width), y: clampY(cy + r.ry * sy * cRect.height) };
       };
 
+      // Garde en mémoire les positions (px) déjà occupées pour empêcher le "+" de chevaucher.
+      const occupied = [];
       orbs.forEach(o => {
         const r = rel.get(o); if (!r) return;
         const p = toPx(r, isCustom(o));
+        occupied.push({ x: p.x, y: p.y });
         stage.appendChild(makeMiniOrb(o, p.x - orbR, p.y - orbR, orbs.indexOf(o)));
       });
       if (plus){
-        const p = toPx(plus, false);
-        stage.appendChild(makeAddFab(p.x - orbR, p.y - orbR));
+        let pp = toPx(plus, false);
+        // Le "+" doit être proche de la carte (par construction de plus.rx ~ COL0) mais
+        // ne doit pas chevaucher d'autres bulles. On le pousse hors collision.
+        const minGap = orbR * 2 + 6;
+        for (let pass = 0; pass < 8; pass++){
+          let collided = false;
+          for (const o of occupied){
+            const dxC = pp.x - o.x, dyC = pp.y - o.y;
+            const dist = Math.hypot(dxC, dyC) || 0.001;
+            if (dist < minGap){
+              const push = (minGap - dist) + 1;
+              pp.x += (dxC / dist) * push;
+              pp.y += (dyC / dist) * push;
+              collided = true;
+            }
+          }
+          pp.x = clampX(pp.x); pp.y = clampY(pp.y);
+          if (!collided) break;
+        }
+        // Évite la carte centrale (ne traverse pas)
+        const cardL = cRect.left - sRect.left, cardT = cRect.top - sRect.top;
+        const cardR = cardL + cRect.width, cardB = cardT + cRect.height;
+        if (pp.x > cardL && pp.x < cardR && pp.y > cardT && pp.y < cardB){
+          const distL = pp.x - cardL, distR = cardR - pp.x;
+          pp.x = (distL < distR) ? Math.max(availLeft, cardL - 2) : Math.min(availRight, cardR + 2);
+        }
+        stage.appendChild(makeAddFab(pp.x - orbR, pp.y - orbR));
       }
     }
     function makeMiniOrb(o, leftPx, topPx, indexInUserOrbs){
@@ -8936,20 +8964,66 @@
           el.style.cursor = 'grabbing';
         }
         if (dragMoved) {
-          // Clamp dans la zone visible du stage (= écran entier) pour qu'une bulle
-          // ne puisse jamais sortir, même si le pointer va hors écran. Tient compte
-          // de la taille réelle de la bulle.
           const sRect = dragData.stage.getBoundingClientRect();
           const w = el.offsetWidth, h = el.offsetHeight;
           const pad = 4;
-          // Si le panel "+" est ouvert à droite, on réduit la zone utile à gauche du panel
           const panel = document.getElementById('oeoAddPanel');
           const panelOpen = panel && panel.getAttribute('data-open') === 'true';
           const panelLeft = panelOpen ? (panel.getBoundingClientRect().left - sRect.left) : sRect.width;
           const maxLeft = Math.max(pad, Math.min(sRect.width - w - pad, panelLeft - w - pad));
           const maxTop  = sRect.height - h - pad;
-          const left = Math.max(pad, Math.min(maxLeft, dragData.startLeft + dx));
-          const top  = Math.max(pad, Math.min(maxTop,  dragData.startTop  + dy));
+          let left = Math.max(pad, Math.min(maxLeft, dragData.startLeft + dx));
+          let top  = Math.max(pad, Math.min(maxTop,  dragData.startTop  + dy));
+
+          // === Évite la carte de profil (la bulle ne peut PAS la traverser) ===
+          const cardRect = dragData.wrap.getBoundingClientRect();
+          const cardL = cardRect.left - sRect.left;
+          const cardT = cardRect.top  - sRect.top;
+          const cardR = cardL + cardRect.width;
+          const cardB = cardT + cardRect.height;
+          // bulle = cercle de rayon w/2 centré sur (left+w/2, top+h/2)
+          const cx = left + w/2, cy = top + h/2;
+          // Si le centre de la bulle entre dans la zone de la carte → on pousse au bord le plus proche
+          if (cx > cardL && cx < cardR && cy > cardT && cy < cardB){
+            // Distance à chaque bord (côté pointer)
+            const distL = cx - cardL, distR = cardR - cx, distT = cy - cardT, distB = cardB - cy;
+            const minDist = Math.min(distL, distR, distT, distB);
+            if (minDist === distL)      left = cardL - w/2;          // pousse à gauche
+            else if (minDist === distR) left = cardR - w/2;          // pousse à droite
+            else if (minDist === distT) top  = cardT - h/2;          // pousse en haut
+            else                        top  = cardB - h/2;          // pousse en bas
+            // Re-clamp dans le stage
+            left = Math.max(pad, Math.min(maxLeft, left));
+            top  = Math.max(pad, Math.min(maxTop,  top));
+          }
+
+          // === Évite les autres bulles (pas de chevauchement) ===
+          const others = [...dragData.stage.querySelectorAll('.oeo-orb')].filter(n => n !== el);
+          const minGap = 4; // px de marge entre cercles
+          for (let pass = 0; pass < 4; pass++){
+            let collided = false;
+            for (const other of others){
+              const oRect = other.getBoundingClientRect();
+              const ow = other.offsetWidth, oh = other.offsetHeight;
+              const ocx = (oRect.left - sRect.left) + ow/2;
+              const ocy = (oRect.top  - sRect.top)  + oh/2;
+              const cx2 = left + w/2, cy2 = top + h/2;
+              const dxC = cx2 - ocx, dyC = cy2 - ocy;
+              const dist = Math.hypot(dxC, dyC) || 0.001;
+              const minDist = (w + ow) / 2 + minGap;
+              if (dist < minDist){
+                // Pousse la bulle dans la direction opposée à la collision
+                const push = (minDist - dist) + 0.5;
+                left += (dxC / dist) * push;
+                top  += (dyC / dist) * push;
+                collided = true;
+              }
+            }
+            left = Math.max(pad, Math.min(maxLeft, left));
+            top  = Math.max(pad, Math.min(maxTop,  top));
+            if (!collided) break;
+          }
+
           el.style.left = left + 'px';
           el.style.top  = top  + 'px';
         }
