@@ -5394,10 +5394,12 @@
         ? `background-image:url('${p.bannerUrl}');background-size:cover;background-position:center`
         : (accentHex ? `background:${accentHex}` : '');
       // PROFILE BODY COLOR : primary + optional secondary as a gradient on the card body (below banner).
+      // Si pas de couleur custom → on retombe sur l'accent_color Discord (= "reset Discord").
       const pc1 = (p.profileColor && p.profileColor !== 'discord') ? p.profileColor : null;
       const pc2 = (p.profileColor2 && p.profileColor2 !== 'discord') ? p.profileColor2 : null;
       if (pc1 && pc2) c.style.background = `linear-gradient(180deg, ${pc1} 0%, ${pc2} 100%)`;
       else if (pc1)   c.style.background = pc1;
+      else if (accentHex) c.style.background = accentHex;
       // Auto-contrast : if the card body is too light, switch text to dark.
       const lum = (hex) => {
         const m = /^#?([0-9a-f]{6})$/i.exec(hex || ''); if (!m) return null;
@@ -8389,12 +8391,21 @@
     (function bindColorReset(){
       const btn = document.getElementById('accColorReset');
       if (!btn) return;
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         state.user = state.user || {};
         state.user.profileColor = null;
         state.user.profileColor2 = null;
         save();
+        // Re-fetch Discord pour récupérer la dernière accent_color officielle
+        try { if (typeof window.__autoResyncDiscord === 'function') await window.__autoResyncDiscord(); } catch(_){}
         if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
+        // Re-init aussi les sliders couleur du formulaire avec accent Discord (sinon ils restent sur la valeur précédente)
+        const ac = state.user.accentColor;
+        const accHex = ac ? '#' + ac.toString(16).padStart(6,'0') : null;
+        const cw1 = document.getElementById('accProfileColor');
+        const cw2 = document.getElementById('accProfileColor2');
+        if (cw1) cw1.value = accHex || '#5865F2';
+        if (cw2) cw2.value = accHex || '#404EED';
         showToast('↺', 'Couleurs réinitialisées', 'On utilise la couleur Discord');
       });
     })();
@@ -8460,14 +8471,16 @@
         reader.readAsDataURL(file);
         fileEl.value = '';
       });
-      resetBtn.addEventListener('click', () => {
+      resetBtn.addEventListener('click', async () => {
         state.user = state.user || {};
         state.user.bannerUrl = null;
         state.user.bannerCustom = false;
         save();
+        // Re-fetch Discord pour récupérer l'URL de la bannière Discord (si l'utilisateur en a une)
+        try { if (typeof window.__autoResyncDiscord === 'function') await window.__autoResyncDiscord(); } catch(_){}
         refreshPrev();
         if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
-        showToast('↩️', 'Bannière réinitialisée', 'On utilisera celle de Discord');
+        showToast('↩️', 'Bannière réinitialisée', 'On utilise celle de Discord');
       });
     })();
 
