@@ -699,6 +699,41 @@
   .onb-select:focus{border-color:rgba(145,70,255,.6);background-color:rgba(255,255,255,.07);box-shadow:0 0 0 4px rgba(145,70,255,.18)}
   .onb-select option{background:#1a1a20;color:#fff}
 
+  /* Custom country picker — affiche les vraies images de drapeaux (flagcdn) */
+  .ctry-picker{position:relative;width:100%;margin-bottom:8px}
+  .ctry-trigger{
+    width:100%;box-sizing:border-box;padding:14px 38px 14px 14px;border-radius:14px;
+    background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.14);
+    color:#fff;font-family:inherit;font-size:16px;cursor:pointer;text-align:left;
+    display:flex;align-items:center;gap:10px;transition:.18s ease;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23b9bbbe' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;background-position:right 14px center;
+  }
+  .ctry-trigger:hover,.ctry-picker[data-open="true"] .ctry-trigger{border-color:rgba(88,101,242,.6);background-color:rgba(255,255,255,.07)}
+  .ctry-trigger .ctry-flag{width:26px;height:18px;object-fit:cover;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.4);flex:0 0 auto}
+  .ctry-trigger .ctry-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ctry-trigger .ctry-placeholder{color:#b9bbbe}
+  .ctry-panel{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:50;
+    background:#1a1a20;border:1px solid rgba(255,255,255,.12);border-radius:14px;
+    box-shadow:0 18px 50px rgba(0,0,0,.6);
+    max-height:0;overflow:hidden;opacity:0;pointer-events:none;
+    transition:opacity .15s ease, max-height .2s ease;
+  }
+  .ctry-picker[data-open="true"] .ctry-panel{max-height:340px;opacity:1;pointer-events:auto}
+  .ctry-search{
+    width:100%;box-sizing:border-box;padding:11px 14px;border:none;border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.04);color:#fff;font-family:inherit;font-size:14px;outline:none;
+  }
+  .ctry-list{max-height:280px;overflow-y:auto;padding:4px}
+  .ctry-list .ctry-item{
+    display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;
+    color:#fff;font-size:14.5px;transition:background .12s ease;
+  }
+  .ctry-list .ctry-item:hover,.ctry-list .ctry-item.is-active{background:rgba(88,101,242,.18)}
+  .ctry-list .ctry-item img{width:26px;height:18px;object-fit:cover;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.4);flex:0 0 auto}
+  .ctry-list .ctry-empty{color:#b9bbbe;font-size:13px;text-align:center;padding:14px}
+
   /* ---- Personnalisation step ---- */
   .onb-perso{text-align:left}
   .onb-perso h2,.onb-perso .sub{text-align:center}
@@ -3092,7 +3127,17 @@
       <div class="onb-step" data-step="3" hidden>
         <h2>D'où viens-tu ?</h2>
         <p class="sub">Ton drapeau apparaîtra sur ton profil</p>
-        <select class="onb-select" id="onbCountry">
+        <!-- Picker custom (avec images flagcdn) ; le <select> reste pour la logique existante -->
+        <div class="ctry-picker" id="onbCountryPicker" data-open="false">
+          <button type="button" class="ctry-trigger" id="onbCountryTrigger">
+            <span class="ctry-name ctry-placeholder">Choisis ton pays…</span>
+          </button>
+          <div class="ctry-panel">
+            <input type="text" class="ctry-search" id="onbCountrySearch" placeholder="Rechercher un pays…" autocomplete="off" />
+            <div class="ctry-list" id="onbCountryList"></div>
+          </div>
+        </div>
+        <select class="onb-select" id="onbCountry" style="display:none">
           <option value="" data-flag="">Choisis ton pays…</option>
           <option value="FR" data-flag="🇫🇷">🇫🇷 France</option>
           <option value="BE" data-flag="🇧🇪">🇧🇪 Belgique</option>
@@ -4863,13 +4908,55 @@
       draft.age = (v >= 18 && v <= 99) ? v : null;
       $onb('onbNext1').disabled = draft.age == null;
     });
-    // Step 3 — pays
+    // Step 3 — pays (select hidden + picker custom synchronisés)
     $onb('onbCountry').addEventListener('change', e => {
       const opt = e.target.selectedOptions[0];
       draft.country = e.target.value || null;
       draft.countryFlag = opt ? (opt.getAttribute('data-flag') || '') : '';
       $onb('onbNext3').disabled = !draft.country;
     });
+
+    /* Country picker custom — affiche les vraies images flagcdn dans le dropdown */
+    (function initCountryPicker(){
+      const picker  = $onb('onbCountryPicker');
+      const trigger = $onb('onbCountryTrigger');
+      const search  = $onb('onbCountrySearch');
+      const list    = $onb('onbCountryList');
+      const select  = $onb('onbCountry');
+      if (!picker || !trigger || !search || !list || !select) return;
+      const countries = [...select.querySelectorAll('option')]
+        .filter(o => o.value)
+        .map(o => ({ code: o.value, name: o.textContent.replace(/^\s*\S+\s*/, '').trim() })); // retire emoji devant
+      const flagUrl = c => c === 'OTHER' ? '' : `https://flagcdn.com/${c.toLowerCase()}.svg`;
+      function renderList(filter){
+        const q = (filter || '').toLowerCase().trim();
+        const matches = countries.filter(c => !q || c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
+        list.innerHTML = matches.length
+          ? matches.map(c => `<div class="ctry-item" data-code="${c.code}"><span style="display:inline-flex;width:26px;height:18px;justify-content:center;align-items:center;flex:0 0 auto">${c.code === 'OTHER' ? '🏳️' : `<img src="${flagUrl(c.code)}" alt="${c.code}" loading="lazy">`}</span><span>${c.name}</span></div>`).join('')
+          : `<div class="ctry-empty">Aucun pays</div>`;
+      }
+      function setTriggerLabel(code, name){
+        if (!code) { trigger.innerHTML = '<span class="ctry-name ctry-placeholder">Choisis ton pays…</span>'; return; }
+        const flag = code === 'OTHER' ? '<span style="font-size:18px">🏳️</span>' : `<img class="ctry-flag" src="${flagUrl(code)}" alt="${code}">`;
+        trigger.innerHTML = `${flag}<span class="ctry-name">${name}</span>`;
+      }
+      function open(){ picker.setAttribute('data-open', 'true'); renderList(''); search.value=''; setTimeout(() => search.focus(), 0); }
+      function close(){ picker.setAttribute('data-open', 'false'); }
+      function pick(code){
+        const c = countries.find(x => x.code === code); if (!c) return;
+        select.value = code;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        setTriggerLabel(code, c.name);
+        close();
+      }
+      trigger.addEventListener('click', e => { e.stopPropagation(); picker.getAttribute('data-open') === 'true' ? close() : open(); });
+      search.addEventListener('input', e => renderList(e.target.value));
+      list.addEventListener('click', e => { const it = e.target.closest('.ctry-item'); if (it) pick(it.dataset.code); });
+      document.addEventListener('click', e => { if (!picker.contains(e.target)) close(); });
+      // Init affichage si valeur déjà sélectionnée
+      if (select.value) { const c = countries.find(x => x.code === select.value); if (c) setTriggerLabel(c.code, c.name); }
+      renderList('');
+    })();
     // Step 4 — personnalisation (tous optionnels)
     $onb('onbPseudo').addEventListener('input', e => { draft.pseudo = e.target.value.trim(); });
     $onb('onbBio').addEventListener('input', e => { draft.bio = e.target.value.trim(); });
