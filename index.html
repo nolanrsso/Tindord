@@ -2410,14 +2410,15 @@
   .oeo-card-wrap .swipe-card{position:absolute !important;inset:0 !important;transform:none !important;cursor:default !important}
   .oeo-card-wrap .swipe-card .badge-stamp{display:none !important}
 
-  /* Mini orb tiles (existing bubbles) + "+" FAB positioned around the card */
+  /* Mini orb tiles (existing bubbles) + "+" FAB — MÊME taille que les bulles de swipe (115px) */
   .oeo-orb,
   .oeo-add-fab{
-    position:absolute;width:78px;height:78px;border-radius:50%;
+    position:absolute;width:115px;height:115px;border-radius:50%;
     display:grid;place-items:center;color:#fff;
     transition:transform .2s ease, box-shadow .2s ease, background .2s ease, top .3s cubic-bezier(.2,.7,.3,1), left .3s cubic-bezier(.2,.7,.3,1);
     animation:oeoFloat 4.2s ease-in-out infinite;
   }
+  .oeo-orb svg, .oeo-add-fab svg{width:42px;height:42px}
   .oeo-orb{
     cursor:grab;
     border:2px solid rgba(255,255,255,.25);
@@ -8718,7 +8719,7 @@
       const cRect = wrap.getBoundingClientRect();
       const cx = (cRect.left + cRect.width / 2) - sRect.left;
       const cy = (cRect.top  + cRect.height / 2) - sRect.top;
-      const orbR = 39; // mini orb = 78px
+      const orbR = 57.5; // mini orb = 115px (= meme taille qu'en swipe)
       const pad = 6;
       // Si le panel "+" est ouvert (à droite), on réduit la zone utile pour ne pas
       // poser de bulles sous le panel.
