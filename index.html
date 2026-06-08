@@ -6468,25 +6468,8 @@
     if (document.body.getAttribute('data-screen') === 'swipe') refreshMyStatusUI();
 
     // ---------- Messages panel ----------
-    const CONVOS = [
-      { id:'alex', name:'Alex',  tag:'alex',     c1:'#FF7EB6', c2:'#9146FF', initial:'A', last:'Yo, on tryhard CS ce soir ?',    t:'14:23', unread:true,
-        msgs:[
-          {who:'them', text:'Yo, on tryhard CS ce soir ?', t:'14:23'},
-          {who:'them', text:'Faceit lvl 8 ici, t\'es chaud ?', t:'14:24'},
-        ] },
-      { id:'lea',   name:'Léa',  tag:'leah_',    c1:'#5BE9FF', c2:'#9146FF', initial:'L', last:'On lance Stardew ?', t:'13:48', unread:true,
-        msgs:[
-          {who:'them', text:'Salut !', t:'13:46'},
-          {who:'me',   text:'Hey ça va ?', t:'13:47'},
-          {who:'them', text:'On lance Stardew ?', t:'13:48'},
-        ] },
-      { id:'sam',   name:'Sam',  tag:'sam.exe',  c1:'#3BD17C', c2:'#5BE9FF', initial:'S', last:'Match it !', t:'hier', unread:false,
-        msgs:[
-          {who:'them', text:'Heyyy on a matché !', t:'hier 22:01'},
-          {who:'me',   text:'Carrément 👀', t:'hier 22:03'},
-          {who:'them', text:'Match it !', t:'hier 22:03'},
-        ] },
-    ];
+    // Conversations mock retirées — sera branche sur Supabase a part
+    const CONVOS = [];
 
     const panel = document.getElementById('msgPanel');
     const fab   = document.getElementById('msgFab');
@@ -7576,13 +7559,8 @@
     });
 
     /* ===== Boost: Liked-me list (mock) ===== */
-    const LIKED_ME = [
-      { name:'Camille', tag:'cami_xo', age:21, c1:'#FF7EB6', c2:'#9146FF', initial:'C' },
-      { name:'Yuki',    tag:'yuki.dev', age:24, c1:'#5BE9FF', c2:'#9146FF', initial:'Y' },
-      { name:'Romane',  tag:'romromm', age:22, c1:'#A65BFF', c2:'#FF7EB6', initial:'R' },
-      { name:'Inès',    tag:'ineslalala', age:20, c1:'#FFB66E', c2:'#FF4FA0', initial:'I' },
-      { name:'Lucas',   tag:'lucazz', age:23, c1:'#3BD17C', c2:'#5BE9FF', initial:'L' },
-    ];
+    // Mocks retirés — passera par Supabase quand la fonctionnalité "Likes recus" sera branchee
+    const LIKED_ME = [];
     /* Open a liker's full profile in an overlay (Boost only) */
     function openLikerProfile(p){
       const overlay = document.getElementById('likerOverlay');
