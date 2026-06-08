@@ -8391,22 +8391,20 @@
     (function bindColorReset(){
       const btn = document.getElementById('accColorReset');
       if (!btn) return;
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', () => {
         state.user = state.user || {};
-        state.user.profileColor = null;
-        state.user.profileColor2 = null;
+        // Reset = couleurs officielles Discord (blurple = la signature Discord)
+        const DISCORD_BLURPLE = '#5865F2';
+        const DISCORD_BLURPLE_DARK = '#404EED';
+        state.user.profileColor  = DISCORD_BLURPLE;
+        state.user.profileColor2 = DISCORD_BLURPLE_DARK;
         save();
-        // Re-fetch Discord pour récupérer la dernière accent_color officielle
-        try { if (typeof window.__autoResyncDiscord === 'function') await window.__autoResyncDiscord(); } catch(_){}
-        if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
-        // Re-init aussi les sliders couleur du formulaire avec accent Discord (sinon ils restent sur la valeur précédente)
-        const ac = state.user.accentColor;
-        const accHex = ac ? '#' + ac.toString(16).padStart(6,'0') : null;
         const cw1 = document.getElementById('accProfileColor');
         const cw2 = document.getElementById('accProfileColor2');
-        if (cw1) cw1.value = accHex || '#5865F2';
-        if (cw2) cw2.value = accHex || '#404EED';
-        showToast('↺', 'Couleurs réinitialisées', 'On utilise la couleur Discord');
+        if (cw1) cw1.value = DISCORD_BLURPLE;
+        if (cw2) cw2.value = DISCORD_BLURPLE_DARK;
+        if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
+        showToast('↺', 'Couleurs Discord appliquées', 'Blurple officiel');
       });
     })();
 
