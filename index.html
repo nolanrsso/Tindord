@@ -373,10 +373,11 @@
   /* Hide bubble-only landing extras on non-landing screens (decluttering) */
   body:not([data-screen="landing"]) .corner-ctrl--discord{display:none}
   body[data-auth="in"] #langSwitch{display:none}
-  /* Bouton Messages retiré partout (demande utilisateur) */
-  #msgFab, .msg-fab{display:none !important}
+  /* Bouton Messages : visible sur swipe quand connecté, caché ailleurs */
   body[data-auth="out"] #msgFab,
   body[data-screen="account"] #msgFab,
+  body[data-screen="landing"] #msgFab,
+  body[data-screen="onboarding"] #msgFab,
   body[data-screen="account"] .bf-fab{display:none !important}
 
   /* Liker full-profile overlay */
@@ -1157,7 +1158,8 @@
     color:#fff;font-family:"Clash Display",sans-serif;font-weight:800;
   }
   .card-age-badge .cab-age{font-size:24px;line-height:1;letter-spacing:.02em}
-  .card-age-badge .cab-flag{font-size:22px;line-height:1}
+  .card-age-badge .cab-flag{font-size:22px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+  .card-age-badge .cab-flag img{width:28px;height:20px;object-fit:cover;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.35), 0 0 0 2px rgba(255,255,255,.85);display:block}
   .card-age-badge .cab-gender{
     font-size:20px;line-height:1;width:28px;height:28px;border-radius:50%;
     display:grid;place-items:center;
@@ -3942,15 +3944,15 @@
   ];
 
   const CONFIG = [
-    { kind:'img',   src:HUB_MEDIA.carti,      fb:'💿', size:84, hue:'#c0152b' },
-    { kind:'logo',  src:HUB_MEDIA.valorant,   fb:'🎯', size:70, hue:'#FF4655', bg:'linear-gradient(150deg,#FF4655,#8a1020)' },
-    { kind:'img',   src:HUB_MEDIA.minecraft,  fb:'⛏️', size:74, hue:'#5d9c3c' },
-    { kind:'img',   src:HUB_MEDIA.tokyoghoul, fb:'🎭', size:80, hue:'#8a0f1a' },
-    { kind:'glyph', glyph:'♂', size:56, hue:'#5B8DEF', color:'#9DC3FF' },
-    { kind:'glyph', glyph:'♀', size:52, hue:'#FF7EB6', color:'#FFB3D8' },
-    { kind:'icon',  icon:'chat',    size:56, hue:'#5BE9FF' },
-    { kind:'icon',  icon:'discord', size:68, hue:'#5865F2' },
-    { kind:'icon',  icon:'heart',   size:60, hue:'#FF4FA0' },
+    { kind:'img',   src:HUB_MEDIA.carti,      fb:'💿', size:118, hue:'#c0152b' },
+    { kind:'logo',  src:HUB_MEDIA.valorant,   fb:'🎯', size:100, hue:'#FF4655', bg:'linear-gradient(150deg,#FF4655,#8a1020)' },
+    { kind:'img',   src:HUB_MEDIA.minecraft,  fb:'⛏️', size:104, hue:'#5d9c3c' },
+    { kind:'img',   src:HUB_MEDIA.tokyoghoul, fb:'🎭', size:112, hue:'#8a0f1a' },
+    { kind:'glyph', glyph:'♂', size:80, hue:'#5B8DEF', color:'#9DC3FF' },
+    { kind:'glyph', glyph:'♀', size:74, hue:'#FF7EB6', color:'#FFB3D8' },
+    { kind:'icon',  icon:'chat',    size:82, hue:'#5BE9FF' },
+    { kind:'icon',  icon:'discord', size:96, hue:'#5865F2' },
+    { kind:'icon',  icon:'heart',   size:86, hue:'#FF4FA0' },
   ];
 
   let W = layer.clientWidth, H = layer.clientHeight;
@@ -5312,11 +5314,13 @@
         autre:     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3 14.7 9.2 21 9.7l-4.8 4.2 1.5 6.6L12 17l-5.7 3.5 1.5-6.6L3 9.7l6.3-.5L12 3Z"/></svg>',
       };
       const gSym = GENDER_SYM[p.gender] || '';
-      const flag = p.countryFlag || '';
-      const ageBadgeHtml = (p.age || gSym || flag) ? `
+      // Drapeau : image flagcdn (les emojis 🇫🇷 s'affichent "FR" sur Windows)
+      const countryCode = (p.country && typeof p.country === 'string' && /^[A-Z]{2}$/i.test(p.country)) ? p.country.toUpperCase() : null;
+      const flagImg = countryCode ? `<img src="https://flagcdn.com/${countryCode.toLowerCase()}.svg" alt="${countryCode}" loading="lazy">` : (p.countryFlag || '');
+      const ageBadgeHtml = (p.age || gSym || flagImg) ? `
         <div class="card-age-badge">
           ${p.age ? `<span class="cab-age">${p.age}</span>` : ''}
-          ${flag ? `<span class="cab-flag" title="${p.country || ''}">${flag}</span>` : ''}
+          ${flagImg ? `<span class="cab-flag" title="${countryCode || ''}">${flagImg}</span>` : ''}
           ${gSym ? `<span class="cab-gender" data-g="${p.gender || ''}">${gSym}</span>` : ''}
         </div>` : '';
       c.innerHTML = `
@@ -7243,7 +7247,9 @@
         avi.style.fontSize = '';
       }
       document.getElementById('accGender').textContent  = ({ il:'Il', elle:'Elle', autre:'Préciser / Autre', male:'Il', female:'Elle', nonbinary:'Iel', other:'Autre' }[p.gender] || '—');
-      document.getElementById('accAge').textContent     = (p.age ? p.age : '—') + (p.countryFlag ? '  ' + p.countryFlag : '');
+      const _accAgeEl = document.getElementById('accAge');
+      const _ccAcc = (p.country && /^[A-Z]{2}$/i.test(p.country)) ? p.country.toUpperCase() : null;
+      _accAgeEl.innerHTML = (p.age ? p.age : '—') + (_ccAcc ? `  <img src="https://flagcdn.com/${_ccAcc.toLowerCase()}.svg" alt="${_ccAcc}" style="width:22px;height:16px;object-fit:cover;border-radius:3px;vertical-align:-3px;margin-left:4px">` : (p.countryFlag ? '  ' + p.countryFlag : ''));
       const vol = typeof u.musicVolume === 'number' ? u.musicVolume : 0.21;
       const volSlider = document.getElementById('musicVolume');
       if (volSlider) { volSlider.value = Math.round(vol * 100); document.getElementById('musicVolVal').textContent = Math.round(vol * 100) + '%'; }
