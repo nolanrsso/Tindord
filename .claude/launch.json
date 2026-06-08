@@ -3,9 +3,9 @@
   "configurations": [
     {
       "name": "tindord",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8092", "--directory", "C:/Users/nolan/OneDrive/Documents/claude/Tindord"],
-      "port": 8092
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-p", "8090", "C:/Users/nolan/OneDrive/Documents/claude/Tindord"],
+      "port": 8090
     }
   ]
 }
