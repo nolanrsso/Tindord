@@ -2350,7 +2350,10 @@
   .gef-card-wrap .swipe-card{position:absolute !important;inset:0 !important;transform:none !important;cursor:default !important;border-radius:20px}
   .gef-card-wrap .swipe-card .badge-stamp{display:none !important}
   /* Couche d'édition par-dessus la carte (handles visibles → overflow visible) */
-  .gef-gif-layer{position:absolute;inset:0;z-index:5}
+  /* Layer d'édition GIF — coïncide avec la carte. Les GIFs débordent visuellement
+     car overflow:visible et la card-wrap aussi. Les coords sont en % de la carte. */
+  .gef-gif-layer{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:visible}
+  .gef-gif-layer > *{pointer-events:auto}
   .gef-gif{position:absolute;touch-action:none;cursor:grab;will-change:transform}
   .gef-gif.dragging{cursor:grabbing}
   .gef-gif-inner{width:100%;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.7);box-shadow:0 10px 28px rgba(0,0,0,.55),0 0 0 2px rgba(88,101,242,.35)}
@@ -8033,8 +8036,10 @@
             state.user = state.user || {};
             state.user.gifs = state.user.gifs || [];
             if (state.user.gifs.length >= MAX_GIFS) { showToast('🎞️', 'Limite atteinte', MAX_GIFS + ' GIFs max'); return; }
-            state.user.gifs.push({ preview:r.preview, full:r.full, x:50, y:30, w:34, rot:0 });
+            state.user.gifs.push({ preview:r.preview, full:r.full, x:-30, y:50, w:34, rot:0 });
             save();
+            // Re-render dans l'aperçu pour montrer le GIF placé à gauche
+            const o2 = document.getElementById('swipeGifsBg'); if (o2) o2.remove();
             document.getElementById('gifInput').value = '';
             sugg.innerHTML=''; sugg.classList.remove('open');
             renderGifStage();
@@ -8123,8 +8128,9 @@
       });
       el.addEventListener('pointermove', e => {
         if (!drag) return;
-        g.x = Math.max(2, Math.min(98, drag.x0 + (e.clientX - drag.mx) / drag.lw * 100));
-        g.y = Math.max(2, Math.min(98, drag.y0 + (e.clientY - drag.my) / drag.lh * 100));
+        // GIFs peuvent maintenant être placés en DEHORS de la carte (jusqu'à 60% sur les côtés)
+        g.x = Math.max(-60, Math.min(160, drag.x0 + (e.clientX - drag.mx) / drag.lw * 100));
+        g.y = Math.max(-30, Math.min(130, drag.y0 + (e.clientY - drag.my) / drag.lh * 100));
         apply();
       });
       const endDrag = e => { if (!drag) return; drag = null; el.classList.remove('dragging'); el.style.zIndex=''; try{ el.releasePointerCapture(e.pointerId);}catch(_){} save(); };
