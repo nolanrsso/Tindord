@@ -2372,6 +2372,24 @@
   }
   body[data-screen="account"] .acc-discord-fab{display:flex}
   .acc-discord-fab svg{width:28px;height:auto;display:block}
+
+  /* Bouton Retour = FAB rond en bas à GAUCHE, symétrique au bouton Discord (bas droite) */
+  .acc-back-fab{
+    display:none;position:fixed;left:22px;bottom:22px;
+    width:52px;height:52px;border-radius:50%;padding:0;
+    align-items:center;justify-content:center;cursor:pointer;
+    background:#2f3136;color:#fff;border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 8px 22px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06) inset;
+    transition:transform .18s ease, background .18s ease, box-shadow .18s ease;
+    z-index:90;
+  }
+  body[data-screen="account"] .acc-back-fab{display:flex}
+  .acc-back-fab svg{display:block}
+  .acc-back-fab:hover{
+    background:#3a3d44;
+    transform:translateY(-2px) scale(1.05);
+    box-shadow:0 12px 30px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.12) inset;
+  }
   .acc-discord-fab:hover{
     background:#6b75f5;
     transform:translateY(-2px) scale(1.05);
@@ -3825,7 +3843,6 @@
       </div><!-- /acc-main -->
 
       <div class="acc-actions">
-        <button type="button" class="acc-btn acc-btn--ghost"   id="accBackSwipe" data-i18n="back_to_swipe">← Retour</button>
         <div class="acc-save-bar" id="accSaveBar" data-show="false">
           <button type="button" class="acc-btn acc-btn--primary" id="accSave">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -3846,6 +3863,11 @@
         <small id="boostBannerSub">18 bulles, Fake Nitro, filtre H/F, likes secrets…</small>
       </div>
       <span class="bb-cta" id="boostBannerCta">Découvrir</span>
+    </button>
+
+    <!-- Bouton Retour : FAB rond bas-GAUCHE (hors .acc-card → fixed relatif au viewport), symétrique au bouton Discord -->
+    <button type="button" class="acc-back-fab" id="accBackSwipe" title="Retour" aria-label="Retour" data-i18n-title="back_to_swipe">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
 
     <!-- Floating Discord server button (bottom-right of page in account screen) -->
