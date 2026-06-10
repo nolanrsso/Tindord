@@ -7831,13 +7831,13 @@
       if (d) d.hidden = !show;
     }
     document.getElementById('boostFakeNitro').addEventListener('change', e => {
-      if (!state.user || !state.user.boost) { e.target.checked = false; openBoostModal(); return; }
+      state.user = state.user || {};
       state.user.fakeNitro = e.target.checked;
       save();
-      _toggleBoostBannerField(e.target.checked);
+      _toggleBoostBannerField(e.target.checked);  // affiche/masque Bannière + Déco d'avatar
       if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
       if (typeof ensureDeck === 'function' && document.body.getAttribute('data-screen') === 'swipe') ensureDeck();
-      showToast('👑', e.target.checked ? 'Fake Nitro activé' : 'Fake Nitro désactivé', 'Apparence sur ton profil');
+      showToast('👑', e.target.checked ? 'Fake Nitro activé' : 'Fake Nitro désactivé', 'Bannière + déco d\'avatar');
     });
     // Init banner visibility from state on load
     setTimeout(() => {
@@ -8803,7 +8803,6 @@
       refreshPrev();
       window.__refreshBannerPrev = refreshPrev;
       importBtn.addEventListener('click', () => {
-        if (!state.user || !state.user.boost) { openBoostModal(); return; }
         fileEl.click();
       });
       fileEl.addEventListener('change', e => {
