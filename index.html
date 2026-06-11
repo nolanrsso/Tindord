@@ -7086,7 +7086,7 @@
        like réciproque → match (animation chez les 2), conversations live.
        Échoue en silence si les tables n'existent pas encore.
        =================================================================== */
-    const RT = { myId:null, ready:false, convoByMatch:new Map() };
+    const RT = { myId:null, ready:false, convoByMatch:new Map(), lastMatchAt:null, lastMsgAt:null, pollTimer:null };
     async function rtMyId(){
       if (RT.myId) return RT.myId;
       try { const { data:{ session } } = await window.__supa.auth.getSession(); RT.myId = (session && session.user && session.user.id) || null; } catch(_){}
@@ -7188,10 +7188,10 @@
         if (!me || (row.user_a !== me && row.user_b !== me)) return;
         if (RT.convoByMatch.has(row.id)) return; // c'est moi qui l'ai initié → déjà animé
         const other = row.user_a === me ? row.user_b : row.user_a;
-        const p = await rtProfile(other);
+        const p = await rtProfile(other) || { name:'Nouveau match', initial:'?', uid:other, c1:'#FF7EB6', c2:'#9146FF' };
         const c = rtUpsertConvo(row.id, other, p, { unread:true });
         renderMsgList();
-        if (typeof playMatchAnimation === 'function' && p) playMatchAnimation(p, c.id);
+        if (typeof playMatchAnimation === 'function') playMatchAnimation(p, c.id);
         if (typeof window.__heartFabRefresh === 'function') window.__heartFabRefresh();
       });
     }
@@ -7205,7 +7205,9 @@
         if (error) { console.warn('[Tindord] load matches', error.message || error); return; }
         matches = data || [];
       } catch(_){ return; }
+      let maxMatch = RT.lastMatchAt, maxMsg = RT.lastMsgAt;
       for (const m of matches) {
+        if (!maxMatch || m.created_at > maxMatch) maxMatch = m.created_at;
         const other = m.user_a === me ? m.user_b : m.user_a;
         const p = await rtProfile(other);
         const c = rtUpsertConvo(m.id, other, p, { system:true });
@@ -7215,16 +7217,43 @@
           if (msgs && msgs.length) {
             c.msgs = msgs.map(r => ({ who: r.sender_id === me ? 'me' : 'them', text:r.body, _id:r.id }));
             c.last = msgs[msgs.length-1].body;
+            const lastAt = msgs[msgs.length-1].created_at;
+            if (!maxMsg || lastAt > maxMsg) maxMsg = lastAt;
           }
         } catch(_){}
       }
+      RT.lastMatchAt = maxMatch;
+      RT.lastMsgAt = maxMsg;
       renderMsgList();
+    }
+    // Filet de sécurité : sondage léger toutes les 2 s → instantané même si le Realtime ne délivre pas.
+    async function rtPoll(){
+      if (!RT.ready || !window.__supa) return;
+      const me = RT.myId; if (!me) return;
+      try {
+        // 1) nouveaux matchs (l'autre vient de me liker) → animation chez moi aussi
+        let q = window.__supa.from('matches').select('*').or(`user_a.eq.${me},user_b.eq.${me}`).order('created_at', { ascending:true }).limit(50);
+        if (RT.lastMatchAt) q = q.gt('created_at', RT.lastMatchAt);
+        const { data: matches } = await q;
+        if (matches) for (const m of matches) { if (!RT.lastMatchAt || m.created_at > RT.lastMatchAt) RT.lastMatchAt = m.created_at; rtHandleNewMatch(m); }
+        // 2) nouveaux messages de mes conversations
+        const ids = Array.from(RT.convoByMatch.keys());
+        if (ids.length) {
+          let mq = window.__supa.from('messages').select('*').in('match_id', ids).order('created_at', { ascending:true }).limit(100);
+          if (RT.lastMsgAt) mq = mq.gt('created_at', RT.lastMsgAt);
+          const { data: msgs } = await mq;
+          if (msgs) for (const row of msgs) { if (!RT.lastMsgAt || row.created_at > RT.lastMsgAt) RT.lastMsgAt = row.created_at; rtHandleIncomingMessage(row); }
+        }
+      } catch(_){}
     }
     // Abonnement Realtime (idempotent).
     async function rtStart(){
       if (RT.ready || !window.__supa) return;
       const me = await rtMyId(); if (!me) return;
       RT.ready = true;
+      // Base temporelle : on n'anime/affiche que ce qui arrive APRÈS le chargement initial.
+      RT.lastMatchAt = new Date().toISOString();
+      RT.lastMsgAt = new Date().toISOString();
       await rtLoadConversations();
       try {
         window.__supa.channel('rt-'+me)
@@ -7232,6 +7261,8 @@
           .on('postgres_changes', { event:'INSERT', schema:'public', table:'matches'  }, payload => rtHandleNewMatch(payload.new))
           .subscribe();
       } catch(e){ console.warn('[Tindord] realtime subscribe', e); }
+      // Filet de sécurité : sondage toutes les 2 s (instantané garanti même sans Realtime).
+      if (!RT.pollTimer) RT.pollTimer = setInterval(rtPoll, 2000);
     }
     window.__rtStart = rtStart;
 
