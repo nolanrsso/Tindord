@@ -5530,6 +5530,10 @@
         publicFlags: u.publicFlags || 0,
         premiumType: u.premiumType || 0,
         socials: u.socials || {},
+        // Cross-user : GIFs, fond perso et musique d'entrée → visibles par les autres
+        gifs: Array.isArray(u.gifs) ? u.gifs : [],
+        bg: u.boostBg || null,
+        swipeMusic: u.swipeMusic || null,
         isMe: true,
       };
     }
@@ -5580,7 +5584,7 @@
     function rowToProfile(r){
       if (!r) return null;
       // Profil complet stocké dans data → on l'utilise tel quel
-      if (r.data && typeof r.data === 'object' && r.data.name) { const p = Object.assign({}, r.data); p.isMe = false; return p; }
+      if (r.data && typeof r.data === 'object' && r.data.name) { const p = Object.assign({}, r.data); p.isMe = false; p.uid = r.id; return p; }
       // Sinon : on reconstruit depuis les colonnes existantes (name/avatar/bio/bulles…)
       if (!r.display_name && !r.avatar_url) return null;
       const subByKind = {music:'musique', game:'jeu', anime:'série', film:'film'};
@@ -5609,7 +5613,7 @@
         initial: (r.display_name || 'T').charAt(0).toUpperCase(),
         avatarUrl: r.avatar_url || null, bannerUrl: r.banner_url || null, decorationUrl: r.decoration_url || null,
         accentColor: (typeof r.accent_color === 'number') ? r.accent_color : null,
-        orbs, socials:{}, isMe:false,
+        orbs, socials:{}, isMe:false, uid: r.id,
       };
     }
 
@@ -5630,6 +5634,56 @@
       } catch (e) { console.warn('[Tindord] fetch profiles error', e); return _remoteProfiles; }
     }
     window.__fetchOtherProfiles = fetchOtherProfiles;
+
+    /* ===== Likes / Match (table public.likes) ===== */
+    async function recordLike(profile){
+      try {
+        if (!window.__supa || !profile || !profile.uid) return;
+        const { data:{ session } } = await window.__supa.auth.getSession();
+        if (!session) return;
+        const myId = session.user.id;
+        await window.__supa.from('likes').upsert({ liker_id: myId, liked_id: profile.uid }, { onConflict: 'liker_id,liked_id' });
+        // L'autre m'a-t-il déjà liké ? → MATCH
+        const { data: back } = await window.__supa.from('likes')
+          .select('liker_id').eq('liker_id', profile.uid).eq('liked_id', myId).limit(1);
+        if (back && back.length && typeof triggerMatch === 'function') triggerMatch(profile);
+      } catch(e){ console.warn('[Tindord] like error', e); }
+    }
+    function triggerMatch(p){
+      const id = 'm_' + Date.now();
+      if (typeof CONVOS !== 'undefined' && !CONVOS.some(c => c.tag === p.tag)) {
+        CONVOS.unshift({ id, name:p.name, tag:p.tag, c1:p.c1||'#5865F2', c2:p.c2||'#404EED', initial:p.initial||(p.name||'?')[0],
+          t:"à l'instant", unread:true, last:'Vous venez de matcher 🎉',
+          msgs:[{ who:'system', text:`🎉 C'est un match avec ${p.name} ! Lancez la conversation.` }] });
+        if (typeof renderMsgList === 'function') renderMsgList();
+      }
+      if (typeof playMatchAnimation === 'function') playMatchAnimation(p, id);
+    }
+    /* Récupère les profils qui M'ONT liké (pour le panneau + badge cœur). */
+    async function fetchLikesReceived(){
+      try {
+        if (!window.__supa) return [];
+        const { data:{ session } } = await window.__supa.auth.getSession();
+        if (!session) return [];
+        const myId = session.user.id;
+        const { data: rows } = await window.__supa.from('likes').select('liker_id, created_at').eq('liked_id', myId).order('created_at',{ascending:false}).limit(100);
+        if (!rows || !rows.length) return [];
+        const ids = rows.map(r => r.liker_id);
+        const { data: profs } = await window.__supa.from('profiles').select('*').in('id', ids);
+        return rows.map(r => { const pr = (profs||[]).find(p => p.id === r.liker_id); return pr ? rowToProfile(pr) : null; }).filter(Boolean);
+      } catch(e){ console.warn('[Tindord] fetch likes error', e); return []; }
+    }
+    async function refreshLikesReceived(){
+      const list = await fetchLikesReceived();
+      if (typeof LIKED_ME === 'undefined') return;
+      LIKED_ME.length = 0;
+      list.forEach(p => LIKED_ME.push({ name:p.name, tag:p.tag, age:p.age||'', c1:p.c1||'#5865F2', c2:p.c2||'#404EED', initial:p.initial||(p.name||'?').charAt(0), avatarUrl:p.avatarUrl||null, uid:p.uid, _full:p }));
+      if (typeof window.__heartFabRefresh === 'function') window.__heartFabRefresh();
+      const lp = document.getElementById('likedPanel');
+      if (typeof renderLikedMe === 'function' && lp && lp.getAttribute('data-open') === 'true') renderLikedMe();
+    }
+    window.__recordLike = recordLike;
+    window.__refreshLikesReceived = refreshLikesReceived;
 
     function genderFilteredProfiles(){
       const f = state.user && state.user.boost && state.user.genderFilter;
@@ -5661,6 +5715,8 @@
       }
       document.body.removeAttribute('data-swipe-empty');
       const p = (myP && deckIdx === 0) ? myP : pool[deckIdx - offset];
+      // Fond selon le profil affiché : on applique SON choix de fond (p.bg)
+      if (typeof applyBgChoice === 'function') applyBgChoice(p && p.bg);
       wrap.appendChild(buildCard(p, true));
       renderOrbs(p);
       renderSwipeGifs(p);
@@ -5731,8 +5787,9 @@
         window.removeEventListener('resize', _swipeGifsResize);
         _swipeGifsResize = null;
       }
+      // GIFs : les miens (state.user) OU ceux du profil affiché (cross-user, depuis p.gifs)
       const isMe = p && p.isMe;
-      const gifs = (isMe && state.user) ? (state.user.gifs || []) : [];
+      const gifs = isMe ? ((state.user && state.user.gifs) || []) : ((p && p.gifs) || []);
       if (!gifs.length) return;
       const wrap = document.getElementById('swipeWrap');
       if (!wrap) return;
@@ -6808,26 +6865,15 @@
       state.user = state.user || {};
       state.user.stats = state.user.stats || { viewed:0, liked:0 };
       state.user.stats.viewed++;
-      // Simulate a like-back ~30 % of the time after a LIKE swipe → Discord notif
+      // LIKE → enregistre un vrai like dans Supabase (match auto si l'autre m'a déjà liké)
       if (dir === 'yes') {
         state.user.stats.liked++;
-        const swiped = (typeof genderFilteredProfiles === 'function') ? genderFilteredProfiles()[deckIdx] : null;
-        if (swiped && Math.random() < 0.30) {
-          setTimeout(() => {
-            if (typeof sendDiscordNotif === 'function') sendDiscordNotif('like', swiped);
-            state.user.likesReceived = (state.user.likesReceived || 0) + 1;
-            save();
-            if (typeof window.__heartFabRefresh === 'function') window.__heartFabRefresh();
-            // Push to the liked-me list so the user can see who liked back
-            if (typeof LIKED_ME !== 'undefined' && !LIKED_ME.some(x => x.tag === swiped.tag)) {
-              LIKED_ME.unshift({
-                name: swiped.name, tag: swiped.tag, age: swiped.age,
-                c1: swiped.c1, c2: swiped.c2, initial: swiped.initial,
-                avatarUrl: swiped.avatarUrl || null,
-              });
-              if (typeof renderLikedMe === 'function') renderLikedMe();
-            }
-          }, 1500 + Math.random() * 3000);
+        const myP = (typeof buildUserProfile === 'function') ? buildUserProfile() : null;
+        const offset = myP ? 1 : 0;
+        const pool = (typeof genderFilteredProfiles === 'function') ? genderFilteredProfiles() : [];
+        const swiped = (myP && deckIdx === 0) ? myP : pool[deckIdx - offset];
+        if (swiped && !swiped.isMe && swiped.uid && typeof recordLike === 'function') {
+          recordLike(swiped);
         }
       }
       save();
@@ -9095,17 +9141,23 @@
       const badge = document.getElementById('heartFabBadge');
       if (!fab) return;
       function refresh(){
-        const n = (state.user && state.user.likesReceived) || 0;
+        const n = (typeof LIKED_ME !== 'undefined') ? LIKED_ME.length : ((state.user && state.user.likesReceived) || 0);
         badge.textContent = String(n);
         badge.style.display = n > 0 ? 'grid' : 'none';
       }
       refresh();
       window.__heartFabRefresh = refresh;
-      fab.addEventListener('click', () => {
-        if (typeof renderLikedMe === 'function') renderLikedMe();
+      fab.addEventListener('click', async () => {
         const panel = document.getElementById('likedPanel');
         if (panel) panel.setAttribute('data-open', 'true');
+        if (typeof refreshLikesReceived === 'function') await refreshLikesReceived(); // vraies données
+        if (typeof renderLikedMe === 'function') renderLikedMe();
       });
+      // Rafraîchit le compteur de likes reçus régulièrement + au démarrage
+      if (typeof refreshLikesReceived === 'function') {
+        refreshLikesReceived();
+        setInterval(refreshLikesReceived, 60000);
+      }
     })();
 
     /* ===== Discord webhook notifications ===== */
