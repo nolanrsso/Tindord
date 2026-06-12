@@ -7037,10 +7037,13 @@
         el.type = 'button';
         el.className = 'msg-item' + (c.unread ? '' : ' read');
         el.dataset.id = c.id;
+        // Heure affichée = celle du dernier message (et non « à l'instant »).
+        const lastWithTime = [...c.msgs].reverse().find(m => m.t);
+        const tLabel = lastWithTime ? lastWithTime.t : '';
         el.innerHTML = `
           <div class="avi" style="background:linear-gradient(135deg, ${c.c1}, ${c.c2});overflow:hidden">${c.avatarUrl ? `<img src="${c.avatarUrl}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">` : c.initial}</div>
           <div class="info">
-            <div class="top"><b>${c.name}</b><span class="t">${c.t}</span></div>
+            <div class="top"><b>${c.name}</b><span class="t">${tLabel}</span></div>
             <p>${c.last}</p>
           </div>
           ${c.unread ? '<span class="dot"></span>' : ''}`;
