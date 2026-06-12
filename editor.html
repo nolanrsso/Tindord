@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ====== DA Tindord (reprise du site) ====== */
 :root{
@@ -490,7 +491,7 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
 
 <div class="drop-guide" id="dropGuide" aria-hidden="true"></div>
 
-<button class="disc-fab" id="btnResync" title="Recharger ton profil depuis Discord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>Mettre à jour Discord</span></button>
+<button class="disc-fab" id="btnResync" title="Recharger ton profil depuis Discord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>Mettre à jour le profil Discord</span></button>
 
 <div class="music-now" id="musicNow" title="Écouter / pause"></div>
 
@@ -1105,10 +1106,60 @@ function writeState(){
   if(S.voice) st.user.profileVoice=S.voice.url;
   st.profile.connections=Object.assign({},S.connections);
   try{ localStorage.setItem(STATE_KEY, JSON.stringify(st)); }catch(_){}
+  scheduleDbSync(); // ← pousse aussi vers Supabase à chaque modif
 }
 function persist(){ clearTimeout(_persistT); _persistT=setTimeout(writeState,400); }
-function saveNow(){ clearTimeout(_persistT); writeState(); }
+function saveNow(){ clearTimeout(_persistT); writeState(); syncToDb(); }
 window.__persist = persist;
+
+/* ===================================================================
+   SAUVEGARDE DIRECTE EN BASE (Supabase) — à chaque modification.
+   On construit le payload depuis l'état COMPLET (localStorage), qui contient
+   déjà les champs posés par le site (âge/genre/pays…), donc rien n'est perdu.
+   =================================================================== */
+const ED_SUPABASE_URL='https://pdhffpxssagclexttfox.supabase.co';
+const ED_SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkaGZmcHhzc2FnY2xleHR0Zm94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NzA4NjgsImV4cCI6MjA5NjI0Njg2OH0.wqnVvxAcjMGfl6QgeUfgEs4EEJAQDjVLMOwy676sccg';
+let _edSupa=null;
+function edSupa(){ if(_edSupa) return _edSupa; try{ if(window.supabase&&window.supabase.createClient) _edSupa=window.supabase.createClient(ED_SUPABASE_URL,ED_SUPABASE_ANON_KEY); }catch(_){} return _edSupa; }
+function buildDbProfile(st){
+  const u=st.user||{}, p=st.profile||{};
+  if(!u.displayName && !u.discordTag && !u.avatarUrl) return null;
+  const subByKind={music:'musique',game:'jeu',anime:'série',film:'film'};
+  const emoByKind={music:'🎵',game:'🎮',anime:'📺',film:'🎬'};
+  const orbs=(p.userOrbs||[]).map(o=>({kind:o.kind,title:o.title,sub:(o.kind==='game'&&o.rank)?o.rank:(subByKind[o.kind]||''),emoji:emoByKind[o.kind]||'✨',cover:o.cover||null,previewUrl:o.previewUrl||null,rank:o.rank||null,customX:o.customX,customY:o.customY}));
+  return {
+    name:u.displayName||'Moi', tag:u.discordTag||'moi',
+    age:p.age||'', gender:p.gender||'', country:p.country||'', countryFlag:p.countryFlag||'',
+    looking:p.looking||'game', status:'online',
+    nitro:!!u.decorationUrl||!!(u.boost&&u.fakeNitro), boost:!!u.boost,
+    joinedOn:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}),
+    bio:p.bio||'', common:{friends:0,servers:0}, c1:'#5865F2', c2:'#404EED',
+    initial:(u.displayName||'T').charAt(0).toUpperCase(),
+    avatarUrl:u.avatarUrl||null, bannerUrl:u.bannerUrl||null, decorationUrl:u.decorationUrl||null,
+    profileColor:u.profileColor||null, profileColor2:u.profileColor2||null,
+    accentColor:u.accentColor||null, profileVoice:u.profileVoice||null,
+    orbs, publicFlags:u.publicFlags||0, premiumType:u.premiumType||0, socials:u.socials||{},
+    gifs:Array.isArray(u.gifs)?u.gifs:[], bg:u.boostBg||null, swipeMusic:u.swipeMusic||null,
+    connections:(p.connections&&typeof p.connections==='object')?p.connections:{},
+  };
+}
+let _dbSyncT=null, _dbSyncing=false;
+async function syncToDb(){
+  if(_dbSyncing) return; const sb=edSupa(); if(!sb) return;
+  try{
+    _dbSyncing=true;
+    const { data:{ session } } = await sb.auth.getSession();
+    if(!session){ return; }
+    const st=readSite(); const my=buildDbProfile(st); if(!my) return;
+    const base={ id:session.user.id, display_name:my.name||null, avatar_url:my.avatarUrl||null, banner_url:my.bannerUrl||null, decoration_url:my.decorationUrl||null, bio:my.bio||null, look_for:my.looking||null, updated_at:new Date().toISOString() };
+    if(st.user&&st.user.discordId) base.discord_id=st.user.discordId;
+    let { error }=await sb.from('profiles').upsert({...base, data:my},{onConflict:'id'});
+    if(error&&/data/i.test((error.message||'')+(error.details||''))){ ({error}=await sb.from('profiles').upsert(base,{onConflict:'id'})); }
+    if(error) console.warn('[editor] sync DB échouée', error.message||error);
+  }catch(e){ console.warn('[editor] sync DB erreur', e); }
+  finally{ _dbSyncing=false; }
+}
+function scheduleDbSync(){ clearTimeout(_dbSyncT); _dbSyncT=setTimeout(syncToDb,1000); }
 /* Décoration d'avatar Discord + point de statut, déposés par-dessus l'avatar (réappliqués après tout setCroppedMedia). */
 let _decorationUrl=null;
 function applyAvatarDeco(){

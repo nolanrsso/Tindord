@@ -5565,6 +5565,7 @@
         gifs: Array.isArray(u.gifs) ? u.gifs : [],
         bg: u.boostBg || null,
         swipeMusic: u.swipeMusic || null,
+        connections: (p.connections && typeof p.connections === 'object') ? p.connections : {},
         isMe: true,
       };
     }
