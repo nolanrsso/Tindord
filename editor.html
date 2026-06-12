@@ -89,8 +89,9 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
 .top-btn--settings{margin-left:auto}
 @media(max-width:560px){.topbar .crumb,.topbar .note{display:none}.top-btn{padding:9px 12px;font-size:0;gap:0}.top-btn svg{width:20px;height:20px}}
 
-.stage{position:fixed;inset:0;z-index:2;display:grid;place-items:center;padding:70px 16px 110px}
-.card-zone{position:relative}
+/* flex + margin auto = carte centrée quand elle tient, défilable quand elle est trop haute (pas de coupure) */
+.stage{position:fixed;inset:0;z-index:2;display:flex;overflow-y:auto;overflow-x:hidden;padding:70px 16px 110px;-webkit-overflow-scrolling:touch}
+.card-zone{position:relative;margin:auto}
 
 /* ===================== ZONE DE PLACEMENT (tout l'écran, sous la topbar et au-dessus de la toolbar) ===================== */
 .drop-guide{position:fixed;top:62px;left:14px;right:14px;bottom:96px;z-index:8;pointer-events:none;opacity:0;transition:opacity .16s ease;
@@ -253,6 +254,9 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
 .music-now .mi .note{font-size:9px;color:#C7A5FF;font-weight:800;letter-spacing:.05em;text-transform:uppercase;display:block}
 .music-now .mi b{display:block;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
 .music-now .mi small{color:var(--dim);font-size:10.5px}
+.music-now .mn-del{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;cursor:pointer;border:1px solid rgba(255,79,160,.4);background:rgba(255,79,160,.16);color:#FF7EB6;transition:.14s ease}
+.music-now .mn-del svg{width:13px;height:13px}
+.music-now .mn-del:hover{background:rgba(255,79,160,.32);color:#fff}
 @media(max-width:560px){.music-now{bottom:78px;max-width:62vw}}
 
 /* yeux : juste une icône œil (pas de bouton), centrée au-dessus du bouton associé / en haut de la carte.
@@ -443,7 +447,7 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
 <div class="grain" aria-hidden="true"></div>
 
 <header class="topbar">
-  <img src="assets/logo.svg" alt="Tindord" class="logo">
+  <img src="assets/logo.svg" alt="Tindord" class="logo" id="logoHome" title="Retour à l'accueil" style="cursor:pointer">
   <span class="crumb">/ éditeur de profil</span>
   <button class="top-btn top-btn--settings" id="btnSettings" title="Paramètres du compte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg><span>Paramètres</span></button>
 </header>
@@ -818,6 +822,13 @@ function stageBounds(margin){
   const bottom=(tb?tb.getBoundingClientRect().top:window.innerHeight)-margin;
   return {minX:margin, maxX:window.innerWidth-margin, minY:top, maxY:Math.max(top,bottom)};
 }
+/* Zone des BULLES = sur les côtés de la carte, JAMAIS au-dessus ni en dessous → Y borné à la hauteur de la carte. */
+function orbBounds(margin){
+  const s=stageBounds(margin);
+  const card=document.getElementById('card');
+  if(card){ const c=card.getBoundingClientRect(); const top=Math.max(s.minY,c.top+margin), bottom=Math.min(s.maxY,c.bottom-margin); return {minX:s.minX, maxX:s.maxX, minY:Math.min(top,bottom), maxY:Math.max(top,bottom)}; }
+  return s;
+}
 /* Guide visuel des zones de placement (affiché pendant un drag). */
 function showGuide(mode){const g=$('dropGuide');if(!g)return;g.setAttribute('data-mode',mode);g.classList.add('show');}
 function hideGuide(){const g=$('dropGuide');if(g)g.classList.remove('show');}
@@ -872,7 +883,7 @@ function renderOrbs(){
     // === drag : placer la bulle où on veut autour de la carte ===
     let drag=null;
     wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.orb-del'))return;if(e.button)return;e.preventDefault();try{wrap.setPointerCapture(e.pointerId);}catch(_){}const or=orb.getBoundingClientRect();drag={mx:e.clientX,my:e.clientY,sx0:or.left+or.width/2,sy0:or.top+or.height/2,moved:false};wrap.classList.add('dragging');showGuide('orb');});
-    wrap.addEventListener('pointermove',e=>{if(!drag)return;if(Math.abs(e.clientX-drag.mx)+Math.abs(e.clientY-drag.my)>2)drag.moved=true;const bnd=stageBounds(D/2+10);const cx=clamp(drag.sx0+(e.clientX-drag.mx),bnd.minX,bnd.maxX);const cy=clamp(drag.sy0+(e.clientY-drag.my),bnd.minY,bnd.maxY);const lr=layer.getBoundingClientRect();o.x=(cx-lr.left)/lr.width*100;o.y=(cy-lr.top)/lr.height*100;wrap.style.left=o.x+'%';wrap.style.top=o.y+'%';});
+    wrap.addEventListener('pointermove',e=>{if(!drag)return;if(Math.abs(e.clientX-drag.mx)+Math.abs(e.clientY-drag.my)>2)drag.moved=true;const bnd=orbBounds(D/2+6);const cx=clamp(drag.sx0+(e.clientX-drag.mx),bnd.minX,bnd.maxX);const cy=clamp(drag.sy0+(e.clientY-drag.my),bnd.minY,bnd.maxY);const lr=layer.getBoundingClientRect();o.x=(cx-lr.left)/lr.width*100;o.y=(cy-lr.top)/lr.height*100;wrap.style.left=o.x+'%';wrap.style.top=o.y+'%';});
     const endDrag=e=>{if(!drag)return;const moved=drag.moved;drag=null;wrap.classList.remove('dragging');hideGuide();try{wrap.releasePointerCapture(e.pointerId);}catch(_){}if(moved)persist();};
     wrap.addEventListener('pointerup',endDrag);wrap.addEventListener('pointercancel',endDrag);
     layer.appendChild(wrap);
@@ -989,7 +1000,7 @@ let chipAudio=null;
 function renderMusicChip(){renderMusicNow();const chip=$('musicChip');if(!chip)return;if(!S.music){chip.innerHTML='<span class="empty">Aucune musique — bouton « Musique » en bas</span>';return;}const m=S.music;chip.innerHTML=`<span class="cov" style="background-image:url('${m.cover}')"></span><span class="mi"><b>${esc(m.title)}</b><small>${esc(m.artist)}</small></span><span class="win">${fmt(m.startSec)} → ${fmt(Math.min(m.startSec+30,m.durSec))}</span>`;chip.onclick=()=>{if(chipAudio&&!chipAudio.paused){chipAudio.pause();chipAudio=null;return;}chipAudio=new Audio(m.previewUrl);chipAudio.volume=.5;chipAudio.play().catch(()=>{});};}
 /* étiquette « musique d'entrée » au-dessus du bouton Annuler */
 let nowAudio=null;
-function renderMusicNow(){const el=$('musicNow');if(!el)return;if(!S.music){el.classList.remove('show');el.innerHTML='';if(nowAudio){nowAudio.pause();nowAudio=null;}return;}const m=S.music;el.innerHTML=`<span class="cov" style="background-image:url('${m.cover||''}')"></span><span class="mi"><span class="note">Musique d'entrée</span><b>${esc(m.title)}</b><small>${esc(m.artist)}</small></span>`;el.classList.add('show');el.onclick=()=>{if(nowAudio&&!nowAudio.paused){nowAudio.pause();nowAudio=null;return;}nowAudio=new Audio(m.previewUrl);nowAudio.volume=.5;nowAudio.play().catch(()=>{});};}
+function renderMusicNow(){const el=$('musicNow');if(!el)return;if(!S.music){el.classList.remove('show');el.innerHTML='';if(nowAudio){nowAudio.pause();nowAudio=null;}return;}const m=S.music;el.innerHTML=`<span class="cov" style="background-image:url('${m.cover||''}')"></span><span class="mi"><span class="note">Musique d'entrée</span><b>${esc(m.title)}</b><small>${esc(m.artist)}</small></span><button class="mn-del" title="Supprimer la musique d'entrée"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>`;el.classList.add('show');el.onclick=e=>{if(e.target.closest('.mn-del')){e.stopPropagation();if(nowAudio){nowAudio.pause();nowAudio=null;}S.music=null;renderMusicNow();renderMusicChip();persist();toast('Musique d\'entrée supprimée');return;}if(nowAudio&&!nowAudio.paused){nowAudio.pause();nowAudio=null;return;}nowAudio=new Audio(m.previewUrl);nowAudio.volume=.5;nowAudio.play().catch(()=>{});};}
 /* yeux : masquer visuellement carte / bulles / GIFs (éditeur uniquement, pas sauvegardé) */
 const EYE_OPEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYE_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19.5C5 19.5 1.5 12 1.5 12a18.5 18.5 0 0 1 5.2-6M9.9 4.7A10.9 10.9 0 0 1 12 4.5c7 0 10.5 7.5 10.5 7.5a18.6 18.6 0 0 1-2.2 3.2M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg>';
@@ -1212,6 +1223,8 @@ hydrateFromSite();
 /* ===== Bas de l'écran : Retour (gauche). Aperçu est collé à la barre d'outils. ===== */
 /* Retour (bas-gauche) : tes modifs sont déjà enregistrées en continu → on revient à l'app. */
 $('btnBack').addEventListener('click',()=>{ saveNow(); toast('✅ Profil enregistré'); setTimeout(()=>{location.href='index.html';},500); });
+/* Logo Tindord → retour à l'accueil (en sauvegardant). */
+$('logoHome').addEventListener('click',()=>{ saveNow(); location.href='index.html'; });
 /* Aperçu (collé aux 5 outils) : sauvegarde puis ouvre l'aperçu du profil. */
 $('btnPreview').addEventListener('click',()=>{ saveNow(); location.href='index.html#preview'; });
 /* Paramètres (haut-droite) : sauvegarde puis ouvre l'écran compte/paramètres. */
