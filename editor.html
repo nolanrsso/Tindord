@@ -132,6 +132,21 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
   opacity:1;transform:scale(1);transition:transform .12s ease;box-shadow:0 3px 10px rgba(255,79,160,.6);
 }
 .orb-del:hover{transform:scale(1.15)}
+/* Bulle JEU : badge édition (clip+rang), indicateur clip, badge rang */
+.orb-edit{position:absolute;top:-6px;left:-6px;width:24px;height:24px;border-radius:50%;z-index:6;
+  background:linear-gradient(135deg,#5BE9FF,#2F7BD8);color:#072033;border:2px solid #0d0b1e;
+  display:grid;place-items:center;font-size:13px;font-weight:800;cursor:pointer;line-height:1;
+  box-shadow:0 3px 10px rgba(91,233,255,.55);transition:transform .12s ease}
+.orb-edit:hover{transform:scale(1.15)}
+.orb-clip{position:absolute;bottom:-4px;right:-4px;width:22px;height:22px;border-radius:50%;z-index:6;
+  background:linear-gradient(135deg,#FF4FA0,#9146FF);color:#fff;border:2px solid #0d0b1e;
+  display:grid;place-items:center;font-size:11px;line-height:1;box-shadow:0 3px 9px rgba(145,70,255,.5)}
+.orb-rankbadge{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);z-index:6;
+  background:rgba(13,11,30,.92);color:#8DCBFF;border:1px solid rgba(141,203,255,.6);border-radius:999px;
+  padding:1px 7px;font-size:9.5px;font-weight:800;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+.gp-l{display:block;font-size:10.5px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 5px}
+#gamePop input{width:100%;padding:10px 12px;border-radius:10px;color:#fff;outline:none;background:rgba(255,255,255,.05);border:1.5px solid var(--stroke-2);font-family:inherit;font-size:13px}
+#gamePop input:focus{border-color:rgba(91,233,255,.6);box-shadow:0 0 0 4px rgba(91,233,255,.16)}
 .orb-label{
   margin-top:6px;text-align:center;font-size:10.5px;font-weight:700;color:#fff;max-width:96px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 8px rgba(0,0,0,.9);
@@ -507,6 +522,17 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
   <div class="conn-pop-actions"><button class="btn ghost-danger" id="connPopRemove">Retirer</button><button class="btn primary" id="connPopSave">Enregistrer</button></div>
 </div>
 
+<!-- Popover bulle JEU : clip + rang -->
+<div class="conn-pop-backdrop" id="gameBackdrop" hidden></div>
+<div class="conn-pop" id="gamePop" hidden>
+  <div class="conn-pop-head"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#8DCBFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18c-2.5 0-4-1.7-4-4 0-3 1.5-7 4-7h12c2.5 0 4 4 4 7 0 2.3-1.5 4-4 4-1.8 0-2.6-2-4-2h-4c-1.4 0-2.2 2-4 2Z"/><path d="M8 11h4M10 9v4"/></svg><b id="gamePopName"></b></div>
+  <label class="gp-l">Rang</label>
+  <input id="gamePopRank" maxlength="40" placeholder="Ex : Immortal, Diamant 2, Radiant…" autocomplete="off">
+  <label class="gp-l">Clip (lien YouTube / vidéo)</label>
+  <input id="gamePopClip" maxlength="400" placeholder="https://youtube.com/… ou un .mp4" autocomplete="off">
+  <div class="conn-pop-actions"><button class="btn ghost-danger" id="gamePopClear">Tout effacer</button><button class="btn primary" id="gamePopSave">Enregistrer</button></div>
+</div>
+
 <div class="sheet" id="sheet"></div>
 
 <div class="modal" id="discModal"><div class="box">
@@ -766,7 +792,7 @@ function renderOrbSugg(sugg,results,kind){
   results.forEach((r,idx)=>{
     const b=document.createElement('button');b.className='sugg'+(r.cover?'':' loading');b.dataset.idx=String(idx);
     b.innerHTML=(r.cover?`<img src="${r.cover}" alt="" loading="lazy">`:`<span class="ph-ico">${ORB_FALLBACK_ICO[kind]||'✨'}</span>`)+`<span class="ti"><b>${esc(r.name)}</b><small>${esc(r.sub||'')}</small></span>`;
-    b.addEventListener('click',()=>ensureCoverThenAdd(r,kind));
+    b.addEventListener('click',()=>{ if(kind==='music'&&r.orb&&r.orb.previewUrl)playPreview(r.orb.previewUrl); ensureCoverThenAdd(r,kind); });
     sugg.appendChild(b);
   });
 }
@@ -875,6 +901,16 @@ function renderOrbs(){
     del.addEventListener('pointerdown',e=>e.stopPropagation());
     del.addEventListener('click',e=>{e.stopPropagation();S.orbs.splice(i,1);renderOrbs();toast('Bulle retirée');const h=document.getElementById('orbHint');if(h)h.textContent=`${S.orbs.length}/${ORB_MAX} bulles · glisse-les pour les placer · clique pour retirer`;});
     orb.appendChild(del);
+    // Bulle JEU : badge d'édition (clip + rang) + indicateur clip
+    if(o.kind==='game'){
+      const ed=document.createElement('div'); ed.className='orb-edit'; ed.title='Ajouter un clip + un rang'; ed.textContent='✎';
+      ed.style.width=Math.round(D*0.28)+'px'; ed.style.height=Math.round(D*0.28)+'px'; ed.style.fontSize=Math.round(D*0.15)+'px';
+      ed.addEventListener('pointerdown',e=>e.stopPropagation());
+      ed.addEventListener('click',e=>{e.stopPropagation();openGamePop(o);});
+      orb.appendChild(ed);
+      if(o.clipUrl){ const cl=document.createElement('div'); cl.className='orb-clip'; cl.textContent='▶'; cl.title='Clip ajouté'; cl.style.width=Math.round(D*0.26)+'px'; cl.style.height=Math.round(D*0.26)+'px'; cl.style.fontSize=Math.round(D*0.13)+'px'; orb.appendChild(cl); }
+      if(o.rank){ const rk=document.createElement('div'); rk.className='orb-rankbadge'; rk.textContent=o.rank; orb.appendChild(rk); }
+    }
     const lbl=document.createElement('div'); lbl.className='orb-label'; lbl.textContent=o.title;
     lbl.style.maxWidth=(D+24)+'px'; lbl.style.fontSize=Math.max(9,Math.round(D*0.13))+'px';
     const col=document.createElement('div'); col.style.cssText='display:flex;flex-direction:column;align-items:center';
@@ -882,7 +918,7 @@ function renderOrbs(){
     wrap.appendChild(col);
     // === drag : placer la bulle où on veut autour de la carte ===
     let drag=null;
-    wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.orb-del'))return;if(e.button)return;e.preventDefault();try{wrap.setPointerCapture(e.pointerId);}catch(_){}const or=orb.getBoundingClientRect();drag={mx:e.clientX,my:e.clientY,sx0:or.left+or.width/2,sy0:or.top+or.height/2,moved:false};wrap.classList.add('dragging');showGuide('orb');});
+    wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.orb-del,.orb-edit'))return;if(e.button)return;e.preventDefault();try{wrap.setPointerCapture(e.pointerId);}catch(_){}const or=orb.getBoundingClientRect();drag={mx:e.clientX,my:e.clientY,sx0:or.left+or.width/2,sy0:or.top+or.height/2,moved:false};wrap.classList.add('dragging');showGuide('orb');});
     wrap.addEventListener('pointermove',e=>{if(!drag)return;if(Math.abs(e.clientX-drag.mx)+Math.abs(e.clientY-drag.my)>2)drag.moved=true;const bnd=orbBounds(D/2+6);const cx=clamp(drag.sx0+(e.clientX-drag.mx),bnd.minX,bnd.maxX);const cy=clamp(drag.sy0+(e.clientY-drag.my),bnd.minY,bnd.maxY);const lr=layer.getBoundingClientRect();o.x=(cx-lr.left)/lr.width*100;o.y=(cy-lr.top)/lr.height*100;wrap.style.left=o.x+'%';wrap.style.top=o.y+'%';});
     const endDrag=e=>{if(!drag)return;const moved=drag.moved;drag=null;wrap.classList.remove('dragging');hideGuide();try{wrap.releasePointerCapture(e.pointerId);}catch(_){}if(moved)persist();};
     wrap.addEventListener('pointerup',endDrag);wrap.addEventListener('pointercancel',endDrag);
@@ -981,7 +1017,10 @@ function renderColorSheet(sh){
 
 /* ===== 5. MUSIQUE D'ENTRÉE ===== */
 const music={sel:null,startSec:0,audio:null};
-function stopAudition(){if(music.audio){music.audio.pause();music.audio=null;}const b=document.getElementById('audBtn');if(b)b.textContent='▶ Écouter l\'extrait';}
+function stopAudition(){if(music.audio){music.audio.pause();music.audio=null;}if(_previewAudio){_previewAudio.pause();_previewAudio=null;}const b=document.getElementById('audBtn');if(b)b.textContent='▶ Écouter l\'extrait';}
+// Lecture d'un extrait au clic (recherche musique : bulles + entrée). Re-clic = stop.
+let _previewAudio=null;
+function playPreview(url){ if(!url)return; try{ if(_previewAudio&&_previewAudio._u===url&&!_previewAudio.paused){_previewAudio.pause();_previewAudio=null;return;} if(_previewAudio)_previewAudio.pause(); _previewAudio=new Audio(url); _previewAudio._u=url; _previewAudio.volume=.5; _previewAudio.play().catch(()=>{}); }catch(_){} }
 function renderMusicSheet(sh){
   sh.innerHTML=sheetHeader('Musique d\'entrée du profil')+`
     <div class="search-row"><input id="musicSearch" placeholder="Rechercher un titre, un artiste…" autocomplete="off"></div>
@@ -995,7 +1034,7 @@ function renderMusicSheet(sh){
   sh.querySelector('#musicSearch').addEventListener('input',e=>{clearTimeout(deb);const q=e.target.value.trim();if(q.length<2)return;deb=setTimeout(async()=>{const list=sh.querySelector('#trackList');list.innerHTML='<div class="hint">Recherche…</div>';let tracks=[];try{tracks=await searchSpotifyTracks(q);}catch(_){}const ts=tracks.filter(t=>t.previewUrl&&t.cover);list.innerHTML='';if(!ts.length){list.innerHTML='<div class="hint">Aucun résultat</div>';return;}ts.forEach(t=>{const b=document.createElement('button');b.className='sugg';b.innerHTML=`<img src="${t.cover}" alt=""><span class="ti"><b>${esc(t.name)}</b><small>${esc(t.artist)}</small></span>`;b.addEventListener('click',()=>selectTrack({title:t.name,artist:t.artist,cover:t.cover,previewUrl:t.previewUrl,durSec:30}));list.appendChild(b);});},320);});
   setTimeout(()=>sh.querySelector('#musicSearch').focus(),250);
 }
-function selectTrack(t){stopAudition();music.sel=t;music.startSec=0;const sh=$('sheet');sh.querySelector('#trackList').innerHTML=`<div class="sugg" style="border-color:rgba(145,70,255,.6)"><img src="${t.cover}"><span class="ti"><b>${esc(t.title)}</b><small>${esc(t.artist)}</small></span></div>`;sh.querySelector('#selZone').hidden=false;const audBtn=sh.querySelector('#audBtn');audBtn.onclick=()=>{if(music.audio&&!music.audio.paused){stopAudition();return;}music.audio=new Audio(t.previewUrl);music.audio.volume=.5;music.audio.play().catch(()=>toast('Lecture bloquée — re-clique'));audBtn.textContent='⏸ Pause';music.audio.addEventListener('ended',stopAudition);};sh.querySelector('#musicOk').onclick=()=>{S.music=Object.assign({},t,{startSec:0});renderMusicChip();persist();closeSheet();toast('Musique d\'entrée enregistrée');};}
+function selectTrack(t){stopAudition();music.sel=t;music.startSec=0;const sh=$('sheet');sh.querySelector('#trackList').innerHTML=`<div class="sugg" style="border-color:rgba(145,70,255,.6)"><img src="${t.cover}"><span class="ti"><b>${esc(t.title)}</b><small>${esc(t.artist)}</small></span></div>`;sh.querySelector('#selZone').hidden=false;const audBtn=sh.querySelector('#audBtn');audBtn.onclick=()=>playPreview(t.previewUrl);sh.querySelector('#musicOk').onclick=()=>{S.music=Object.assign({},t,{startSec:0});renderMusicChip();persist();closeSheet();toast('Musique d\'entrée enregistrée');};if(t.previewUrl)playPreview(t.previewUrl);}
 let chipAudio=null;
 function renderMusicChip(){renderMusicNow();const chip=$('musicChip');if(!chip)return;if(!S.music){chip.innerHTML='<span class="empty">Aucune musique — bouton « Musique » en bas</span>';return;}const m=S.music;chip.innerHTML=`<span class="cov" style="background-image:url('${m.cover}')"></span><span class="mi"><b>${esc(m.title)}</b><small>${esc(m.artist)}</small></span><span class="win">${fmt(m.startSec)} → ${fmt(Math.min(m.startSec+30,m.durSec))}</span>`;chip.onclick=()=>{if(chipAudio&&!chipAudio.paused){chipAudio.pause();chipAudio=null;return;}chipAudio=new Audio(m.previewUrl);chipAudio.volume=.5;chipAudio.play().catch(()=>{});};}
 /* étiquette « musique d'entrée » au-dessus du bouton Annuler */
@@ -1063,6 +1102,21 @@ $('connPopInput').addEventListener('keydown',e=>{ if(e.key==='Enter')$('connPopS
 $('connBackdrop').addEventListener('click',closeConnPop);
 renderConnections();
 
+/* ===== Popover bulle JEU : clip + rang ===== */
+let _gameOrb=null;
+function openGamePop(o){_gameOrb=o;$('gamePopName').textContent=o.title;$('gamePopRank').value=o.rank||'';$('gamePopClip').value=o.clipUrl||'';$('gameBackdrop').hidden=false;$('gamePop').hidden=false;setTimeout(()=>$('gamePopRank').focus(),50);}
+function closeGamePop(){$('gameBackdrop').hidden=true;$('gamePop').hidden=true;_gameOrb=null;}
+$('gamePopSave').addEventListener('click',()=>{
+  if(!_gameOrb)return;
+  const rk=$('gamePopRank').value.trim(), cl=$('gamePopClip').value.trim();
+  if(rk)_gameOrb.rank=rk;else delete _gameOrb.rank;
+  if(cl)_gameOrb.clipUrl=cl;else delete _gameOrb.clipUrl;
+  renderOrbs(); persist(); closeGamePop(); toast('Bulle de jeu mise à jour');
+});
+$('gamePopClear').addEventListener('click',()=>{if(!_gameOrb)return;delete _gameOrb.rank;delete _gameOrb.clipUrl;renderOrbs();persist();closeGamePop();toast('Clip et rang retirés');});
+$('gamePopClip').addEventListener('keydown',e=>{if(e.key==='Enter')$('gamePopSave').click();});
+$('gameBackdrop').addEventListener('click',closeGamePop);
+
 /* ===== REMETTRE À JOUR LE PROFIL DISCORD (re-fetch via le token stocké) ===== */
 async function resyncDiscord(){
   const token=localStorage.getItem('tindord_discord_token');
@@ -1091,7 +1145,7 @@ $('btnResync').addEventListener('click',()=>{ $('discModal').classList.add('open
 $('discCancel').addEventListener('click',()=>$('discModal').classList.remove('open'));
 $('discOk').addEventListener('click',()=>{ $('discModal').classList.remove('open'); resyncDiscord(); });
 
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('discModal').classList.contains('open'))$('discModal').classList.remove('open');else if(!$('connPop').hidden)closeConnPop();else if($('cropModal').classList.contains('open'))$('cropCancel').click();else if($('voiceModal').classList.contains('open'))closeVoiceModal();else closeSheet();});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('discModal').classList.contains('open'))$('discModal').classList.remove('open');else if(!$('gamePop').hidden)closeGamePop();else if(!$('connPop').hidden)closeConnPop();else if($('cropModal').classList.contains('open'))$('cropCancel').click();else if($('voiceModal').classList.contains('open'))closeVoiceModal();else closeSheet();});
 
 /* ===================================================================
    PONT avec le vrai profil Tindord (localStorage tindord_state, même
@@ -1111,7 +1165,7 @@ function writeState(){
   st.user.profileColor=S.c1; st.user.profileColor2=S.c2;
   if(S.bg.type==='preset') st.user.boostBg=S.bg.value;
   // x/y = % de la carte (50=centre) pour l'éditeur ; customX/customY = fractions depuis le centre, lues par la carte de swipe.
-  st.profile.userOrbs=S.orbs.map(o=>{const r={kind:o.kind,title:o.title,sub:o.sub||'',cover:o.cover||null,previewUrl:o.previewUrl||null,x:o.x,y:o.y};if(typeof o.x==='number'&&typeof o.y==='number'){r.customX=(o.x-50)/100;r.customY=(o.y-50)/100;}return r;});
+  st.profile.userOrbs=S.orbs.map(o=>{const r={kind:o.kind,title:o.title,sub:o.sub||'',cover:o.cover||null,previewUrl:o.previewUrl||null,rank:o.rank||null,clipUrl:o.clipUrl||null,x:o.x,y:o.y};if(typeof o.x==='number'&&typeof o.y==='number'){r.customX=(o.x-50)/100;r.customY=(o.y-50)/100;}return r;});
   st.user.gifs=S.gifs.map(g=>({preview:g.url,full:g.url,x:g.x,y:g.y,w:g.w,rot:g.rot}));
   if(S.music) st.user.swipeMusic={title:S.music.title,artist:S.music.artist,cover:S.music.cover,previewUrl:S.music.previewUrl,startSec:S.music.startSec};
   if(S.voice) st.user.profileVoice=S.voice.url;
@@ -1201,7 +1255,7 @@ function hydrateFromSite(){
   }
   if(u.boostBg){ applyBg({type:'preset',value:u.boostBg}); }
   if(Array.isArray(p.userOrbs)&&p.userOrbs.length){
-    S.orbs=p.userOrbs.map(o=>({kind:(o.kind==='anime'?'film':o.kind),title:o.title,sub:o.sub||'',cover:o.cover||null,previewUrl:o.previewUrl||null,
+    S.orbs=p.userOrbs.map(o=>({kind:(o.kind==='anime'?'film':o.kind),title:o.title,sub:o.sub||'',cover:o.cover||null,previewUrl:o.previewUrl||null,rank:o.rank||null,clipUrl:o.clipUrl||null,
         x:typeof o.x==='number'?o.x:(typeof o.customX==='number'?50+o.customX*100:undefined),
         y:typeof o.y==='number'?o.y:(typeof o.customY==='number'?50+o.customY*100:undefined)}))
       .filter(o=>['music','game','film'].includes(o.kind)).slice(0,ORB_MAX);

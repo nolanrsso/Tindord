@@ -6816,8 +6816,8 @@
     window.openClipOverlay = openClipOverlay;
 
     function playOrb(o, el){
-      // Game orb → open the associated clip (if any)
-      if (o.kind === 'game') { openClipOverlay(o); return; }
+      // Game orb → ouvre le clip UNIQUEMENT s'il y en a un (sinon rien ne se passe).
+      if (o.kind === 'game') { if (o.clipUrl) openClipOverlay(o); return; }
       if (o.kind === 'voice' && 'speechSynthesis' in window) {
         try {
           window.speechSynthesis.cancel();
