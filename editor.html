@@ -961,10 +961,11 @@ let _lastGifPlace=null;
 function addGif(url){
   if(S.gifs.length>=GIF_MAX){toast('Limite : '+GIF_MAX+' GIFs');return;}
   const last=S.gifs[S.gifs.length-1];
-  // Spawn là où l'utilisateur a posé le dernier GIF (sinon : à gauche de la carte par défaut)
-  const base=_lastGifPlace||(last?{x:last.x,y:last.y,w:last.w}:{x:-2,y:26,w:30});
-  const nudge=S.gifs.length?4:0; // léger décalage pour ne pas masquer complètement le précédent
-  const g={url,x:base.x+nudge,y:base.y+nudge,w:base.w,rot:0};
+  // Spawn EXACTEMENT là où l'utilisateur a posé le dernier GIF (sinon : à gauche de la carte par défaut)
+  const base=_lastGifPlace||(last?{x:last.x,y:last.y,w:last.w}:{x:-16,y:34,w:30});
+  // Décalage UNIQUEMENT vertical → garde le même X (reste visible à gauche, ne dérive pas derrière la carte)
+  const dy=S.gifs.length?6:0;
+  const g={url,x:base.x,y:base.y+dy,w:base.w,rot:0};
   S.gifs.push(g);
   _lastGifPlace={x:g.x,y:g.y,w:g.w};
   renderGifs();
