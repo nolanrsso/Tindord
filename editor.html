@@ -151,6 +151,8 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
 .gp-rank-tile:hover{transform:translateY(-1px);background:rgba(255,255,255,.08)}
 .gp-rank-tile.selected{border-color:rgba(91,233,255,.7);background:rgba(91,233,255,.12);box-shadow:0 0 0 3px rgba(91,233,255,.16)}
 .gp-rank-tile img{width:30px;height:30px;object-fit:contain}
+.gp-rank-tile.noimg{justify-content:center;min-height:52px}
+.gp-rank-tile.noimg span{font-size:10px}
 .gp-rank-tile span{font-size:9px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 #gamePop input{width:100%;padding:10px 12px;border-radius:10px;color:#fff;outline:none;background:rgba(255,255,255,.05);border:1.5px solid var(--stroke-2);font-family:inherit;font-size:13px}
 #gamePop input:focus{border-color:rgba(91,233,255,.6);box-shadow:0 0 0 4px rgba(91,233,255,.16)}
@@ -533,11 +535,11 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
 <div class="conn-pop-backdrop" id="gameBackdrop" hidden></div>
 <div class="conn-pop" id="gamePop" hidden>
   <div class="conn-pop-head"><b id="gamePopName"></b></div>
-  <label class="gp-l">Rang</label>
+  <label class="gp-l" id="gamePopRankLabel" hidden>Rang</label>
   <div class="gp-rank-grid" id="gamePopRankGrid" hidden></div>
-  <input id="gamePopRank" maxlength="40" placeholder="Ex : Immortal, Diamant 2, Radiant…" autocomplete="off">
-  <label class="gp-l">Clip (lien YouTube / vidéo)</label>
-  <input id="gamePopClip" maxlength="400" placeholder="https://youtube.com/… ou un .mp4" autocomplete="off">
+  <input id="gamePopRank" type="hidden">
+  <label class="gp-l">Clip (lien YouTube)</label>
+  <input id="gamePopClip" maxlength="400" placeholder="https://youtube.com/… ou https://youtu.be/…" autocomplete="off">
   <div class="conn-pop-actions"><button class="btn ghost-danger" id="gamePopClear">Tout effacer</button><button class="btn primary" id="gamePopSave">Enregistrer</button></div>
 </div>
 
@@ -1118,60 +1120,67 @@ const RANK_SETS={
     {label:'Platinum',icon:'platinum.png'},{label:'Diamond',icon:'diamond.png'},{label:'Elite',icon:'elite.png'},
     {label:'Champion',icon:'champion.png'},{label:'Unreal',icon:'unreal.png'},
   ],
-  valorant:[
-    {label:'Iron',icon:'iron.png'},{label:'Bronze',icon:'bronze.png'},{label:'Silver',icon:'silver.png'},
-    {label:'Gold',icon:'gold.png'},{label:'Platinum',icon:'platinum.png'},{label:'Diamond',icon:'diamond.png'},
-    {label:'Ascendant',icon:'ascendant.png'},{label:'Immortal',icon:'immortal.png'},{label:'Radiant',icon:'radiant.png'},
-  ],
   'rocket-league':[
     {label:'Bronze',icon:'bronze.png'},{label:'Silver',icon:'silver.png'},{label:'Gold',icon:'gold.png'},
     {label:'Platinum',icon:'platinum.png'},{label:'Diamond',icon:'diamond.png'},{label:'Champion',icon:'champion.png'},
     {label:'Grand Champion',icon:'grand_champion.png'},{label:'Supersonic Legend',icon:'supersonic_legend.png'},
   ],
-  'league-of-legends':[
+  'call-of-duty':[
+    {label:'Bronze',icon:'bronze.png'},{label:'Silver',icon:'silver.png'},{label:'Gold',icon:'gold.png'},
+    {label:'Platinum',icon:'platinum.png'},{label:'Diamond',icon:'diamond.png'},{label:'Crimson',icon:'crimson.png'},
+    {label:'Iridescent',icon:'iridescent.png'},{label:'Top 250',icon:'top250.png'},
+  ],
+  overwatch:[
+    {label:'Bronze',icon:'bronze.png'},{label:'Silver',icon:'silver.png'},{label:'Gold',icon:'gold.png'},
+    {label:'Platinum',icon:'platinum.png'},{label:'Diamond',icon:'diamond.png'},{label:'Master',icon:'master.png'},
+    {label:'Grandmaster',icon:'grandmaster.png'},{label:'Top 500',icon:'top500.png'},
+  ],
+  valorant:[
     {label:'Iron',icon:'iron.png'},{label:'Bronze',icon:'bronze.png'},{label:'Silver',icon:'silver.png'},
-    {label:'Gold',icon:'gold.png'},{label:'Platinum',icon:'platinum.png'},{label:'Emerald',icon:'emerald.png'},
-    {label:'Diamond',icon:'diamond.png'},{label:'Master',icon:'master.png'},{label:'Grandmaster',icon:'grandmaster.png'},
-    {label:'Challenger',icon:'challenger.png'},
+    {label:'Gold',icon:'gold.png'},{label:'Platinum',icon:'platinum.png'},{label:'Diamond',icon:'diamond.png'},
+    {label:'Ascendant',icon:'ascendant.png'},{label:'Immortal',icon:'immortal.png'},{label:'Radiant',icon:'radiant.png'},
   ],
 };
 function rankGameKey(title){
   const t=(title||'').toLowerCase();
   if(t.includes('fortnite'))return 'fortnite';
-  if(t.includes('valorant'))return 'valorant';
   if(t.includes('rocket league')||t.includes('rocket-league'))return 'rocket-league';
-  if(t.includes('league of legends')||t.includes('league-of-legends')||/\blol\b/.test(t))return 'league-of-legends';
+  if(t.includes('call of duty')||t.includes('call-of-duty')||/\b(cod|warzone)\b/.test(t)||t.includes('modern warfare')||t.includes('black ops'))return 'call-of-duty';
+  if(t.includes('overwatch'))return 'overwatch';
+  if(t.includes('valorant'))return 'valorant';
   return null;
 }
 function renderRankGrid(o){
-  const grid=$('gamePopRankGrid');
+  const grid=$('gamePopRankGrid'), label=$('gamePopRankLabel');
   const gk=rankGameKey(o.title);
   const set=gk&&RANK_SETS[gk];
   grid.innerHTML='';
-  if(!set){grid.hidden=true;return;}
-  grid.hidden=false;
+  if(!set){grid.hidden=true;label.hidden=true;return;} // pas de rang pour ce jeu
+  grid.hidden=false;label.hidden=false;
   const cur=(o.rank||'').trim().toLowerCase();
   set.forEach(t=>{
     const tile=document.createElement('button');
     tile.type='button';
-    tile.className='gp-rank-tile'+((cur===t.label.toLowerCase()||cur.startsWith(t.label.toLowerCase()+' '))?' selected':'');
+    tile.className='gp-rank-tile'+((cur===t.label.toLowerCase())?' selected':'');
     tile.title=t.label;
-    tile.innerHTML=`<img src="assets/ranks/${gk}/${t.icon}" alt="${t.label}"><span>${t.label}</span>`;
+    // onerror → si l'icône n'existe pas encore (ex: Call of Duty), on masque l'image au lieu d'afficher un visuel cassé
+    tile.innerHTML=`<img src="assets/ranks/${gk}/${t.icon}" alt="${t.label}" onerror="var p=this.closest('.gp-rank-tile');if(p)p.classList.add('noimg');this.remove();"><span>${t.label}</span>`;
     tile.addEventListener('click',()=>{
       grid.querySelectorAll('.gp-rank-tile').forEach(x=>x.classList.remove('selected'));
       tile.classList.add('selected');
       $('gamePopRank').value=t.label;
-      $('gamePopRank').focus();
     });
     grid.appendChild(tile);
   });
 }
 let _gameOrb=null;
-function openGamePop(o){_gameOrb=o;$('gamePopName').textContent=o.title;$('gamePopRank').value=o.rank||'';$('gamePopClip').value=o.clipUrl||'';renderRankGrid(o);$('gameBackdrop').hidden=false;$('gamePop').hidden=false;setTimeout(()=>$('gamePopRank').focus(),50);}
+function openGamePop(o){_gameOrb=o;$('gamePopName').textContent=o.title;$('gamePopRank').value=o.rank||'';$('gamePopClip').value=o.clipUrl||'';renderRankGrid(o);$('gameBackdrop').hidden=false;$('gamePop').hidden=false;}
 function closeGamePop(){$('gameBackdrop').hidden=true;$('gamePop').hidden=true;_gameOrb=null;}
+function isYouTubeUrl(u){return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|m\.youtube\.com)\//i.test(u);}
 $('gamePopSave').addEventListener('click',()=>{
   if(!_gameOrb)return;
   const rk=$('gamePopRank').value.trim(), cl=$('gamePopClip').value.trim();
+  if(cl&&!isYouTubeUrl(cl)){toast('Mets un lien YouTube valide (youtube.com / youtu.be)');return;}
   if(rk)_gameOrb.rank=rk;else delete _gameOrb.rank;
   if(cl)_gameOrb.clipUrl=cl;else delete _gameOrb.clipUrl;
   renderOrbs(); persist(); closeGamePop(); toast('Bulle de jeu mise à jour');
