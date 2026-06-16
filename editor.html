@@ -967,7 +967,7 @@ function addGif(url){
   if(S.gifs.length>=GIF_MAX){toast('Limite : '+GIF_MAX+' GIFs');return;}
   const last=S.gifs[S.gifs.length-1];
   // Spawn EXACTEMENT là où l'utilisateur a posé le dernier GIF (sinon : à gauche de la carte par défaut)
-  const base=_lastGifPlace||(last?{x:last.x,y:last.y,w:last.w}:{x:-16,y:34,w:30});
+  const base=_lastGifPlace||(last?{x:last.x,y:last.y,w:last.w}:{x:-18,y:58,w:30});
   // Décalage UNIQUEMENT vertical → garde le même X (reste visible à gauche, ne dérive pas derrière la carte)
   const dy=S.gifs.length?6:0;
   const g={url,x:base.x,y:base.y+dy,w:base.w,rot:0};
