@@ -345,6 +345,14 @@
     st.user=st.user||{};
     st.user.boost=true;
     st.user.boostPlan=plan;
+    // Date de souscription : sert à calculer la prochaine échéance (mensuel = +1 mois).
+    st.user.boostSince=new Date().toISOString();
+    if(plan==='monthly'){
+      const d=new Date(); d.setMonth(d.getMonth()+1);
+      st.user.boostNextPayment=d.toISOString(); // prochain prélèvement dans 1 mois
+    } else {
+      st.user.boostNextPayment=null; // À vie : pas de prélèvement
+    }
     try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(_){}
   }
 

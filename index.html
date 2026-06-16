@@ -1779,6 +1779,10 @@
   .acc-notif-lbl{font-size:13.5px;color:#dcddde;font-weight:500}
 
   /* Danger zone in Paramètres */
+  .acc-billing{display:flex;flex-direction:column;gap:7px;padding:13px 15px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+  .acc-billing .bill-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13.5px}
+  .acc-billing .bill-k{color:#b9bbbe}
+  .acc-billing .bill-v{font-weight:700;color:#fff;text-align:right}
   .acc-danger-zone{display:flex;flex-direction:column;gap:8px;margin-top:8px}
   .acc-danger-zone .acc-btn--danger{margin-left:0 !important}
   .acc-tab-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
@@ -3603,8 +3607,7 @@
         <button type="button" class="acc-tab-btn acc-tab-btn--boost" data-tab="boost"><span class="boost-star">
           <img src="assets/logo-gold.svg" alt="Boost" style="width:22px;height:auto;display:block;filter:drop-shadow(0 0 4px rgba(255,216,61,.55))" />
         </span> Boost</button>
-        <button type="button" class="acc-tab-btn active" data-tab="profil">Profil</button>
-        <button type="button" class="acc-tab-btn" data-tab="infos">Paramètres</button>
+        <button type="button" class="acc-tab-btn active" data-tab="infos">Paramètres</button>
       </div>
 
       <!-- Main: profile card preview (left, all tabs) + tab content (right) -->
@@ -3899,6 +3902,10 @@
           <label>Debut de la musique <span id="musicStartVal" style="color:#b9bbbe;font-weight:400;margin-left:6px">0s</span></label>
           <input type="range" id="musicStartTime" min="0" max="28" value="0" style="width:100%;accent-color:#9146FF;margin-top:6px" />
         </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:22px 0 14px" />
+        <h3>Abonnement & facturation</h3>
+        <div class="acc-billing" id="accBilling"></div>
 
         <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:22px 0 14px" />
         <h3 style="color:#FF7EB6">Zone dangereuse</h3>
@@ -8199,9 +8206,11 @@
       // Always reset to Profil tab on (re)entry — previously left tab state would
       // bleed across screen transitions and look like a render bug.
       const card = document.querySelector('#screen-account .acc-card');
-      if (card) card.setAttribute('data-current-tab', 'profil');
-      document.querySelectorAll('#accTabs .acc-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'profil'));
-      document.querySelectorAll('#screen-account .acc-tab').forEach(p => { p.hidden = (p.dataset.tab !== 'profil'); });
+      // L'édition de profil est dans l'éditeur → l'écran compte ouvre sur PARAMÈTRES.
+      if (card) card.setAttribute('data-current-tab', 'infos');
+      document.querySelectorAll('#accTabs .acc-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'infos'));
+      document.querySelectorAll('#screen-account .acc-tab').forEach(p => { p.hidden = (p.dataset.tab !== 'infos'); });
+      if (typeof refreshBillingUI === 'function') refreshBillingUI();
       const u = state.user || {};
       const p = state.profile || {};
       document.getElementById('accName').textContent = u.displayName || u.email || 'Tindord user';
@@ -9029,6 +9038,46 @@
       renderGifStage();
       renderUserOrbs();
     }
+    /* Section Abonnement & facturation (onglet Paramètres). */
+    function refreshBillingUI(){
+      const box = document.getElementById('accBilling');
+      if (!box) return;
+      const u = state.user || {};
+      const fmt = (d) => { try { return new Date(d).toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'}); } catch(_){ return '—'; } };
+      if (!u.boost) {
+        box.innerHTML = `<div class="bill-row"><span class="bill-k">Formule</span><span class="bill-v">Gratuit</span></div>
+          <div class="bill-row"><span class="bill-k">Statut</span><span class="bill-v">Aucun abonnement actif</span></div>`;
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.className = 'acc-btn acc-btn--primary'; btn.style.cssText = 'width:100%;margin-top:11px';
+        btn.textContent = 'Passer en Tindord Boost';
+        btn.onclick = () => { window.location.href = 'checkout.html?plan=monthly'; };
+        box.appendChild(btn);
+        return;
+      }
+      const lifetime = u.boostPlan === 'lifetime';
+      box.innerHTML =
+        `<div class="bill-row"><span class="bill-k">Formule</span><span class="bill-v">${lifetime ? 'Boost à vie' : 'Boost mensuel'}</span></div>` +
+        `<div class="bill-row"><span class="bill-k">Prix</span><span class="bill-v">${lifetime ? '14,99€ · paiement unique' : '3,59€ / mois'}</span></div>` +
+        `<div class="bill-row"><span class="bill-k">Abonné depuis</span><span class="bill-v">${u.boostSince ? fmt(u.boostSince) : '—'}</span></div>` +
+        (lifetime
+          ? `<div class="bill-row"><span class="bill-k">Renouvellement</span><span class="bill-v">Aucun — accès à vie</span></div>`
+          : `<div class="bill-row"><span class="bill-k">Prochain paiement</span><span class="bill-v" style="color:#9CF0BD">${u.boostNextPayment ? fmt(u.boostNextPayment) : '—'}</span></div>`);
+      if (!lifetime) {
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.className = 'acc-btn acc-btn--ghost'; btn.style.cssText = 'width:100%;margin-top:11px';
+        btn.textContent = "Résilier l'abonnement";
+        btn.onclick = () => {
+          if (!confirm("Résilier ton abonnement Tindord Boost ? Tu perds les avantages premium à la fin de la période en cours.")) return;
+          state.user.boost = false; state.user.boostPlan = null; state.user.boostNextPayment = null; state.user.boostSince = null;
+          save();
+          if (typeof refreshBoostUI === 'function') refreshBoostUI();
+          refreshBillingUI();
+          if (typeof showToast === 'function') showToast('✓', 'Abonnement résilié', '');
+        };
+        box.appendChild(btn);
+      }
+    }
+    window.__refreshBillingUI = refreshBillingUI;
     function openBoostModal(){ document.getElementById('boostModal').setAttribute('data-open','true'); refreshBoostUI(); }
     function closeBoostModal(){ document.getElementById('boostModal').setAttribute('data-open','false'); }
     document.getElementById('boostBanner').addEventListener('click', openBoostModal);
@@ -10286,6 +10335,10 @@
         state.user = state.user || {};
         state.user.boost = true;
         state.user.boostPlan = state.user.boostPlan || 'monthly';
+        if (!state.user.boostSince) {
+          state.user.boostSince = new Date().toISOString();
+          if (state.user.boostPlan === 'monthly') { const d = new Date(); d.setMonth(d.getMonth() + 1); state.user.boostNextPayment = d.toISOString(); }
+        }
         state.user.fakeNitro = fakeNitro;
         state.user.genderFilter = genderFilter;
         if (typeof refreshBoostUI === 'function') refreshBoostUI();
@@ -10351,6 +10404,8 @@
               genderFilter: u.genderFilter || null,
               boost: u.boost || null,
               boostPlan: u.boostPlan || null,
+              boostSince: u.boostSince || null,
+              boostNextPayment: u.boostNextPayment || null,
               boostShowName: (u.boostShowName === false) ? false : null,
               boostBg: u.boostBg || null,
             },
