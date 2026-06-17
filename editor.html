@@ -943,6 +943,7 @@ function renderOrbs(){
     wrap.addEventListener('pointerup',endDrag);wrap.addEventListener('pointercancel',endDrag);
     layer.appendChild(wrap);
   });
+  if(typeof updateEyeVisibility==='function') updateEyeVisibility();
   if(typeof persist==='function') persist();
 }
 // Re-render des bulles au resize (garde l'échelle proportionnelle à la carte)
@@ -976,7 +977,7 @@ function addGif(url){
   const h=document.getElementById('gifHint'); if(h)h.textContent=`${S.gifs.length}/${GIF_MAX} GIFs · glisse · coin vert = taille · coin bleu = rotation`;
   toast('GIF ajouté');
 }
-function renderGifs(){const layer=$('stickerLayer');layer.innerHTML='';S.gifs.forEach((g,i)=>layer.appendChild(makeSticker(g,i,layer)));if(typeof persist==='function')persist();}
+function renderGifs(){const layer=$('stickerLayer');layer.innerHTML='';S.gifs.forEach((g,i)=>layer.appendChild(makeSticker(g,i,layer)));if(typeof updateEyeVisibility==='function')updateEyeVisibility();if(typeof persist==='function')persist();}
 function makeSticker(g,idx,layer){
   if(typeof g.x!=='number')g.x=50; if(typeof g.y!=='number')g.y=28; if(typeof g.w!=='number')g.w=34; if(typeof g.rot!=='number')g.rot=0;
   const el=document.createElement('div'); el.className='sticker';
@@ -1079,6 +1080,14 @@ document.querySelectorAll('.eye-dot').forEach(btn=>{
     btn.innerHTML=on?EYE_OFF:EYE_OPEN;
   });
 });
+/* L'œil d'un bouton ne s'affiche QUE s'il y a du contenu associé sur le profil. */
+function updateEyeVisibility(){
+  const ov=document.querySelector('.eye-dot[data-eye="orbs"]');
+  const gv=document.querySelector('.eye-dot[data-eye="gifs"]');
+  if(ov) ov.style.display=(S.orbs&&S.orbs.length)?'':'none';
+  if(gv) gv.style.display=(S.gifs&&S.gifs.length)?'':'none';
+}
+updateEyeVisibility();
 
 /* ===== CONNEXIONS (logos d'apps + pseudo, façon Discord) ===== */
 const CONN_APPS=[
