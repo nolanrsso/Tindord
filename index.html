@@ -9044,8 +9044,30 @@
       renderGifStage();
       renderUserOrbs();
     }
+    /* Vérifie l'échéance d'un abonnement MENSUEL (mock, sans backend de paiement) :
+       - période en cours (now < prochain paiement) → rien.
+       - échéance atteinte + résilié → l'abonnement EXPIRE (le Boost dure bien le mois payé, pas plus).
+       - échéance atteinte + actif → renouvellement (+1 mois), comme un vrai prélèvement. */
+    function checkBoostExpiry(){
+      const u = state.user;
+      if (!u || !u.boost || u.boostPlan !== 'monthly' || !u.boostNextPayment) return;
+      const now = Date.now(), due = new Date(u.boostNextPayment).getTime();
+      if (isNaN(due) || now < due) return;
+      if (u.boostCancelled) {
+        u.boost = false; u.boostPlan = null; u.boostNextPayment = null; u.boostSince = null; u.boostCancelled = false;
+      } else {
+        const d = new Date(due);
+        while (d.getTime() <= now) d.setMonth(d.getMonth() + 1); // rattrape plusieurs mois si besoin
+        u.boostNextPayment = d.toISOString();
+      }
+      save();
+      if (typeof refreshBoostUI === 'function') refreshBoostUI();
+    }
+    window.__checkBoostExpiry = checkBoostExpiry;
+
     /* Section Abonnement & facturation (onglet Paramètres). */
     function refreshBillingUI(){
+      checkBoostExpiry();
       const box = document.getElementById('accBilling');
       if (!box) return;
       const u = state.user || {};
@@ -9061,25 +9083,41 @@
         return;
       }
       const lifetime = u.boostPlan === 'lifetime';
+      const cancelled = !lifetime && !!u.boostCancelled;
       box.innerHTML =
         `<div class="bill-row"><span class="bill-k">Formule</span><span class="bill-v">${lifetime ? 'Boost à vie' : 'Boost mensuel'}</span></div>` +
         `<div class="bill-row"><span class="bill-k">Prix</span><span class="bill-v">${lifetime ? '14,99€ · paiement unique' : '3,59€ / mois'}</span></div>` +
         `<div class="bill-row"><span class="bill-k">Abonné depuis</span><span class="bill-v">${u.boostSince ? fmt(u.boostSince) : '—'}</span></div>` +
         (lifetime
           ? `<div class="bill-row"><span class="bill-k">Renouvellement</span><span class="bill-v">Aucun — accès à vie</span></div>`
-          : `<div class="bill-row"><span class="bill-k">Prochain paiement</span><span class="bill-v" style="color:#9CF0BD">${u.boostNextPayment ? fmt(u.boostNextPayment) : '—'}</span></div>`);
+          : cancelled
+            ? `<div class="bill-row"><span class="bill-k">Statut</span><span class="bill-v" style="color:#FFB66E">Résilié</span></div>
+               <div class="bill-row"><span class="bill-k">Actif jusqu'au</span><span class="bill-v" style="color:#9CF0BD">${u.boostNextPayment ? fmt(u.boostNextPayment) : '—'}</span></div>`
+            : `<div class="bill-row"><span class="bill-k">Prochain paiement</span><span class="bill-v" style="color:#9CF0BD">${u.boostNextPayment ? fmt(u.boostNextPayment) : '—'}</span></div>`);
       if (!lifetime) {
         const btn = document.createElement('button');
-        btn.type = 'button'; btn.className = 'acc-btn acc-btn--ghost'; btn.style.cssText = 'width:100%;margin-top:11px';
-        btn.textContent = "Résilier l'abonnement";
-        btn.onclick = () => {
-          if (!confirm("Résilier ton abonnement Tindord Boost ? Tu perds les avantages premium à la fin de la période en cours.")) return;
-          state.user.boost = false; state.user.boostPlan = null; state.user.boostNextPayment = null; state.user.boostSince = null;
-          save();
-          if (typeof refreshBoostUI === 'function') refreshBoostUI();
-          refreshBillingUI();
-          if (typeof showToast === 'function') showToast('✓', 'Abonnement résilié', '');
-        };
+        btn.type = 'button';
+        btn.style.cssText = 'width:100%;margin-top:11px';
+        if (cancelled) {
+          btn.className = 'acc-btn acc-btn--primary';
+          btn.textContent = "Réactiver l'abonnement";
+          btn.onclick = () => {
+            state.user.boostCancelled = false; save();
+            refreshBillingUI();
+            if (typeof showToast === 'function') showToast('✓', 'Abonnement réactivé', 'Le renouvellement reprend');
+          };
+        } else {
+          btn.className = 'acc-btn acc-btn--ghost';
+          btn.textContent = "Résilier l'abonnement";
+          btn.onclick = () => {
+            const until = u.boostNextPayment ? fmt(u.boostNextPayment) : 'la fin de la période';
+            if (!confirm("Résilier ton abonnement Tindord Boost ?\nTu gardes les avantages jusqu'au " + until + ", puis ton compte repassera en gratuit.")) return;
+            state.user.boostCancelled = true; // on garde boost=true jusqu'à l'échéance
+            save();
+            refreshBillingUI();
+            if (typeof showToast === 'function') showToast('✓', 'Résiliation programmée', 'Actif jusqu\'au ' + until);
+          };
+        }
         box.appendChild(btn);
       }
     }
@@ -10412,6 +10450,7 @@
               boostPlan: u.boostPlan || null,
               boostSince: u.boostSince || null,
               boostNextPayment: u.boostNextPayment || null,
+              boostCancelled: u.boostCancelled || null,
               boostShowName: (u.boostShowName === false) ? false : null,
               boostBg: u.boostBg || null,
             },
@@ -10465,6 +10504,7 @@
     }
 
     // ---------- Init from persisted state ----------
+    if (typeof checkBoostExpiry === 'function') checkBoostExpiry(); // expiration/renouvellement mensuel au chargement
     if (state.user) {
       setAuth(true);
       setScreen(state.profile ? 'landing' : 'onboarding');
