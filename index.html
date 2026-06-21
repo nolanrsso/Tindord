@@ -454,6 +454,19 @@
     h1{font-size:clamp(72px,22vw,140px)}
   }
 
+  /* Mobile : interface épurée — pas de bulles, hero plus confortable */
+  @media (max-width:600px){
+    #bubbles{display:none}
+    .badge.corner{display:none}
+    .hero{padding:14px 18px 28px;justify-content:flex-start;gap:2px}
+    h1{font-size:clamp(64px,26vw,110px);margin:14px auto 10px}
+    .tagline{font-size:clamp(17px,5.2vw,22px);margin:0 0 10px}
+    .sub{font-size:14.5px;max-width:34ch;margin:0 auto 22px}
+    .cta-row{width:100%}
+    .cta-row .btn-primary{width:100%;justify-content:center;padding:16px 22px}
+    .cta-meta{flex-wrap:wrap;justify-content:center;row-gap:4px}
+  }
+
   /* Bigger nav on large screens */
   @media (min-width:1100px){
     header{margin:20px 44px 0;padding:14px 22px;border-radius:22px}
@@ -4699,8 +4712,10 @@
     requestAnimationFrame(step);
   }
 
-  init();
-  requestAnimationFrame(step);
+  // Sur mobile : pas de champ de bulles (interface épurée + perf). On n'initialise rien.
+  const _noBubbles = window.matchMedia('(max-width: 600px)').matches;
+  if (_noBubbles) { layer.style.display = 'none'; }
+  else { init(); requestAnimationFrame(step); }
 
   // background blob parallax
   const blobsEls = document.querySelectorAll('.blob');
