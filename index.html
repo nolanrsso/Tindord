@@ -3255,111 +3255,73 @@
   #gate .gate-err{color:#FF7EB6;font-size:13px;min-height:16px;font-weight:600}
 
   /* ============================================================
-     PARAMÈTRES — DA dédiée (refonte complète)
-     Thème "control panel" clair, volontairement différent du reste
-     de l'app (sombre / néon / glassmorphism). Scopé à l'écran compte.
+     PARAMÈTRES — refonte placement & esthétisme (fond transparent)
+     On garde le glassmorphism sombre de l'app, on restructure le
+     contenu en groupes/panneaux pour une meilleure lisibilité.
      ============================================================ */
-  body[data-screen="account"] #screen-account{
-    min-height:100vh;
-    background:
-      radial-gradient(900px 620px at 12% -12%, #ffffff 0%, rgba(255,255,255,0) 55%),
-      radial-gradient(760px 640px at 102% 112%, #e7e0ff 0%, rgba(231,224,255,0) 60%),
-      linear-gradient(162deg, #eef0f8 0%, #e6e9f5 100%) !important;
+  /* En-tête de page */
+  .acc-settings .set-head{ margin-bottom:18px; }
+  .acc-settings .set-title{
+    font-family:"Clash Display",sans-serif;font-weight:800;
+    font-size:26px;letter-spacing:-.015em;margin:0;
+    background:linear-gradient(180deg,#fff 0%, #E9DCFF 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  body[data-screen="account"] .acc-card{
-    background:#ffffff !important;
-    border:1px solid #e6e8f2 !important;
-    backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
-    box-shadow:0 28px 70px rgba(38,28,80,.18), 0 2px 8px rgba(38,28,80,.06) !important;
-    color:#1b1830 !important;
-    border-radius:26px !important;
-    padding:28px 30px 22px !important;
-    overflow:hidden !important;
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif !important;
+  .acc-settings .set-sub{ margin:4px 0 0;color:var(--ink-dim);font-size:13px;font-weight:500; }
+
+  /* Groupes (panneaux translucides) */
+  .acc-settings .set-group{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;padding:16px 18px;margin-bottom:14px;
   }
-  /* Liseré accent en haut de la fiche (seul rappel de la marque) */
-  body[data-screen="account"] .acc-card::before{
-    content:"";position:absolute;top:0;left:0;right:0;height:5px;z-index:6;
-    background:linear-gradient(90deg,#5865F2 0%, #9146FF 52%, #FF4FA0 100%);
+  .acc-settings .set-group:last-child{ margin-bottom:0; }
+  .acc-settings .set-group-h{
+    display:flex;align-items:center;gap:8px;
+    font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+    color:#b9a7ff;margin-bottom:13px;
   }
-  /* Titre de page */
-  body[data-screen="account"] .acc-card .acc-tab[data-tab="infos"] > h3:first-child{
-    font-size:23px !important;font-weight:800 !important;color:#15122b !important;
-    text-transform:none !important;letter-spacing:-.015em !important;margin:0 0 18px !important;
+  .acc-settings .set-ico{ font-size:14px;filter:saturate(1.1); }
+  .acc-settings .set-group--danger{ border-color:rgba(255,79,160,.28);background:rgba(255,79,160,.05); }
+  .acc-settings .set-group--danger .set-group-h{ color:#FF8FBE; }
+
+  /* Rangées dans un groupe */
+  .acc-settings .set-row{ display:flex;align-items:center;justify-content:space-between;gap:14px;min-width:0; }
+  .acc-settings .set-row + .set-row{ margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06); }
+  .acc-settings .set-row--col{ flex-direction:column;align-items:stretch;gap:10px; }
+  .acc-settings .set-row-lbl{ font-size:13.5px;font-weight:600;color:#fff;display:flex;align-items:center; }
+  .acc-settings .set-row-val{ color:#C9B6FF;font-weight:700;margin-left:8px;font-size:13px; }
+
+  /* Sélecteur de langue — segmenté glass */
+  .acc-settings .acc-langs{ display:flex;gap:8px;flex:0 0 auto; }
+  .acc-settings .acc-langs button{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    padding:8px 14px;border-radius:11px;cursor:pointer;font-weight:600;font-size:12.5px;
+    background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.12);color:var(--ink-dim);
+    transition:.15s ease;
   }
-  /* Libellés de section (uppercase, discrets) */
-  body[data-screen="account"] .acc-card h3{
-    color:#7b77a0 !important;font-family:inherit !important;font-weight:800 !important;
-    font-size:11.5px !important;letter-spacing:.13em !important;text-transform:uppercase !important;
-    margin:0 0 12px !important;
+  .acc-settings .acc-langs button:hover{ background:rgba(255,255,255,.10);color:#fff; }
+  .acc-settings .acc-langs button.active{
+    background:linear-gradient(180deg,#A65BFF,#6B2BFF);border-color:transparent;color:#fff;
+    box-shadow:0 6px 16px rgba(107,43,255,.4);
   }
-  body[data-screen="account"] .acc-card h3[style*="FF7EB6"]{ color:#d61f63 !important; }
-  /* Séparateurs */
-  body[data-screen="account"] .acc-card hr{
-    border:none !important;border-top:1px solid #ebecf4 !important;margin:22px 0 16px !important;
-  }
-  /* Champs */
-  body[data-screen="account"] .acc-card .acc-field{ margin-bottom:6px !important; }
-  body[data-screen="account"] .acc-card .acc-field label{
-    color:#4a4766 !important;font-weight:600 !important;font-size:12.5px !important;
-    text-transform:none !important;letter-spacing:0 !important;margin-bottom:6px !important;
-  }
-  body[data-screen="account"] .acc-card #musicVolVal,
-  body[data-screen="account"] .acc-card #musicStartVal{ color:#5865F2 !important;font-weight:700 !important; }
-  body[data-screen="account"] .acc-card input[type="range"]{ accent-color:#5865F2 !important; }
-  body[data-screen="account"] .acc-card .acc-input,
-  body[data-screen="account"] .acc-card .acc-select,
-  body[data-screen="account"] .acc-card textarea{
-    background:#f4f5fb !important;border:1.5px solid #e3e5ef !important;color:#1b1830 !important;
-  }
-  body[data-screen="account"] .acc-card .acc-input::placeholder,
-  body[data-screen="account"] .acc-card textarea::placeholder{ color:#9a97b8 !important; }
-  /* Sélecteur de langue — segmenté clair */
-  body[data-screen="account"] .acc-card .acc-langs button{
-    flex:1;padding:11px 12px !important;border-radius:13px !important;
-    background:#f1f2f8 !important;border:1.5px solid #e3e5ef !important;color:#2a2746 !important;
-    font-weight:600 !important;font-size:13px !important;transition:.15s ease;
-  }
-  body[data-screen="account"] .acc-card .acc-langs button:hover{ background:#e9eaf4 !important;color:#2a2746 !important; }
-  body[data-screen="account"] .acc-card .acc-langs button.active{
-    background:#5865F2 !important;border-color:#5865F2 !important;color:#fff !important;
-    box-shadow:0 6px 16px rgba(88,101,242,.32) !important;
-  }
-  /* Abonnement & facturation — "reçu" sombre encastré (contraste assumé) */
-  body[data-screen="account"] .acc-card .acc-billing{
-    background:linear-gradient(160deg,#211c40,#15112a) !important;
-    border:1px solid rgba(255,255,255,.07) !important;border-radius:16px !important;
-    padding:16px 18px !important;gap:9px !important;
-    box-shadow:0 12px 30px rgba(33,23,70,.22) !important;
-  }
-  /* Boutons */
-  body[data-screen="account"] .acc-card .acc-btn--ghost{
-    background:#f1f2f8 !important;color:#2a2746 !important;border:1.5px solid #e3e5ef !important;
-  }
-  body[data-screen="account"] .acc-card .acc-btn--ghost:hover{ background:#e7e8f3 !important; }
-  body[data-screen="account"] .acc-card .acc-btn--danger{
-    background:#fdeaf1 !important;color:#d61f63 !important;border:1.5px solid #f6c9da !important;
-  }
-  body[data-screen="account"] .acc-card .acc-btn--danger:hover{ background:#fbdbe7 !important; }
-  body[data-screen="account"] .acc-card .acc-btn--primary{
-    background:linear-gradient(180deg,#5865F2,#4149d6) !important;color:#fff !important;
-    box-shadow:0 8px 22px rgba(88,101,242,.4) !important;
-  }
-  body[data-screen="account"] .acc-card .acc-msg{
-    background:#e7f7ee !important;border:1px solid #b7e6cb !important;color:#1a7a45 !important;
-  }
-  /* FAB retour — clair pour coller à la nouvelle DA */
-  body[data-screen="account"] .acc-back-fab{
-    background:#ffffff !important;color:#2a2746 !important;border:1px solid #e3e5ef !important;
-    box-shadow:0 10px 28px rgba(33,23,70,.18) !important;
-  }
-  body[data-screen="account"] .acc-back-fab:hover{ background:#f3f4fb !important; }
+
+  /* Slider volume pleine largeur */
+  .acc-settings input[type="range"]{ width:100%;accent-color:#9146FF;margin:0; }
+
+  /* Facturation — lignes claires sur fond du groupe */
+  .acc-settings .acc-billing{ background:transparent !important;border:none !important;padding:0 !important;gap:9px !important; }
+
+  /* Zone dangereuse — boutons empilés pleine largeur */
+  .acc-settings .acc-danger-zone{ display:flex;flex-direction:column;gap:10px;margin-top:0; }
+  .acc-settings .acc-danger-zone .acc-btn{ width:100%;margin:0 !important; }
+
   /* Confort mobile */
   @media (max-width:600px){
     body[data-screen="account"] #screen-account{ padding-left:12px !important;padding-right:12px !important; }
-    body[data-screen="account"] .acc-card{ width:100% !important;max-width:100% !important;box-sizing:border-box !important;padding:22px 18px 18px !important;border-radius:20px !important; }
-    body[data-screen="account"] .acc-card .acc-tab[data-tab="infos"] > h3:first-child{ font-size:20px !important; }
-    body[data-screen="account"] .acc-card .acc-danger-zone .acc-btn{ width:100% !important; }
+    body[data-screen="account"] .acc-card{ width:100% !important;max-width:100% !important;box-sizing:border-box !important;border-radius:20px !important; }
+    .acc-settings .set-row{ flex-direction:column;align-items:stretch;gap:9px; }
+    .acc-settings .acc-langs button{ flex:1; }
   }
 </style>
 </head>
@@ -4009,36 +3971,45 @@
       </div>
 
       <!-- Paramètres -->
-      <div class="acc-section acc-tab" data-tab="infos" hidden>
-        <h3>Paramètres</h3>
-        <div class="acc-field">
-          <label data-i18n="acc_lang">Langue</label>
-          <div class="acc-langs" id="accLangs">
-            <button type="button" data-val="FR"><img src="https://flagcdn.com/fr.svg" alt="FR" class="acc-lang-flag"> Français</button>
-            <button type="button" data-val="EN"><img src="https://flagcdn.com/gb.svg" alt="EN" class="acc-lang-flag"> English</button>
-          </div>
-        </div>
+      <div class="acc-section acc-tab acc-settings" data-tab="infos" hidden>
+        <header class="set-head">
+          <h2 class="set-title">Paramètres</h2>
+          <p class="set-sub">Préférences &amp; abonnement</p>
+        </header>
+
         <!-- Genre + Âge retirés des paramètres (placeholders gardés pour le JS) -->
         <div style="display:none"><span id="accGender">—</span><span id="accAge">—</span></div>
-        <div class="acc-field" style="margin-top:14px">
-          <label>Volume de la musique <span id="musicVolVal" style="color:#b9bbbe;font-weight:400;margin-left:6px">50%</span></label>
-          <input type="range" id="musicVolume" min="0" max="100" value="50" style="width:100%;accent-color:#9146FF;margin-top:6px" />
-        </div>
-        <div class="acc-field" style="margin-top:14px">
-          <label>Debut de la musique <span id="musicStartVal" style="color:#b9bbbe;font-weight:400;margin-left:6px">0s</span></label>
-          <input type="range" id="musicStartTime" min="0" max="28" value="0" style="width:100%;accent-color:#9146FF;margin-top:6px" />
-        </div>
 
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:22px 0 14px" />
-        <h3>Abonnement & facturation</h3>
-        <div class="acc-billing" id="accBilling"></div>
+        <!-- Préférences -->
+        <section class="set-group">
+          <div class="set-group-h"><span class="set-ico">⚙️</span> Préférences</div>
+          <div class="set-row">
+            <span class="set-row-lbl" data-i18n="acc_lang">Langue</span>
+            <div class="acc-langs" id="accLangs">
+              <button type="button" data-val="FR"><img src="https://flagcdn.com/fr.svg" alt="FR" class="acc-lang-flag"> Français</button>
+              <button type="button" data-val="EN"><img src="https://flagcdn.com/gb.svg" alt="EN" class="acc-lang-flag"> English</button>
+            </div>
+          </div>
+          <div class="set-row set-row--col">
+            <span class="set-row-lbl">Volume de la musique <span id="musicVolVal" class="set-row-val">50%</span></span>
+            <input type="range" id="musicVolume" min="0" max="100" value="50" />
+          </div>
+        </section>
 
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:22px 0 14px" />
-        <h3 style="color:#FF7EB6">Zone dangereuse</h3>
-        <div class="acc-danger-zone">
-          <button type="button" class="acc-btn acc-btn--ghost" id="accLogout" data-i18n="logout" style="width:100%;margin-bottom:10px">Se déconnecter</button>
-          <button type="button" class="acc-btn acc-btn--danger" id="accDeleteAccount" style="width:100%;margin-left:0">Supprimer mon compte</button>
-        </div>
+        <!-- Abonnement -->
+        <section class="set-group">
+          <div class="set-group-h"><span class="set-ico">💳</span> Abonnement &amp; facturation</div>
+          <div class="acc-billing" id="accBilling"></div>
+        </section>
+
+        <!-- Zone dangereuse -->
+        <section class="set-group set-group--danger">
+          <div class="set-group-h"><span class="set-ico">⚠️</span> Zone dangereuse</div>
+          <div class="acc-danger-zone">
+            <button type="button" class="acc-btn acc-btn--ghost" id="accLogout" data-i18n="logout">Se déconnecter</button>
+            <button type="button" class="acc-btn acc-btn--danger" id="accDeleteAccount">Supprimer mon compte</button>
+          </div>
+        </section>
       </div>
 
         </div><!-- /acc-tab-body -->
