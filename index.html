@@ -3753,366 +3753,6 @@
        ACCOUNT — view + full edit (pseudo, bio, music, game, anime,
        socials, language) + live preview
        ============================================================ -->
-  <section id="screen-account" class="screen">
-    <div class="acc-card">
-      <!-- Tabs bar -->
-      <div class="acc-tabs" id="accTabs">
-        <button type="button" class="acc-tab-btn acc-tab-btn--boost" data-tab="boost"><span class="boost-star">
-          <img src="assets/logo-gold.svg" alt="Boost" style="width:22px;height:auto;display:block;filter:drop-shadow(0 0 4px rgba(255,216,61,.55))" />
-        </span> Boost</button>
-        <button type="button" class="acc-tab-btn active" data-tab="infos">Paramètres</button>
-      </div>
-
-      <!-- Main: profile card preview (left, all tabs) + tab content (right) -->
-      <div class="acc-main">
-        <!-- LEFT: profile card preview — visible on all tabs -->
-        <aside class="acc-identity">
-          <h3 style="margin:0 0 8px;text-align:left">Aperçu du profil</h3>
-          <div class="acc-preview-frame">
-            <div class="acc-preview-wrap" id="accPreview" aria-label="Aperçu de ta carte"></div>
-            <button type="button" class="acc-preview-full" id="accPreviewFull" title="Aperçu complet (bulles, GIFs, fond)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-              <span>Aperçu complet</span>
-            </button>
-          </div>
-          <!-- Hidden DOM placeholders (some legacy code reads these IDs) -->
-          <div style="display:none">
-            <div id="prevBanner"></div><div id="prevAv">?</div>
-            <img id="prevDeco" src="">
-            <span id="prevName"></span><span id="prevAge"></span>
-            <span id="prevHandle"></span><span id="prevBio"></span>
-            <div id="prevSocials"></div><div id="prevChips"></div>
-            <span id="accAvatar"></span><span id="accName"></span><span id="accHandle"></span>
-            <input type="file" id="accAvatarFile" accept="image/*" />
-          </div>
-        </aside>
-
-        <!-- RIGHT: tab content -->
-        <div class="acc-tab-body">
-
-      <!-- 🪪 Profil — layout refondu : hero (identité+couleur), puis sections empilées -->
-      <div class="acc-section acc-tab acc-tab--profil" data-tab="profil">
-        <!-- HERO : pseudo/bio à gauche · avatar au centre · couleur à droite -->
-        <div class="acc-hero">
-          <div class="acc-hero-side acc-hero-side--left">
-            <div class="acc-field acc-field--compact">
-              <label>Pseudo</label>
-              <input class="acc-input" id="accPseudo" type="text" maxlength="32" placeholder="Tindord_user" />
-            </div>
-            <div class="acc-field acc-field--compact">
-              <label>Bio</label>
-              <textarea id="accBio" maxlength="280" placeholder="Parle un peu de toi…" rows="3"></textarea>
-            </div>
-          </div>
-
-          <div class="acc-hero-avatar">
-            <label class="acc-hero-avatar-circle" id="accHeroAvatar" title="Changer la photo">
-              <input type="file" id="accAvatarFileHero" accept="image/*" hidden />
-              <img class="acc-hero-avatar-img" id="accHeroAvatarImg" alt="" />
-              <span class="acc-hero-avatar-empty" id="accHeroAvatarEmpty">
-                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 22a8 8 0 0 1 16 0"/></svg>
-              </span>
-              <span class="acc-hero-avatar-edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-            </label>
-            <span class="acc-hero-avatar-hint">Photo de profil</span>
-          </div>
-
-          <div class="acc-hero-side acc-hero-side--right">
-            <div class="acc-field" id="accColorBlock">
-              <label style="display:block">Couleur de profil</label>
-              <div class="acc-color-wheel-row">
-                <label class="acc-color-wheel" title="Couleur principale">
-                  <span class="acc-color-wheel-lbl">Primaire</span>
-                  <input type="color" id="accProfileColor" value="#36393F" />
-                </label>
-                <label class="acc-color-wheel" title="Couleur secondaire (dégradé)">
-                  <span class="acc-color-wheel-lbl">Secondaire</span>
-                  <input type="color" id="accProfileColor2" value="#2F3136" />
-                </label>
-                <button type="button" class="acc-color-reset" id="accColorReset" title="Réinitialiser">↺</button>
-              </div>
-              <div style="display:none">
-                <div class="acc-color-row" data-target="profileColor"></div>
-                <div class="acc-color-row" data-target="profileColor2"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 1) Mes bulles -->
-        <div class="acc-row acc-row--bulles">
-          <button type="button" class="acc-bulles-cta" id="accBullesCta">
-            <span class="acc-bulles-cta-ico">🫧</span>
-            <span class="acc-bulles-cta-text">
-              <b>Mes bulles</b>
-              <small id="accBullesCtaCount">0 / 4</small>
-            </span>
-            <span class="acc-bulles-cta-arrow">›</span>
-          </button>
-        </div>
-
-        <!-- 2) Comptes liés (REMONTÉS, juste après les bulles) -->
-        <div class="acc-row acc-row--socials">
-          <h3 style="margin:0 0 8px" data-i18n="acc_socials">Comptes liés <small style="color:#b9bbbe;font-weight:400;font-size:11px">(cliquables sur la carte)</small></h3>
-          <div class="acc-social">
-            <div class="acc-social-row" data-kind="instagram">
-              <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4a4 4 0 1 1-7.9 1.1A4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></span>
-              <span class="so-name">Instagram</span>
-              <input type="text" id="socIg" placeholder="@username" autocomplete="off" />
-              <button type="button" id="socIgBtn" data-i18n="connect">Connecter</button>
-            </div>
-            <div class="acc-social-row" data-kind="tiktok">
-              <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 7.5a6.5 6.5 0 0 1-3.8-1.2v8.3a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v3.1a2.9 2.9 0 1 0 2 2.7V2h3a3.5 3.5 0 0 0 3.8 3.5v2z"/></svg></span>
-              <span class="so-name">TikTok</span>
-              <input type="text" id="socTt" placeholder="@username" autocomplete="off" />
-              <button type="button" id="socTtBtn" data-i18n="connect">Connecter</button>
-            </div>
-            <div class="acc-social-row" data-kind="spotify">
-              <span class="so-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Zm1.25-2.78a.88.88 0 0 1-1.2.28c-2.97-1.83-7.5-2.36-11.02-1.3a.88.88 0 0 1-.5-1.69c4-1.2 8.97-.6 12.4 1.5.4.25.55.81.32 1.21Zm.1-2.9c-3.56-2.12-9.44-2.32-12.83-1.28a1.05 1.05 0 1 1-.6-2.02c3.9-1.18 10.4-.95 14.5 1.5a1.05 1.05 0 1 1-1.07 1.8Z"/></svg></span>
-              <span class="so-name">Spotify</span>
-              <input type="text" id="socSp" placeholder="username" autocomplete="off" />
-              <button type="button" id="socSpBtn" data-i18n="connect">Connecter</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3) Vocal du profil (deplace plus bas, car moins important visuellement) -->
-        <div class="acc-row acc-row--voice">
-          <div class="acc-voice" id="accVoiceBlock">
-            <span class="acc-voice-lbl">Vocal du profil <small style="color:#72767d;font-weight:400;font-size:11px">(5s max — joue à l'arrivée sur ton profil)</small></span>
-            <button type="button" class="acc-voice-record" id="accVoiceFab" title="Enregistrer un vocal" data-state="idle">
-              <span class="acc-voice-ico">
-                <svg class="ico-mic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M9 21h6"/></svg>
-                <svg class="ico-stop" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
-              </span>
-              <span class="acc-voice-label" id="accVoiceLabel">Enregistrer un vocal</span>
-              <span class="acc-voice-timer" id="accVoiceTimer"></span>
-            </button>
-            <div class="acc-voice-player" id="accVoicePreview" hidden>
-              <button type="button" class="acc-voice-play" id="accVoicePlay" title="Lecture">
-                <svg class="ico-play"  width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
-                <svg class="ico-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-              </button>
-              <div class="acc-voice-track">
-                <span class="acc-voice-track-bar" id="accVoiceBar"></span>
-              </div>
-              <span class="acc-voice-time" id="accVoiceTime">0:00</span>
-              <button type="button" class="acc-voice-del" id="accVoiceDel" title="Supprimer le vocal">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
-              </button>
-              <audio id="accVoiceAudio" preload="metadata" style="display:none"></audio>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4) Resync Discord -->
-        <div class="acc-row acc-row--resync">
-          <button type="button" class="acc-btn acc-btn--ghost acc-resync-btn" id="accResyncDiscord" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="accResyncIco"><path d="M3 12a9 9 0 0 1 15.5-6.4L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.4L3 16"/><path d="M3 21v-5h5"/></svg>
-            <span id="accResyncLabel">Remettre à jour mon compte Discord</span>
-          </button>
-          <small id="accResyncHint" style="color:#b9bbbe;font-weight:400;font-size:11.5px;display:block;margin-top:4px">Récupère ton avatar, bannière, décoration et badges depuis Discord</small>
-        </div>
-
-        <select class="acc-select" id="accLookSel" style="display:none">
-          <option value="chill">🛋️ Chill</option>
-          <option value="game">🎮 Jouer</option>
-          <option value="talk">💬 Discuter</option>
-          <option value="sleep">💤 Sleepcall</option>
-        </select>
-      </div>
-
-      <!-- 🫧 Bulles : section cachée — DOM gardé pour le JS, l'édition se fait dans l'overlay -->
-      <div class="acc-section acc-tab" data-tab="bulles" hidden style="display:none !important">
-        <span class="pill" id="orbCounterPill">0/4</span>
-        <div class="acc-orb-cats" id="accOrbCats">
-          <button type="button" class="acc-orb-cat active" data-kind="music">Musique</button>
-          <button type="button" class="acc-orb-cat" data-kind="game">Jeu</button>
-          <button type="button" class="acc-orb-cat" data-kind="film">Série·Film</button>
-        </div>
-        <div class="acc-orb-form">
-          <div class="acc-orb-input-wrap">
-            <input class="acc-input" id="accOrbInput" type="text" placeholder="Recherche un son Spotify…" autocomplete="off" />
-            <div class="spotify-sugg" id="spotifySugg"></div>
-          </div>
-          <button type="button" class="acc-orb-add" id="accOrbAdd">+</button>
-        </div>
-        <div class="acc-orb-grid" id="accOrbGrid"></div>
-        <button type="button" id="orbPreviewBtn">Apercu</button>
-      </div>
-
-      <!-- ✨ Boost-only options -->
-      <div class="acc-section boost-only acc-tab" data-tab="boost" id="boostSection" hidden>
-        <h3>Tindord Boost</h3>
-
-        <!-- ✨ Fake Nitro — panneau dédié -->
-        <div class="fn-panel" id="fnPanel">
-          <div class="fn-head">
-            <span class="fn-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M11 2 4 13h5l-1 9 9-12h-5l2-8z"/></svg></span>
-            <div class="fn-head-txt">
-              <b>Fake Nitro</b>
-              <small>Anneau animé autour de l'avatar + bannière &amp; décoration custom sur ta carte</small>
-            </div>
-            <label class="toggle fn-toggle"><input type="checkbox" id="boostFakeNitro" /><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
-          </div>
-          <div class="fn-hint" id="fnHint">Active Fake Nitro pour débloquer la bannière et la décoration d'avatar ✨</div>
-          <div class="fn-body">
-            <!-- Bannière -->
-            <div class="acc-field" id="boostBannerField" hidden>
-              <label>Bannière personnalisée <small style="color:#b9bbbe;font-weight:400">(image, max 2 Mo)</small></label>
-              <div class="acc-banner-row">
-                <div class="acc-banner-prev" id="accBannerPrev" aria-label="Aperçu bannière"></div>
-                <div class="acc-banner-actions">
-                  <input type="file" id="accBannerFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" />
-                  <button type="button" class="acc-btn acc-btn--ghost" id="accBannerImport">Importer</button>
-                  <button type="button" class="acc-btn acc-btn--ghost" id="accBannerReset" hidden>Reset</button>
-                </div>
-              </div>
-            </div>
-            <!-- Décoration Discord -->
-            <div class="acc-field" id="boostDiscordDecoField" hidden>
-              <label>Décoration d'avatar <small style="color:#b9bbbe;font-weight:400">(les vraies décos animées du shop Discord)</small></label>
-              <input type="text" id="ddDecoSearch" class="acc-input" placeholder="Rechercher (ex: phoenix, rainbow, cat…)" style="margin-bottom:8px" />
-              <div class="dd-deco-grid" id="ddDecoGrid">
-                <button type="button" class="dd-deco-tile dd-deco-tile--none" data-hash="" title="Aucune">
-                  <div class="dd-deco-empty">✕</div>
-                  <span class="dd-deco-name">Aucune</span>
-                </button>
-                <!-- Items injectés via JS depuis assets/discord-decos.json -->
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="acc-field">
-          <label>Badge Boost sur le pseudo <small style="color:#b9bbbe;font-weight:400">(pseudo doré + étoile sur ta carte)</small></label>
-          <label class="toggle"><input type="checkbox" id="boostShowName" checked /><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
-        </div>
-
-        <div class="acc-field">
-          <label>Fond d'écran <small style="color:#b9bbbe;font-weight:400">(personnalise l'arrière-plan du site)</small></label>
-          <div class="bg-picker" id="bgPicker">
-            <button type="button" class="bg-tile is-active" data-bg="default"><span class="bg-tile-prev bg-prev-default"></span><span>Défaut</span></button>
-            <button type="button" class="bg-tile" data-bg="stars"><span class="bg-tile-prev bg-prev-stars"></span><span>Nuit étoilée</span></button>
-            <button type="button" class="bg-tile" data-bg="pink"><span class="bg-tile-prev bg-prev-pink"></span><span>Rose</span></button>
-          </div>
-        </div>
-
-        <div class="acc-field">
-          <label>Musique d'entrée du profil <small style="color:#b9bbbe;font-weight:400">(joue quand on arrive sur ta carte, s'arrête au swipe)</small></label>
-          <div class="swipe-music-current" id="swipeMusicCurrent" hidden></div>
-          <div class="acc-orb-input-wrap">
-            <input class="acc-input" id="swipeMusicInput" type="text" placeholder="Recherche un son (titre, artiste…)" autocomplete="off" />
-            <div class="spotify-sugg" id="swipeMusicSugg"></div>
-          </div>
-        </div>
-
-        <div class="acc-field">
-          <label>GIFs sur ta carte <small style="color:#b9bbbe;font-weight:400">(place, agrandis et oriente tes GIFs)</small></label>
-          <button type="button" class="acc-bulles-cta" id="accGifsCta">
-            <span class="acc-bulles-cta-ico">🎞️</span>
-            <span class="acc-bulles-cta-text">
-              <b>Mes GIFs</b>
-              <small id="accGifsCtaCount">0 / 5</small>
-            </span>
-            <span class="acc-bulles-cta-arrow">›</span>
-          </button>
-        </div>
-
-        <!-- Éléments cachés : DOM gardé pour le JS legacy (filtres, GIFs, musique d'entrée…) -->
-        <div style="display:none">
-          <div id="accDecoBlock">
-            <div class="acc-deco-grid" id="accDecoGrid">
-              <button type="button" class="acc-deco-tile" data-deco="none"><span class="deco-avi">A</span></button>
-            </div>
-          </div>
-          <select id="boostGenderFilter"><option value="all">Tous</option><option value="il">il</option><option value="elle">elle</option></select>
-          <button id="openLikedMe" type="button"></button>
-          <span id="gifCounterPill"></span>
-          <input id="gifInput" type="text" />
-          <div id="gifSugg"></div>
-          <div id="gifStage"></div>
-        </div>
-      </div>
-
-      <!-- Paramètres -->
-      <div class="acc-section acc-tab acc-settings" data-tab="infos" hidden>
-        <header class="set-head">
-          <h2 class="set-title">Paramètres</h2>
-          <p class="set-sub">Préférences &amp; abonnement</p>
-        </header>
-
-        <!-- Genre + Âge retirés des paramètres (placeholders gardés pour le JS) -->
-        <div style="display:none"><span id="accGender">—</span><span id="accAge">—</span></div>
-
-        <!-- Préférences -->
-        <section class="set-group">
-          <div class="set-group-h"><span class="set-ico">⚙️</span> Préférences</div>
-          <div class="set-row">
-            <span class="set-row-lbl" data-i18n="acc_lang">Langue</span>
-            <div class="acc-langs" id="accLangs">
-              <button type="button" data-val="FR"><img src="https://flagcdn.com/fr.svg" alt="FR" class="acc-lang-flag"> Français</button>
-              <button type="button" data-val="EN"><img src="https://flagcdn.com/gb.svg" alt="EN" class="acc-lang-flag"> English</button>
-            </div>
-          </div>
-          <div class="set-row set-row--col">
-            <span class="set-row-lbl">Volume de la musique <span id="musicVolVal" class="set-row-val">50%</span></span>
-            <input type="range" id="musicVolume" min="0" max="100" value="50" />
-          </div>
-        </section>
-
-        <!-- Abonnement -->
-        <section class="set-group">
-          <div class="set-group-h"><span class="set-ico">💳</span> Abonnement &amp; facturation</div>
-          <div class="acc-billing" id="accBilling"></div>
-        </section>
-
-        <!-- Zone dangereuse -->
-        <section class="set-group set-group--danger">
-          <div class="set-group-h"><span class="set-ico">⚠️</span> Zone dangereuse</div>
-          <div class="acc-danger-zone">
-            <button type="button" class="acc-btn acc-btn--ghost" id="accLogout" data-i18n="logout">Se déconnecter</button>
-            <button type="button" class="acc-btn acc-btn--danger" id="accDeleteAccount">Supprimer mon compte</button>
-          </div>
-        </section>
-      </div>
-
-        </div><!-- /acc-tab-body -->
-      </div><!-- /acc-main -->
-
-      <div class="acc-actions">
-        <div class="acc-save-bar" id="accSaveBar" data-show="false">
-          <button type="button" class="acc-btn acc-btn--primary" id="accSave">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Sauvegarder les changements
-          </button>
-          <button type="button" id="accSaveReset" style="display:none"></button>
-        </div>
-      </div>
-      <div class="acc-msg" id="accMsg" data-show="false"></div>
-    </div>
-
-    <!-- Boost banner is OUTSIDE the acc-card frame (full width below) -->
-    <button type="button" class="boost-banner boost-banner--outside" id="boostBanner">
-      <div class="bb-glow"></div>
-      <span class="bb-emoji">✨</span>
-      <div class="bb-text">
-        <b id="boostBannerTitle">Passer en Tindord Boost</b>
-        <small id="boostBannerSub">14 bulles, Fake Nitro, filtre H/F, likes secrets…</small>
-      </div>
-      <span class="bb-cta" id="boostBannerCta">Découvrir</span>
-    </button>
-
-    <!-- Bouton Retour : FAB rond bas-GAUCHE (hors .acc-card → fixed relatif au viewport), symétrique au bouton Discord -->
-    <button type="button" class="acc-back-fab" id="accBackSwipe" title="Retour" aria-label="Retour" data-i18n-title="back_to_swipe">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-
-    <!-- Floating Discord server button (bottom-right of page in account screen) -->
-    <a href="https://discord.gg/NkW4uMmQR" target="_blank" rel="noopener" class="acc-discord-fab" id="accDiscordFab" title="Rejoindre le serveur Discord" aria-label="Discord">
-      <svg viewBox="0 0 127.14 96.36" fill="currentColor" aria-hidden="true"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69Z"/></svg>
-    </a>
-  </section>
 
   <!-- Floating toast for orb interactions -->
   <div class="swipe-toast" id="swipeToast" data-show="false" role="status" aria-live="polite">
@@ -5136,7 +4776,7 @@
     }
   }
   window.refreshLandingCta = refreshLandingCta;
-  document.getElementById('join').addEventListener('click', (e) => {
+  document.getElementById('join')?.addEventListener('click', (e) => {
     e.preventDefault();
     const b = e.currentTarget;
     b.animate(
@@ -5186,7 +4826,7 @@
       if (e.key === 'Escape' && modal.getAttribute('data-open') === 'true') close();
     });
 
-    document.getElementById('authDiscord').addEventListener('click', () => {
+    document.getElementById('authDiscord')?.addEventListener('click', () => {
       // Real Discord OAuth via Supabase. Will redirect to Discord, then back here.
       close();
       window.signInWithDiscord && window.signInWithDiscord();
@@ -6924,10 +6564,10 @@
     (function bindGameMetaModal(){
       const modal = document.getElementById('gameMetaModal');
       if (!modal) return;
-      document.getElementById('gmmClose').addEventListener('click', closeGameMetaModal);
-      document.getElementById('gmmBackdrop').addEventListener('click', closeGameMetaModal);
-      document.getElementById('gmmSkip').addEventListener('click', closeGameMetaModal);
-      document.getElementById('gmmSave').addEventListener('click', () => {
+      document.getElementById('gmmClose')?.addEventListener('click', closeGameMetaModal);
+      document.getElementById('gmmBackdrop')?.addEventListener('click', closeGameMetaModal);
+      document.getElementById('gmmSkip')?.addEventListener('click', closeGameMetaModal);
+      document.getElementById('gmmSave')?.addEventListener('click', () => {
         if (!_editingGameOrb) { closeGameMetaModal(); return; }
         const editedOrb = _editingGameOrb; // capture before close nulls the ref
         const rank = document.getElementById('gmmRankSelect').value.trim();
@@ -7021,8 +6661,8 @@
     (function bindClipOverlay(){
       const overlay = document.getElementById('clipOverlay');
       if (!overlay) return;
-      document.getElementById('clipClose').addEventListener('click', closeClipOverlay);
-      document.getElementById('clipBackdrop').addEventListener('click', closeClipOverlay);
+      document.getElementById('clipClose')?.addEventListener('click', closeClipOverlay);
+      document.getElementById('clipBackdrop')?.addEventListener('click', closeClipOverlay);
       document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.getAttribute('data-show') === 'true') closeClipOverlay(); });
     })();
     window.openClipOverlay = openClipOverlay;
@@ -7182,11 +6822,11 @@
       const filt = (u.boost && u.genderFilter) || 'all';
       document.getElementById('stoolFilterLbl').textContent = ({all:'Tous', il:'Il', elle:'Elle'}[filt] || 'Tous');
     }
-    document.getElementById('stoolLikes').addEventListener('click', () => {
+    document.getElementById('stoolLikes')?.addEventListener('click', () => {
       renderLikedMe();
       document.getElementById('likedPanel').setAttribute('data-open','true');
     });
-    document.getElementById('stoolFilter').addEventListener('click', () => {
+    document.getElementById('stoolFilter')?.addEventListener('click', () => {
       if (!state.user || !state.user.boost) { openBoostModal(); return; }
       const order = ['all','il','elle'];
       const cur = state.user.genderFilter || 'all';
@@ -7199,8 +6839,8 @@
       showToast('🔍', 'Filtre', {all:'Tous', il:'Hommes (Il)', elle:'Femmes (Elle)'}[next]);
     });
     function topCard(){ return document.querySelector('#swipeWrap .swipe-card:last-child'); }
-    document.getElementById('swipeYes').addEventListener('click', () => { const t = topCard(); if (t) commitSwipe('yes', t); });
-    document.getElementById('swipeNo').addEventListener('click',  () => { const t = topCard(); if (t) commitSwipe('no',  t); });
+    document.getElementById('swipeYes')?.addEventListener('click', () => { const t = topCard(); if (t) commitSwipe('yes', t); });
+    document.getElementById('swipeNo')?.addEventListener('click',  () => { const t = topCard(); if (t) commitSwipe('no',  t); });
 
     // ---------- My-status floating control ----------
     const LOOK_EMO = { chill:'🛋️', game:'🎮', now:'⌨️', sleep:'💤' };
@@ -7318,9 +6958,9 @@
       panel.setAttribute('data-view', 'list');
       renderMsgList();
     });
-    document.getElementById('msgClose').addEventListener('click', () => panel.setAttribute('data-open', 'false'));
-    document.getElementById('msgCloseChat').addEventListener('click', () => panel.setAttribute('data-open', 'false'));
-    document.getElementById('msgBack').addEventListener('click', () => { panel.setAttribute('data-view', 'list'); activeConvo = null; });
+    document.getElementById('msgClose')?.addEventListener('click', () => panel.setAttribute('data-open', 'false'));
+    document.getElementById('msgCloseChat')?.addEventListener('click', () => panel.setAttribute('data-open', 'false'));
+    document.getElementById('msgBack')?.addEventListener('click', () => { panel.setAttribute('data-view', 'list'); activeConvo = null; });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && panel.getAttribute('data-open') === 'true') {
         if (panel.getAttribute('data-view') === 'chat') panel.setAttribute('data-view', 'list');
@@ -7774,11 +7414,11 @@
     }
 
     // Free-text adding is disabled — orbs can only be created by clicking a suggestion
-    document.getElementById('accOrbAdd').addEventListener('click', () => {
+    document.getElementById('accOrbAdd')?.addEventListener('click', () => {
       showToast('🔎', 'Choisis dans la liste', 'Clique sur une suggestion pour créer une bulle');
       document.getElementById('accOrbInput').focus();
     });
-    document.getElementById('accOrbInput').addEventListener('keydown', e => {
+    document.getElementById('accOrbInput')?.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
         const first = document.querySelector('#spotifySugg .sp-item');
@@ -8357,27 +7997,28 @@
       }
     }
 
-    document.getElementById('accOrbInput').addEventListener('input', e => {
+    document.getElementById('accOrbInput')?.addEventListener('input', e => {
       _pendingSpotifyOrb = null;
       const val = e.target.value.trim();
       clearTimeout(_suggDebounce);
       _suggDebounce = setTimeout(() => runOrbSearch(val), selectedOrbKind === 'music' ? 320 : 80);
     });
     /* Show curated suggestions immediately on focus (empty input → top of list) */
-    document.getElementById('accOrbInput').addEventListener('focus', () => {
+    document.getElementById('accOrbInput')?.addEventListener('focus', () => {
       if (selectedOrbKind === 'music') return;
       const val = document.getElementById('accOrbInput').value.trim();
       runOrbSearch(val);
     });
-    document.getElementById('accOrbInput').addEventListener('blur', () => setTimeout(closeSugg, 200));
+    document.getElementById('accOrbInput')?.addEventListener('blur', () => setTimeout(closeSugg, 200));
 
     // ---------- Account screen ----------
     function renderAccount(){
       // Always reset to Profil tab on (re)entry — previously left tab state would
       // bleed across screen transitions and look like a render bug.
       const card = document.querySelector('#screen-account .acc-card');
-      // L'édition de profil est dans l'éditeur → l'écran compte ouvre sur PARAMÈTRES.
-      if (card) card.setAttribute('data-current-tab', 'infos');
+      // L'écran compte/paramètres a été retiré (les réglages sont dans l'éditeur).
+      if (!card) return;
+      card.setAttribute('data-current-tab', 'infos');
       document.querySelectorAll('#accTabs .acc-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'infos'));
       document.querySelectorAll('#screen-account .acc-tab').forEach(p => { p.hidden = (p.dataset.tab !== 'infos'); });
       if (typeof refreshBillingUI === 'function') refreshBillingUI();
@@ -8482,13 +8123,14 @@
       if (typeof setScreen === 'function') setScreen('swipe');
     });
     // Pseudo → met à jour le titre du header en live
-    document.getElementById('accPseudo').addEventListener('input', (e) => {
+    document.getElementById('accPseudo')?.addEventListener('input', (e) => {
       const v = e.target.value.trim();
       if (v) document.getElementById('accName').textContent = v;
     });
     // Social connect buttons
     function bindSocial(btnId, inputId, key){
       const btn = document.getElementById(btnId), input = document.getElementById(inputId);
+      if (!btn || !input) return;
       btn.addEventListener('click', () => {
         const v = input.value.trim().replace(/^@/, '');
         state.user = state.user || {};
@@ -8536,7 +8178,7 @@
       const panel = document.getElementById('fnPanel');
       if (panel) panel.classList.toggle('is-on', !!show);  // glow + révèle le corps du panneau
     }
-    document.getElementById('boostFakeNitro').addEventListener('change', e => {
+    document.getElementById('boostFakeNitro')?.addEventListener('change', e => {
       state.user = state.user || {};
       state.user.fakeNitro = e.target.checked;
       save();
@@ -8612,7 +8254,7 @@
     applyBgChoice(state.user && state.user.boostBg);
 
     /* ===== Boost: Gender filter ===== */
-    document.getElementById('boostGenderFilter').addEventListener('change', e => {
+    document.getElementById('boostGenderFilter')?.addEventListener('change', e => {
       if (!state.user || !state.user.boost) { e.target.value = 'all'; openBoostModal(); return; }
       state.user.genderFilter = e.target.value;
       save();
@@ -8662,8 +8304,8 @@
       const overlay = document.getElementById('likerOverlay');
       if (!overlay) return;
       const close = () => overlay.setAttribute('data-show', 'false');
-      document.getElementById('likerClose').addEventListener('click', close);
-      document.getElementById('likerBackdrop').addEventListener('click', close);
+      document.getElementById('likerClose')?.addEventListener('click', close);
+      document.getElementById('likerBackdrop')?.addEventListener('click', close);
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && overlay.getAttribute('data-show') === 'true') close();
       });
@@ -8748,7 +8390,7 @@
         });
       }
     }
-    document.getElementById('likedClose').addEventListener('click', () => {
+    document.getElementById('likedClose')?.addEventListener('click', () => {
       document.getElementById('likedPanel').setAttribute('data-open','false');
     });
 
@@ -8757,6 +8399,7 @@
     let _swipeMusicAudio = null;
     function renderSwipeMusicCurrent(){
       const box = document.getElementById('swipeMusicCurrent');
+      if (!box) return;
       const sm = state.user && state.user.swipeMusic;
       if (!sm) { box.hidden = true; box.innerHTML = ''; return; }
       box.hidden = false;
@@ -8764,14 +8407,14 @@
         (sm.cover ? `<img src="${sm.cover}" alt="" loading="lazy" decoding="async">` : '') +
         `<div class="smc-info"><b>${escapeHtmlMini(sm.title)}</b><small>${escapeHtmlMini(sm.artist || '')}</small></div>` +
         `<button type="button" id="smcRemove">Retirer</button>`;
-      document.getElementById('smcRemove').addEventListener('click', () => {
+      document.getElementById('smcRemove')?.addEventListener('click', () => {
         state.user.swipeMusic = null;
         save();
         renderSwipeMusicCurrent();
         stopSwipeMusic();
       });
     }
-    document.getElementById('swipeMusicInput').addEventListener('input', e => {
+    document.getElementById('swipeMusicInput')?.addEventListener('input', e => {
       const val = e.target.value.trim();
       const sugg = document.getElementById('swipeMusicSugg');
       if (val.length < 2) { sugg.innerHTML=''; sugg.classList.remove('open'); return; }
@@ -8805,7 +8448,7 @@
         } catch(_){}
       }, 320);
     });
-    document.getElementById('swipeMusicInput').addEventListener('blur', () => setTimeout(() => {
+    document.getElementById('swipeMusicInput')?.addEventListener('blur', () => setTimeout(() => {
       const s = document.getElementById('swipeMusicSugg');
       s.innerHTML=''; s.classList.remove('open');
     }, 200));
@@ -8837,7 +8480,7 @@
       if (_swipeMusicAudio) { _swipeMusicAudio.pause(); _swipeMusicAudio = null; }
       document.getElementById('swipeMusic').setAttribute('data-show', 'false');
     }
-    document.getElementById('smToggle').addEventListener('click', () => {
+    document.getElementById('smToggle')?.addEventListener('click', () => {
       if (!_swipeMusicAudio) return;
       if (_swipeMusicAudio.paused) {
         _swipeMusicAudio.play().catch(()=>{});
@@ -8884,6 +8527,7 @@
 
     function renderGifStage(){
       const stage = document.getElementById('gifStage');
+      if (!stage) return;
       stage.querySelectorAll('.gif-item').forEach(n => n.remove());
       const gifs = (state.user && state.user.gifs) || [];
       gifs.forEach((g, i) => {
@@ -8943,7 +8587,7 @@
       item.addEventListener('touchstart', onDown, { passive:false });
     }
 
-    document.getElementById('gifInput').addEventListener('input', (e) => {
+    document.getElementById('gifInput')?.addEventListener('input', (e) => {
       const val = e.target.value.trim();
       const sugg = document.getElementById('gifSugg');
       if (val.length < 2) { sugg.innerHTML=''; sugg.classList.remove('open'); return; }
@@ -8979,7 +8623,7 @@
         sugg.classList.add('open');
       }, 320);
     });
-    document.getElementById('gifInput').addEventListener('blur', () => setTimeout(() => {
+    document.getElementById('gifInput')?.addEventListener('blur', () => setTimeout(() => {
       const s = document.getElementById('gifSugg');
       s.innerHTML=''; s.classList.remove('open');
     }, 200));
@@ -9176,37 +8820,42 @@
 
     /* ===== Boost banner + pricing modal ===== */
     function refreshBoostUI(){
-      const banner = document.getElementById('boostBanner');
-      const title  = document.getElementById('boostBannerTitle');
-      const sub    = document.getElementById('boostBannerSub');
-      const cta    = document.getElementById('boostBannerCta');
       const active = !!(state.user && state.user.boost);
-      banner.classList.toggle('is-active', active);
-      if (active) {
-        const plan = state.user.boostPlan === 'lifetime' ? 'À vie' : 'Mensuel';
-        title.textContent = 'Tindord Boost actif';
-        sub.textContent   = plan + ' · 14 bulles, Fake Nitro, filtre H/F…';
-        cta.textContent   = 'Gérer';
-      } else {
-        title.textContent = 'Passer en Tindord Boost';
-        sub.textContent   = '14 bulles, Fake Nitro, filtre H/F, likes secrets…';
-        cta.textContent   = 'Découvrir';
+      // Bannière + formulaires Boost : retirés avec l'écran compte → on no-op s'ils manquent.
+      const banner = document.getElementById('boostBanner');
+      if (banner) {
+        const title = document.getElementById('boostBannerTitle');
+        const sub   = document.getElementById('boostBannerSub');
+        const cta   = document.getElementById('boostBannerCta');
+        banner.classList.toggle('is-active', active);
+        if (active) {
+          const plan = state.user.boostPlan === 'lifetime' ? 'À vie' : 'Mensuel';
+          if (title) title.textContent = 'Tindord Boost actif';
+          if (sub)   sub.textContent   = plan + ' · 14 bulles, Fake Nitro, filtre H/F…';
+          if (cta)   cta.textContent   = 'Gérer';
+        } else {
+          if (title) title.textContent = 'Passer en Tindord Boost';
+          if (sub)   sub.textContent   = '14 bulles, Fake Nitro, filtre H/F, likes secrets…';
+          if (cta)   cta.textContent   = 'Découvrir';
+        }
       }
       const bmActive = document.getElementById('bmActive');
-      document.querySelectorAll('.bm-plan').forEach(b => b.style.opacity = active ? '.45' : '1');
-      bmActive.hidden = !active;
-      if (active) document.getElementById('bmActivePlan').textContent =
-        '· ' + (state.user.boostPlan === 'lifetime' ? '14,99€ à vie' : '3,59€/mois');
-      // Note: do NOT touch boostSection.hidden here — that's controlled by the tab switcher.
-      // We only sync the form fields with the boost state.
-      document.getElementById('boostFakeNitro').checked = !!(state.user && state.user.fakeNitro);
+      if (bmActive) {
+        document.querySelectorAll('.bm-plan').forEach(b => b.style.opacity = active ? '.45' : '1');
+        bmActive.hidden = !active;
+        const bmp = document.getElementById('bmActivePlan');
+        if (active && bmp) bmp.textContent = '· ' + (state.user.boostPlan === 'lifetime' ? '14,99€ à vie' : '3,59€/mois');
+      }
+      const fn = document.getElementById('boostFakeNitro');
+      if (fn) fn.checked = !!(state.user && state.user.fakeNitro);
       const _bsn = document.getElementById('boostShowName');
       if (_bsn) _bsn.checked = !(state.user && state.user.boostShowName === false);
       if (typeof applyBgChoice === 'function') applyBgChoice(state.user && state.user.boostBg);
-      document.getElementById('boostGenderFilter').value = (state.user && state.user.genderFilter) || 'all';
-      renderSwipeMusicCurrent();
-      renderGifStage();
-      renderUserOrbs();
+      const gfEl = document.getElementById('boostGenderFilter');
+      if (gfEl) gfEl.value = (state.user && state.user.genderFilter) || 'all';
+      if (typeof renderSwipeMusicCurrent === 'function') renderSwipeMusicCurrent();
+      if (typeof renderGifStage === 'function') renderGifStage();
+      if (typeof renderUserOrbs === 'function') renderUserOrbs();
     }
     /* Vérifie l'échéance d'un abonnement MENSUEL (mock, sans backend de paiement) :
        - période en cours (now < prochain paiement) → rien.
@@ -9288,9 +8937,9 @@
     window.__refreshBillingUI = refreshBillingUI;
     function openBoostModal(){ document.getElementById('boostModal').setAttribute('data-open','true'); refreshBoostUI(); }
     function closeBoostModal(){ document.getElementById('boostModal').setAttribute('data-open','false'); }
-    document.getElementById('boostBanner').addEventListener('click', openBoostModal);
-    document.getElementById('boostModalClose').addEventListener('click', closeBoostModal);
-    document.getElementById('boostModalBackdrop').addEventListener('click', closeBoostModal);
+    document.getElementById('boostBanner')?.addEventListener('click', openBoostModal);
+    document.getElementById('boostModalClose')?.addEventListener('click', closeBoostModal);
+    document.getElementById('boostModalBackdrop')?.addEventListener('click', closeBoostModal);
     document.querySelectorAll('.bm-plan').forEach(btn => {
       btn.addEventListener('click', () => {
         if (state.user && state.user.boost) return;
@@ -9298,7 +8947,7 @@
         window.location.href = 'checkout.html?plan=' + (btn.dataset.plan || 'monthly');
       });
     });
-    document.getElementById('bmCancel').addEventListener('click', () => {
+    document.getElementById('bmCancel')?.addEventListener('click', () => {
       if (!state.user) return;
       state.user.boost = false;
       state.user.boostPlan = null;
@@ -9307,7 +8956,7 @@
       showToast('💔', 'Boost annulé', 'Retour à la version gratuite');
     });
     // Language toggle in account
-    document.getElementById('accLangs').addEventListener('click', (e) => {
+    document.getElementById('accLangs')?.addEventListener('click', (e) => {
       const b = e.target.closest('button[data-val]');
       if (!b) return;
       const li = document.querySelector(`#langSwitch .ls-menu li[data-code="${b.dataset.val}"]`);
@@ -10324,9 +9973,9 @@
     (function bindOrbEditOverlay(){
       const overlay = document.getElementById('orbEditOverlay');
       if (!overlay) return;
-      document.getElementById('oeoBackdrop').addEventListener('click', closeOrbEditOverlay);
-      document.getElementById('oeoClose').addEventListener('click', closeOrbEditOverlay);
-      document.getElementById('oeoPanelClose').addEventListener('click', () => {
+      document.getElementById('oeoBackdrop')?.addEventListener('click', closeOrbEditOverlay);
+      document.getElementById('oeoClose')?.addEventListener('click', closeOrbEditOverlay);
+      document.getElementById('oeoPanelClose')?.addEventListener('click', () => {
         document.getElementById('oeoAddPanel').setAttribute('data-open', 'false');
       });
       // The "+" FAB is now created dynamically by renderOrbEditLayout()
@@ -10417,7 +10066,7 @@
           });
         }, 220);
       }
-      document.getElementById('oeoSearch').addEventListener('input', e => runOeoSearch(e.target.value));
+      document.getElementById('oeoSearch')?.addEventListener('input', e => runOeoSearch(e.target.value));
       // Esc closes the overlay
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && overlay.getAttribute('data-show') === 'true') closeOrbEditOverlay();
@@ -10428,8 +10077,8 @@
       });
     })();
 
-    document.getElementById('orbPreviewBtn').addEventListener('click', openOrbEditOverlay);
-    document.getElementById('accountChip').addEventListener('click', (e) => {
+    document.getElementById('orbPreviewBtn')?.addEventListener('click', openOrbEditOverlay);
+    document.getElementById('accountChip')?.addEventListener('click', (e) => {
       e.preventDefault();
       // Clic sur « mon compte » → ouvre directement l'éditeur de profil.
       location.href = 'editor.html';
@@ -10446,12 +10095,12 @@
         if (document.body.getAttribute('data-auth') === 'in' && typeof setScreen === 'function') {
           clearInterval(iv);
           if (h === '#preview') {
-            // Aperçu direct : on déclenche le mode aperçu (qui bascule sur le swipe avec la propre carte),
-            // on ne touche JAMAIS l'écran Paramètres.
+            // Aperçu direct : on déclenche le mode aperçu (qui bascule sur le swipe avec la propre carte).
             const b = document.getElementById('accPreviewFull');
             if (b) b.click(); else setScreen('swipe');
           } else {
-            setScreen('account');
+            // L'écran Paramètres a été retiré → les réglages sont dans l'éditeur.
+            location.href = 'editor.html';
           }
           try { history.replaceState(null, '', location.pathname); } catch(_){}
         } else if (tries > 80) { clearInterval(iv); }
@@ -10461,10 +10110,12 @@
        If any field differs from the snapshot, the floating save bar appears. */
     let _accSnapshot = null;
     function _accSnap(){
+      const pseudoEl = document.getElementById('accPseudo');
+      if (!pseudoEl) return '';
       const fn = document.getElementById('boostFakeNitro');
       const gf = document.getElementById('boostGenderFilter');
       return JSON.stringify({
-        pseudo: document.getElementById('accPseudo').value,
+        pseudo: pseudoEl.value,
         bio:    document.getElementById('accBio').value,
         look:   document.getElementById('accLookSel').value,
         fakeNitro: fn ? !!fn.checked : false,
@@ -10553,9 +10204,9 @@
       msg.setAttribute('data-show', 'true');
       setTimeout(() => msg.setAttribute('data-show', 'false'), 1800);
     }
-    document.getElementById('accSave').addEventListener('click', doAccSave);
+    document.getElementById('accSave')?.addEventListener('click', doAccSave);
     // Delete account
-    document.getElementById('accDeleteAccount').addEventListener('click', () => {
+    document.getElementById('accDeleteAccount')?.addEventListener('click', () => {
       if (!confirm('Supprimer définitivement ton compte Tindord ? Toutes tes données locales seront effacées.')) return;
       try { localStorage.clear(); } catch {}
       try { if (window.__supa) window.__supa.auth.signOut().catch(() => {}); } catch {}
@@ -10563,7 +10214,7 @@
       setAuth(false);
       setScreen('landing');
     });
-    document.getElementById('accSaveReset').addEventListener('click', () => {
+    document.getElementById('accSaveReset')?.addEventListener('click', () => {
       // Revert fields to last snapshot
       const u = state.user || {}; const p = state.profile || {};
       document.getElementById('accPseudo').value  = u.displayName || '';
@@ -10573,8 +10224,8 @@
       refreshSaveBar();
       refreshAccountPreview();
     });
-    document.getElementById('accBackSwipe').addEventListener('click', () => setScreen('swipe'));
-    document.getElementById('accLogout').addEventListener('click', () => {
+    document.getElementById('accBackSwipe')?.addEventListener('click', () => setScreen('swipe'));
+    document.getElementById('accLogout')?.addEventListener('click', () => {
       // Archive the current profile so we can restore it on next Discord reconnect.
       // Keyed by Discord ID (or email as fallback) so different users keep separate profiles.
       try {
