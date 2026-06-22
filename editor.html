@@ -217,6 +217,20 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
 }
 .username input{font:inherit;color:#fff;background:rgba(0,0,0,.25);border:1.5px solid rgba(255,255,255,.6);border-radius:10px;padding:2px 10px;outline:none;max-width:240px}
 .tag{color:rgba(255,255,255,.7);font-size:13px;margin-top:-8px}
+.tag--clickable{cursor:pointer;border-radius:7px;transition:background .15s ease,filter .2s ease;padding:1px 4px;margin-left:-4px;display:inline-block}
+.tag--clickable:hover{background:rgba(255,255,255,.08)}
+.tag.tag--blur{filter:blur(5px);user-select:none}
+/* Style doré Boost sur le pseudo Tindord (carte éditeur) */
+.username--boost{
+  background:linear-gradient(110deg,#FFE17A 0%,#F5C040 20%,#FFFAE6 35%,#F5C040 50%,#B27B14 65%,#F5C040 80%,#FFE17A 100%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 8px rgba(255,216,61,.35));text-shadow:none;
+}
+.username--boost::after{content:" ✦";-webkit-text-fill-color:#FFD83D;color:#FFD83D}
+/* Bouton bascule du style doré dans le popup pseudo */
+.uname-boost-btn{width:100%;margin:10px 0 2px;padding:10px 12px;border-radius:12px;cursor:pointer;font:inherit;font-weight:800;font-size:13px;
+  border:1.5px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#b9bbbe;transition:.15s}
+.uname-boost-btn.on{border-color:rgba(255,216,61,.55);background:linear-gradient(180deg,rgba(255,216,61,.18),rgba(255,179,71,.08));color:#FFE08A}
 .divider{height:1px;background:rgba(255,255,255,.12);margin:2px 0}
 .bio{position:relative;padding:11px 13px;border-radius:13px;cursor:pointer;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:13.5px;line-height:1.5;min-height:44px;white-space:pre-wrap}
 .bio textarea{width:100%;min-height:74px;resize:vertical;font:inherit;color:#fff;background:transparent;border:none;outline:none}
@@ -606,6 +620,15 @@ body.not-boost .boost-fab{display:inline-flex}
   <div class="conn-pop-actions"><button class="btn ghost-danger" id="gamePopClear">Tout effacer</button><button class="btn primary" id="gamePopSave">Enregistrer</button></div>
 </div>
 
+<!-- Popover pseudo Tindord : renommer + (Boost) retirer le style doré -->
+<div class="conn-pop-backdrop" id="unameBackdrop" hidden></div>
+<div class="conn-pop" id="unamePop" hidden>
+  <div class="conn-pop-head"><b>Ton pseudo Tindord</b></div>
+  <input id="unameInput" maxlength="32" placeholder="Ton pseudo…" autocomplete="off">
+  <button type="button" class="uname-boost-btn" id="unameBoostBtn" hidden></button>
+  <div class="conn-pop-actions"><button class="btn" id="unameCancel">Fermer</button><button class="btn primary" id="unameSave">Enregistrer</button></div>
+</div>
+
 <div class="sheet" id="sheet"></div>
 
 <div class="modal" id="boostGate"><div class="box boost-gate-box">
@@ -667,6 +690,8 @@ const S = {
   orbs:[],     // {kind,title,sub,cover}
   gifs:[],     // {url,x,y,w,rot}   (x,y = % carte, w = % largeur carte)
   connections:{}, // {appId: pseudo}
+  handleBlur:false,   // floute le pseudo Discord (@tag) pour éviter les ajouts
+  boostShowName:true, // style doré Boost sur le pseudo Tindord
 };
 let toastT=null; function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
 
@@ -686,8 +711,47 @@ function applyColors(c1,c2){
 function applyColor(hex){ applyColors(hex, darken(hex,.55)); }
 function hslToHex(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12;const a=s*Math.min(l,1-l);const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return '#'+[f(0),f(8),f(4)].map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');}
 
-/* ===== INLINE pseudo + bio ===== */
-(function(){const slot=$('usernameSlot');slot.addEventListener('click',()=>{if(slot.classList.contains('editing'))return;slot.classList.add('editing');const cur=S.username;slot.innerHTML='';const inp=document.createElement('input');inp.value=cur;inp.maxLength=32;slot.appendChild(inp);inp.focus();inp.select();const done=ok=>{const v=ok?(inp.value.trim()||cur):cur;S.username=v;slot.classList.remove('editing');slot.textContent=v;persist();};inp.addEventListener('keydown',e=>{if(e.key==='Enter')done(true);if(e.key==='Escape')done(false);});inp.addEventListener('blur',()=>done(true));});})();
+/* ===== Style doré Boost + flou du pseudo Discord ===== */
+function applyUsernameBoostStyle(){
+  const slot=$('usernameSlot'); if(!slot) return;
+  const isBoost=!document.body.classList.contains('not-boost');
+  const on = isBoost && (S.boostShowName!==false);
+  slot.classList.toggle('username--boost', on);
+}
+function applyTagBlur(){
+  const tag=document.querySelector('.tag'); if(!tag) return;
+  tag.classList.toggle('tag--blur', !!S.handleBlur);
+}
+/* Pseudo Discord (@tag) : clic = flou ON/OFF (empêche les autres de t'ajouter) */
+(function(){
+  const tag=document.querySelector('.tag'); if(!tag) return;
+  tag.classList.add('tag--clickable');
+  tag.title='Clique pour flouter ton pseudo Discord (éviter les ajouts)';
+  tag.addEventListener('click',()=>{ S.handleBlur=!S.handleBlur; applyTagBlur(); persist(); toast(S.handleBlur?'Pseudo Discord flouté 🔒':'Pseudo Discord visible'); });
+})();
+/* Pseudo Tindord : popup rename + (Boost) retrait du style doré */
+(function(){
+  const slot=$('usernameSlot');
+  const pop=$('unamePop'), back=$('unameBackdrop'), inp=$('unameInput'), boostBtn=$('unameBoostBtn');
+  function refreshBoostBtn(){
+    const on=(S.boostShowName!==false);
+    boostBtn.classList.toggle('on', on);
+    boostBtn.textContent = on ? '✦ Pseudo doré Boost : Activé' : 'Pseudo doré Boost : Désactivé';
+  }
+  window.openUnamePop=function(){
+    inp.value=S.username;
+    const isBoost=!document.body.classList.contains('not-boost');
+    boostBtn.hidden=!isBoost; if(isBoost) refreshBoostBtn();
+    back.hidden=false; pop.hidden=false; inp.focus(); inp.select();
+  };
+  window.closeUnamePop=function(){ pop.hidden=true; back.hidden=true; };
+  slot.addEventListener('click',openUnamePop);
+  back.addEventListener('click',closeUnamePop);
+  boostBtn.addEventListener('click',()=>{ S.boostShowName=(S.boostShowName===false); applyUsernameBoostStyle(); refreshBoostBtn(); persist(); });
+  $('unameSave').addEventListener('click',()=>{ const v=inp.value.trim()||S.username; S.username=v; slot.textContent=v; applyUsernameBoostStyle(); persist(); closeUnamePop(); });
+  $('unameCancel').addEventListener('click',closeUnamePop);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter')$('unameSave').click(); if(e.key==='Escape')closeUnamePop(); });
+})();
 (function(){const slot=$('bioSlot');const PH='Clique ici pour écrire ta bio ✨';slot.addEventListener('click',()=>{if(slot.classList.contains('editing'))return;slot.classList.add('editing');slot.innerHTML='';const ta=document.createElement('textarea');ta.value=S.bio;ta.maxLength=280;ta.placeholder='Parle un peu de toi…';slot.appendChild(ta);ta.focus();const done=()=>{S.bio=ta.value.trim();slot.classList.remove('editing');slot.textContent=S.bio||PH;persist();};ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();done();}if(e.key==='Escape')done();});ta.addEventListener('blur',done);});})();
 
 /* ===== CROP (photo + bannière) ===== */
@@ -1352,7 +1416,7 @@ $('btnResync').addEventListener('click',()=>{ $('discModal').classList.add('open
 $('discCancel').addEventListener('click',()=>$('discModal').classList.remove('open'));
 $('discOk').addEventListener('click',()=>{ $('discModal').classList.remove('open'); resyncDiscord(); });
 
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('boostGate').classList.contains('open'))$('bgateClose').click();else if($('discModal').classList.contains('open'))$('discModal').classList.remove('open');else if(!$('gamePop').hidden)closeGamePop();else if(!$('connPop').hidden)closeConnPop();else if($('cropModal').classList.contains('open'))$('cropCancel').click();else if($('voiceModal').classList.contains('open'))closeVoiceModal();else closeSheet();});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('boostGate').classList.contains('open'))$('bgateClose').click();else if($('discModal').classList.contains('open'))$('discModal').classList.remove('open');else if($('unamePop')&&!$('unamePop').hidden){if(window.closeUnamePop)closeUnamePop();}else if(!$('gamePop').hidden)closeGamePop();else if(!$('connPop').hidden)closeConnPop();else if($('cropModal').classList.contains('open'))$('cropCancel').click();else if($('voiceModal').classList.contains('open'))closeVoiceModal();else closeSheet();});
 
 /* ===================================================================
    PONT avec le vrai profil Tindord (localStorage tindord_state, même
@@ -1366,6 +1430,8 @@ let _persistT=null;
 function writeState(){
   const st=readSite(); st.user=st.user||{}; st.profile=st.profile||{};
   st.user.displayName=S.username;
+  st.user.handleBlur=!!S.handleBlur;        // pseudo Discord flouté (visible par les autres)
+  st.user.boostShowName=(S.boostShowName!==false); // style doré Boost sur le pseudo
   st.profile.bio=S.bio;
   if(S.avatar) st.user.avatarUrl=S.avatar.url;
   if(S.banner){ st.user.bannerUrl=S.banner.url; st.user.bannerCustom=true; }
@@ -1431,6 +1497,7 @@ function buildDbProfile(st){
     orbs, publicFlags:u.publicFlags||0, premiumType:u.premiumType||0, socials:u.socials||{},
     gifs:Array.isArray(u.gifs)?u.gifs:[], bg:u.boostBg||null, swipeMusic:u.swipeMusic||null,
     connections:(p.connections&&typeof p.connections==='object')?p.connections:{},
+    handleBlur:!!u.handleBlur, showBoostName:(u.boostShowName===false)?false:true,
   };
 }
 let _dbSyncT=null, _dbSyncing=false;
@@ -1469,6 +1536,8 @@ function hydrateFromSite(){
   if(u.displayName){ S.username=u.displayName; $('usernameSlot').textContent=u.displayName; }
   if(u.discordTag){ document.querySelector('.tag').textContent='@'+u.discordTag+' · en ligne sur Tindord'; }
   document.body.classList.toggle('not-boost', !u.boost); // outils Boost en or pour les non-Boost
+  S.handleBlur=!!u.handleBlur; S.boostShowName=(u.boostShowName!==false);
+  applyTagBlur(); applyUsernameBoostStyle();
   if(typeof p.bio==='string' && p.bio.trim()){ S.bio=p.bio.trim(); $('bioSlot').textContent=S.bio; }
   if(u.avatarUrl){ S.avatar={url:u.avatarUrl,posX:50,posY:50,scale:1}; setCroppedMedia($('avatarSlot'),S.avatar,'<div class="ph">'+(u.displayName||'T').charAt(0).toUpperCase()+'</div>'); }
   // Décoration d'avatar + point de statut Discord → la carte éditeur colle au vrai profil.
