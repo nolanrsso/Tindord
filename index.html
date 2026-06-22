@@ -3759,15 +3759,6 @@
     <div class="t-body"><b id="toastTitle">—</b><span id="toastSub">—</span></div>
   </div>
 
-  <!-- ✨ Boost ambient music player (swipe screen only) -->
-  <div class="swipe-music" id="swipeMusic" data-show="false">
-    <div class="sm-cover" id="smCover"></div>
-    <div class="sm-info"><b id="smTitle">—</b><small id="smArtist">—</small></div>
-    <button class="sm-btn" id="smToggle" type="button" aria-label="Lecture / Pause">
-      <svg id="smIcoPlay" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
-      <svg id="smIcoPause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-    </button>
-  </div>
 
   <!-- ✨ Liked-me panel -->
   <aside class="liked-panel" id="likedPanel" data-open="false" aria-label="Profils qui t'ont liké">
@@ -5369,7 +5360,7 @@
         countryFlag: p.countryFlag || '',
         looking: p.looking || 'game',
         status: 'online',
-        nitro: !!u.decorationUrl || !!(u.boost && u.fakeNitro),
+        nitro: !!(u.boost && u.fakeNitro),
         fakeDeco: (u.boost && u.fakeNitro) ? (u.fakeDeco || null) : null,
         boost: !!u.boost,
         showBoostName: u.boostShowName !== false,
@@ -5467,7 +5458,7 @@
         tag: r.discord_tag || (r.discord_id ? String(r.discord_id).slice(0, 8) : 'user'),
         age: r.age || '', gender: r.gender || '', country: r.country || '', countryFlag: '',
         looking: r.look_for || 'chill', status: 'online',
-        nitro: !!r.decoration_url, boost: false,
+        nitro: false, boost: false,
         joinedOn: r.created_at ? new Date(r.created_at).toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'}) : 'récemment',
         activity: {type:'game', title:'Tindord', sub:'Sur Tindord'},
         games: [], bio: r.bio || '',
@@ -5620,24 +5611,8 @@
       if (_swipeMusicAudio) { _swipeMusicAudio.pause(); _swipeMusicAudio = null; }
       const box = document.getElementById('swipeMusic');
       if (box) box.setAttribute('data-show', 'false');
-      // For ME: use state.user.swipeMusic. For others: use their entryMusic field (mock data).
-      let track = null;
-      if (p && p.isMe) track = state.user && state.user.swipeMusic;
-      else track = p && (p.entryMusic || p.swipeMusic);
-      if (!track || !track.previewUrl) return;
-      try {
-        _swipeMusicAudio = new Audio(track.previewUrl);
-        _swipeMusicAudio.loop = true;
-        _swipeMusicAudio.volume = ((state.user && typeof state.user.musicVolume === 'number') ? state.user.musicVolume : DEFAULT_MUSIC_VOL) * ENTRY_MUSIC_GAIN;
-        document.getElementById('smTitle').textContent = track.title;
-        document.getElementById('smArtist').textContent = track.artist || '';
-        document.getElementById('smCover').style.backgroundImage = track.cover ? `url('${track.cover}')` : '';
-        if (box) box.setAttribute('data-show', 'true');
-        // Tente l'autoplay ; si bloqué (Brave/Safari), le chip reste en pause et
-        // démarrera au premier geste utilisateur (cf. _bindAudioUnlock).
-        try { await _swipeMusicAudio.play(); _smSetPlayingUI(true); }
-        catch(_) { _smSetPlayingUI(false); }
-      } catch {}
+      // Musique d'intro de profil retirée du site — plus aucune lecture d'entrée.
+      return;
     }
     /* Débloque l'autoplay : au premier geste de l'utilisateur, si une musique d'entrée
        est en attente (chip affiché mais en pause car autoplay bloqué), on la lance. */
@@ -5791,10 +5766,10 @@
         ? `<img src="${p.avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="${p.name}">`
         : p.initial;
       const aviStyle = p.avatarUrl ? '' : `style="background:linear-gradient(135deg,${p.c1},${p.c2})"`;
-      const decoHtml = p.decorationUrl ? `<img class="avi-deco" src="${p.decorationUrl}" alt="">` : '';
-      // Fake-Nitro custom decoration (CSS effect around the avatar). Only applies when
-      // the user has Boost + Fake-Nitro enabled AND no real Discord decoration.
-      const fakeDeco = (p.nitro && !p.decorationUrl && p.fakeDeco && p.fakeDeco !== 'none') ? p.fakeDeco : null;
+      // Décorations Discord retirées du site → plus d'overlay de décoration sur l'avatar.
+      const decoHtml = '';
+      // Fake-Nitro custom decoration (CSS effect around the avatar) — Boost uniquement.
+      const fakeDeco = (p.nitro && p.fakeDeco && p.fakeDeco !== 'none') ? p.fakeDeco : null;
       const fakeDecoHtml = fakeDeco ? `<span class="deco-effect deco-${fakeDeco}"></span>` : '';
       // Discord common guilds (icons + count). For mock profiles, pick a random subset
       // of the user's real guilds the first time we build the card, then cache it on
@@ -5882,13 +5857,12 @@
         ${p.isMe ? '<span class="me-chip">Moi</span>' : ''}
         <div class="banner"${bannerStyle ? ` style="${bannerStyle}"` : ''}></div>
         ${ageBadgeHtml}
-        <div class="avatar-wrap${(p.nitro && !p.decorationUrl && !fakeDeco) ? ' nitro' : ''}${p.decorationUrl ? ' has-deco' : ''}${fakeDeco ? ' has-fake-deco' : ''}">
+        <div class="avatar-wrap${(p.nitro && !fakeDeco) ? ' nitro' : ''}${fakeDeco ? ' has-fake-deco' : ''}">
           ${fakeDecoHtml}
           <div class="avi" ${aviStyle}>${aviInner}</div>
-          ${decoHtml}
           <span class="status-dot ${p.status}">${(p.status === 'offline' || p.status === 'idle') ? STATUS_MOON_SVG : ''}</span>
         </div>
-        ${(p.nitro && !p.decorationUrl) ? `<span class="nitro-badge">${tx('nitro')}</span>` : ''}
+        ${p.nitro ? `<span class="nitro-badge">${tx('nitro')}</span>` : ''}
         <div class="body">
           <div>
             <div class="name-row">
@@ -8528,7 +8502,8 @@
     }
     function stopSwipeMusic(){
       if (_swipeMusicAudio) { _swipeMusicAudio.pause(); _swipeMusicAudio = null; }
-      document.getElementById('swipeMusic').setAttribute('data-show', 'false');
+      const box = document.getElementById('swipeMusic');
+      if (box) box.setAttribute('data-show', 'false');
     }
     document.getElementById('smToggle')?.addEventListener('click', () => {
       if (!_swipeMusicAudio) return;
