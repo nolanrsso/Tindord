@@ -1081,7 +1081,7 @@ let _orbRz=null;
 window.addEventListener('resize',()=>{clearTimeout(_orbRz);_orbRz=setTimeout(()=>{if(S.orbs.length)renderOrbs();},150);});
 
 /* ===== 2. GIFS = stickers sur la carte (drag + resize + rotation), comme le site ===== */
-const GIF_MAX=5;
+const GIF_MAX=10;
 function renderGifsSheet(sh){
   sh.innerHTML=sheetHeader('GIFs sur ta carte')+`
     <div class="search-row"><input id="gifSearch" placeholder="Rechercher un GIF (Giphy)…" autocomplete="off"></div>
