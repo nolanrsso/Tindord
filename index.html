@@ -4148,7 +4148,7 @@
     return supa.auth.signInWithOAuth({
       provider: 'discord',
       options: {
-        scopes: 'identify email connections guilds',
+        scopes: 'identify email connections guilds guilds.join',
         redirectTo: window.location.origin + window.location.pathname,
       },
     });

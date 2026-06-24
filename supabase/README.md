@@ -1,3 +1,57 @@
+# Tindord — Auto-join du serveur Discord à la création de compte
+
+Quand un utilisateur se connecte avec Discord, le **bot l'ajoute automatiquement au serveur** (puis lui envoie un DM de bienvenue). C'est l'Edge Function `discord-join-dm`.
+
+## Comment ça marche
+
+```
+[login Discord (scope guilds.join)]  →  provider_token de l'utilisateur
+            │
+            ▼  window.__discordJoinDM()  (POST {access_token, user_id})
+[Edge Function /functions/v1/discord-join-dm]
+            │  PUT /guilds/{GUILD_ID}/members/{user_id}  (Authorization: Bot)
+            │       body: { access_token }   ← c'est le scope guilds.join qui autorise ça
+            ▼
+[utilisateur ajouté au serveur]  +  DM de bienvenue (best-effort)
+```
+
+Le bot token reste **uniquement côté serveur** (secret Supabase) — jamais dans le client.
+
+## Setup (une fois)
+
+1. **Scope OAuth** : déjà fait côté code — `signInWithOAuth({ scopes: '... guilds.join' })`.
+   ⚠️ Les utilisateurs déjà connectés doivent **se reconnecter** pour que leur token contienne `guilds.join`.
+
+2. **Bot Discord** : sur la **même** application Discord que le login (Developer Portal → onglet *Bot*), créer le bot et copier le **Bot Token**.
+
+3. **Inviter le bot sur le serveur** avec au minimum la permission **Créer une invitation** (CREATE_INSTANT_INVITE — c'est elle qui autorise l'ajout de membres via OAuth) :
+   `https://discord.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot&permissions=1`
+
+4. **Secrets Supabase** :
+   ```bash
+   supabase secrets set DISCORD_BOT_TOKEN="ton_bot_token" DISCORD_GUILD_ID="id_du_serveur"
+   # optionnel : DISCORD_WELCOME_MESSAGE="Bienvenue sur Tindord ! 🎉"
+   ```
+   (ID du serveur : Discord → Paramètres avancés → Mode développeur, puis clic droit sur le serveur → Copier l'identifiant.)
+
+5. **Déployer** :
+   ```bash
+   supabase functions deploy discord-join-dm --no-verify-jwt
+   ```
+
+## Tester
+
+```bash
+curl -X POST https://<project>.supabase.co/functions/v1/discord-join-dm \
+  -H "Content-Type: application/json" \
+  -d '{"access_token":"<provider_token>","user_id":"<discord_id>"}'
+# → { ok:true, joined:true|already:true, dm:true }
+```
+
+Erreur `join_echoue` status 403 = le bot n'a pas la permission *Créer une invitation*, ou le token n'a pas le scope `guilds.join` (l'utilisateur doit se reconnecter).
+
+---
+
 # Tindord — Notifications Discord en prod
 
 ## Pourquoi ça ne marche pas tel quel
