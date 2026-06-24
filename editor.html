@@ -547,10 +547,23 @@ body.not-boost .boost-fab{display:inline-flex}
 .rec-btn:hover{transform:scale(1.06)}
 .rec-btn.recording{background:linear-gradient(135deg,#FF4FA0,#C9184A);animation:recPulse 1.1s ease-in-out infinite}
 @keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,79,160,.5)}50%{box-shadow:0 0 0 16px rgba(255,79,160,0)}}
+.rec-hint{text-align:center;color:var(--dim);font-size:12.5px;margin:2px 0 -4px}
 .rec-timer{font-variant-numeric:tabular-nums;font-size:20px;font-weight:800;font-family:"Clash Display",sans-serif}
-.rec-prev{display:flex;align-items:center;gap:10px;width:100%}
-.rec-prev .bar{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
-.rec-prev .bar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#9146FF,#FF7EB6)}
+.rec-timer .rec-max{color:var(--mute);font-size:14px;font-weight:700}
+.rec-prev{display:flex;flex-direction:column;align-items:center;gap:13px;width:100%}
+.rec-prev[hidden]{display:none}                  /* sinon display:flex écrase l'attribut hidden */
+.rec-prev .pv-row{display:flex;align-items:center;gap:12px;width:100%}
+.rec-play{width:48px;height:48px;flex:0 0 auto;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(180deg,#9146FF,#6B2BFF);color:#fff;display:grid;place-items:center;box-shadow:0 6px 18px rgba(107,43,255,.45);transition:transform .14s ease}
+.rec-play:hover{transform:scale(1.07)}
+.rec-play svg{width:20px;height:20px;display:block;grid-area:1/1}   /* les 2 icônes se superposent dans la même cellule */
+.rec-play svg[hidden]{display:none}              /* sinon display:block écrase l'attribut hidden */
+.rec-play .ico-play{margin-left:3px}            /* centrage optique du triangle */
+.rec-prev .bar{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;cursor:pointer}
+.rec-prev .bar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#9146FF,#FF7EB6);border-radius:4px}
+.rec-dur{font-variant-numeric:tabular-nums;color:var(--dim);font-size:12.5px;min-width:32px;text-align:right}
+.rec-redo{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:11px;border:1px solid var(--stroke-2);background:rgba(255,255,255,.05);color:#fff;font-family:inherit;font-weight:700;font-size:12.5px;cursor:pointer;transition:transform .13s ease,background .16s ease}
+.rec-redo:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
+.rec-redo svg{width:15px;height:15px}
 
 .toast{position:fixed;left:50%;bottom:104px;transform:translate(-50%,16px);z-index:90;padding:12px 18px;border-radius:14px;font-size:13.5px;font-weight:600;background:linear-gradient(180deg, rgba(28,22,58,.95), rgba(20,16,46,.95));border:1px solid var(--stroke-2);backdrop-filter:blur(18px) saturate(140%);box-shadow:0 18px 50px rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.24s ease}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -676,11 +689,22 @@ body.not-boost .boost-fab{display:inline-flex}
 
 <div class="modal" id="voiceModal"><div class="box">
   <h3>Vocal du profil</h3>
+  <p class="rec-hint" id="recHint">Appuie sur le micro pour enregistrer — 10 s max</p>
   <div class="rec-zone">
     <canvas id="recCanvas" width="640" height="160"></canvas>
-    <div class="rec-timer" id="recTimer">0:00</div>
-    <button class="rec-btn" id="recBtn" title="Enregistrer"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5M9 21.5h6"/></svg></button>
-    <div class="rec-prev" id="recPrev" hidden><button class="btn" id="recPlay">▶</button><div class="bar"><i id="recBar"></i></div><span id="recDur" style="color:var(--dim);font-size:12px">0:00</span></div>
+    <div class="rec-timer"><span id="recTimer">0:00</span><span class="rec-max"> / 0:10</span></div>
+    <button class="rec-btn" id="recBtn" title="Enregistrer"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5M9 21.5h6"/></svg></button>
+    <div class="rec-prev" id="recPrev" hidden>
+      <div class="pv-row">
+        <button class="rec-play" id="recPlay" type="button" aria-label="Lecture du vocal">
+          <svg class="ico-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
+          <svg class="ico-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+        <div class="bar" id="recSeek"><i id="recBar"></i></div>
+        <span class="rec-dur" id="recDur">0:00</span>
+      </div>
+      <button class="rec-redo" id="recRedo" type="button" title="Réenregistrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>Réenregistrer</span></button>
+    </div>
   </div>
   <div class="row-end"><button class="btn ghost-danger" id="recDiscard" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button><button class="btn" id="recClose">Fermer</button><button class="btn primary" id="recOk" disabled>Confirmer</button></div>
 </div></div>
@@ -818,17 +842,69 @@ $('bannerSlot').addEventListener('click',()=>$('fileBanner').click());
 $('fileBanner').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;openCrop(URL.createObjectURL(f),'banner','Recadrer la bannière',async d=>{S.banner=d;setCroppedMedia($('bannerSlot'),d,'<div class="ph">Clique pour ajouter une bannière (image ou GIF)</div>');persist();toast('Envoi de la bannière…');const url=await edUpload(f,'banner');if(url){S.banner={url,posX:d.posX,posY:d.posY,scale:d.scale};setCroppedMedia($('bannerSlot'),S.banner,'');persist();toast('Bannière mise à jour');}else{toast('⚠️ Envoi échoué — bannière locale seulement');}});e.target.value='';});
 
 /* ===== VOCAL ===== */
-const rec={media:null,recorder:null,chunks:[],url:null,dur:0,t0:0,raf:null,timerI:null,audio:null,actx:null};
-$('voiceSlot').addEventListener('click',()=>{$('voiceModal').classList.add('open');drawIdleWave();});
+const rec={media:null,recorder:null,chunks:[],url:null,blob:null,dur:0,t0:0,raf:null,timerI:null,audio:null,actx:null};
+function setHint(t){const h=$('recHint');if(h)h.textContent=t;}
+// NB : ce sont des <svg> → la propriété .hidden n'existe pas dessus, il faut manipuler l'ATTRIBUT.
+function setPlayUI(playing){const b=$('recPlay');if(!b)return;const ip=b.querySelector('.ico-play'),ipa=b.querySelector('.ico-pause');if(!ip||!ipa)return;if(playing){ip.setAttribute('hidden','');ipa.removeAttribute('hidden');}else{ipa.setAttribute('hidden','');ip.removeAttribute('hidden');}}
+function resetPlayIcon(){setPlayUI(false);}
+function showRecPreview(){$('recBtn').style.display='none';$('recPrev').hidden=false;$('recDur').textContent=fmt(rec.dur);$('recBar').style.width='0%';resetPlayIcon();$('recOk').disabled=false;}
+function showRecMic(){$('recBtn').style.display='';$('recPrev').hidden=true;$('recOk').disabled=true;}
+$('voiceSlot').addEventListener('click',()=>{
+  $('voiceModal').classList.add('open');drawIdleWave();$('recTimer').textContent='0:00';
+  if(rec.audio){rec.audio.pause();rec.audio=null;}
+  // Réouverture avec un vocal déjà enregistré → on le propose directement à l'écoute.
+  if(S.voice&&S.voice.url){ rec.url=S.voice.url;rec.blob=null;rec.dur=S.voice.dur||0;showRecPreview();setHint('Écoute ton vocal ou réenregistre'); }
+  else { rec.url=null;rec.blob=null;showRecMic();setHint('Appuie sur le micro pour enregistrer — 10 s max'); }
+});
 function drawIdleWave(){const c=$('recCanvas'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='rgba(255,255,255,.14)';for(let i=0;i<60;i++){const h=6+Math.abs(Math.sin(i*.55))*14;ctx.fillRect(i*(c.width/60)+2,c.height/2-h/2,4,h);}}
-async function startRec(){try{rec.media=await navigator.mediaDevices.getUserMedia({audio:true});}catch(_){toast('Accès micro refusé');return;}rec.chunks=[];rec.recorder=new MediaRecorder(rec.media);rec.recorder.ondataavailable=e=>{if(e.data.size)rec.chunks.push(e.data);};rec.recorder.onstop=()=>{if(rec.url)URL.revokeObjectURL(rec.url);rec.url=URL.createObjectURL(new Blob(rec.chunks,{type:rec.recorder.mimeType||'audio/webm'}));rec.dur=(performance.now()-rec.t0)/1000;rec.media.getTracks().forEach(t=>t.stop());cancelAnimationFrame(rec.raf);clearInterval(rec.timerI);if(rec.actx){rec.actx.close().catch(()=>{});rec.actx=null;}$('recBtn').classList.remove('recording');$('recPrev').hidden=false;$('recDur').textContent=fmt(rec.dur);$('recOk').disabled=false;drawIdleWave();};rec.recorder.start();rec.t0=performance.now();$('recBtn').classList.add('recording');$('recPrev').hidden=true;$('recOk').disabled=true;rec.actx=new (window.AudioContext||window.webkitAudioContext)();const src=rec.actx.createMediaStreamSource(rec.media);const an=rec.actx.createAnalyser();an.fftSize=256;src.connect(an);const buf=new Uint8Array(an.frequencyBinCount);const c=$('recCanvas'),ctx=c.getContext('2d');const loop=()=>{an.getByteFrequencyData(buf);ctx.clearRect(0,0,c.width,c.height);const n=60,step=Math.floor(buf.length/n);const g=ctx.createLinearGradient(0,0,c.width,0);g.addColorStop(0,'#9146FF');g.addColorStop(1,'#FF7EB6');ctx.fillStyle=g;for(let i=0;i<n;i++){const v=buf[i*step]/255;const h=5+v*(c.height-14);ctx.fillRect(i*(c.width/n)+2,c.height/2-h/2,4,h);}rec.raf=requestAnimationFrame(loop);};loop();rec.timerI=setInterval(()=>{const s=(performance.now()-rec.t0)/1000;$('recTimer').textContent=fmt(s);if(s>=10)stopRec();},200);}
+async function startRec(){try{rec.media=await navigator.mediaDevices.getUserMedia({audio:true});}catch(_){toast('Accès micro refusé');return;}rec.chunks=[];rec.recorder=new MediaRecorder(rec.media);rec.recorder.ondataavailable=e=>{if(e.data.size)rec.chunks.push(e.data);};rec.recorder.onstop=()=>{if(rec.url&&rec.url.startsWith('blob:'))URL.revokeObjectURL(rec.url);rec.blob=new Blob(rec.chunks,{type:rec.recorder.mimeType||'audio/webm'});rec.url=URL.createObjectURL(rec.blob);rec.dur=Math.min(10,(performance.now()-rec.t0)/1000);rec.media.getTracks().forEach(t=>t.stop());cancelAnimationFrame(rec.raf);clearInterval(rec.timerI);if(rec.actx){rec.actx.close().catch(()=>{});rec.actx=null;}$('recBtn').classList.remove('recording');showRecPreview();setHint('Écoute ton vocal ou réenregistre');drawIdleWave();};rec.recorder.start();rec.t0=performance.now();$('recBtn').classList.add('recording');$('recBtn').style.display='';$('recPrev').hidden=true;$('recOk').disabled=true;setHint('Enregistrement… appuie pour arrêter');rec.actx=new (window.AudioContext||window.webkitAudioContext)();const src=rec.actx.createMediaStreamSource(rec.media);const an=rec.actx.createAnalyser();an.fftSize=256;src.connect(an);const buf=new Uint8Array(an.frequencyBinCount);const c=$('recCanvas'),ctx=c.getContext('2d');const loop=()=>{an.getByteFrequencyData(buf);ctx.clearRect(0,0,c.width,c.height);const n=60,step=Math.floor(buf.length/n);const g=ctx.createLinearGradient(0,0,c.width,0);g.addColorStop(0,'#9146FF');g.addColorStop(1,'#FF7EB6');ctx.fillStyle=g;for(let i=0;i<n;i++){const v=buf[i*step]/255;const h=5+v*(c.height-14);ctx.fillRect(i*(c.width/n)+2,c.height/2-h/2,4,h);}rec.raf=requestAnimationFrame(loop);};loop();rec.timerI=setInterval(()=>{const s=(performance.now()-rec.t0)/1000;$('recTimer').textContent=fmt(s);if(s>=10)stopRec();},200);}
 function stopRec(){try{rec.recorder&&rec.recorder.state==='recording'&&rec.recorder.stop();}catch(_){}}
 $('recBtn').addEventListener('click',()=>{if(rec.recorder&&rec.recorder.state==='recording')stopRec();else startRec();});
-$('recPlay').addEventListener('click',()=>{if(!rec.url)return;if(rec.audio&&!rec.audio.paused){rec.audio.pause();$('recPlay').textContent='▶';return;}rec.audio=new Audio(rec.url);rec.audio.play();$('recPlay').textContent='⏸';rec.audio.addEventListener('timeupdate',()=>{$('recBar').style.width=(rec.audio.currentTime/(rec.dur||1)*100)+'%';});rec.audio.addEventListener('ended',()=>{$('recPlay').textContent='▶';$('recBar').style.width='0%';});});
+$('recPlay').addEventListener('click',()=>{
+  if(!rec.url)return;
+  const setUI=setPlayUI;
+  if(rec.audio&&!rec.audio.paused){rec.audio.pause();setUI(false);return;}
+  if(rec.audio&&rec.audio._u===rec.url&&!rec.audio.ended){rec.audio.play().then(()=>setUI(true)).catch(()=>{});return;}
+  rec.audio=new Audio(rec.url);rec.audio._u=rec.url;
+  rec.audio.addEventListener('timeupdate',()=>{const d=(rec.audio.duration&&isFinite(rec.audio.duration))?rec.audio.duration:(rec.dur||1);$('recBar').style.width=Math.min(100,(rec.audio.currentTime/d)*100)+'%';});
+  rec.audio.addEventListener('ended',()=>{setUI(false);$('recBar').style.width='0%';});
+  rec.audio.play().then(()=>setUI(true)).catch(()=>{setUI(false);toast('Lecture impossible');});
+});
+// Clic sur la barre → se positionner dans le vocal.
+$('recSeek').addEventListener('click',e=>{
+  if(!rec.audio)return;
+  const r=e.currentTarget.getBoundingClientRect();
+  const frac=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+  const d=(rec.audio.duration&&isFinite(rec.audio.duration))?rec.audio.duration:(rec.dur||0);
+  if(d){rec.audio.currentTime=frac*d;$('recBar').style.width=(frac*100)+'%';}
+});
+// Réenregistrer : on jette le vocal courant et on relance directement l'enregistrement.
+$('recRedo').addEventListener('click',()=>{
+  if(rec.audio){rec.audio.pause();rec.audio=null;}
+  if(rec.url&&rec.url.startsWith('blob:'))URL.revokeObjectURL(rec.url);
+  rec.url=null;rec.blob=null;$('recTimer').textContent='0:00';
+  startRec();
+});
 function closeVoiceModal(){stopRec();if(rec.audio){rec.audio.pause();rec.audio=null;}$('voiceModal').classList.remove('open');$('recTimer').textContent='0:00';}
 $('recClose').addEventListener('click',closeVoiceModal);
-$('recDiscard').addEventListener('click',()=>{if(rec.url){URL.revokeObjectURL(rec.url);rec.url=null;}$('recPrev').hidden=true;$('recOk').disabled=true;$('recTimer').textContent='0:00';drawIdleWave();});
-$('recOk').addEventListener('click',()=>{if(!rec.url)return;S.voice={url:rec.url,dur:rec.dur};rec.url=null;renderVoice();persist();closeVoiceModal();toast('Vocal enregistré sur ton profil');});
+$('recDiscard').addEventListener('click',()=>{if(rec.audio){rec.audio.pause();rec.audio=null;}if(rec.url&&rec.url.startsWith('blob:'))URL.revokeObjectURL(rec.url);rec.url=null;rec.blob=null;showRecMic();$('recTimer').textContent='0:00';setHint('Appuie sur le micro pour enregistrer — 10 s max');drawIdleWave();});
+$('recOk').addEventListener('click',async()=>{
+  if(!rec.url&&!rec.blob)return;
+  const ok=$('recOk');ok.disabled=true;
+  let finalUrl=rec.url;
+  // Le vocal doit être HÉBERGÉ (Supabase) sinon le blob: meurt au rechargement / sur la carte
+  // de swipe → c'était la cause de « tous les vocaux ne marchent plus ».
+  if(rec.blob){
+    setHint('Envoi du vocal…');toast('Envoi du vocal…');
+    try{
+      const file=new File([rec.blob],'voice-'+Date.now()+'.webm',{type:rec.blob.type||'audio/webm'});
+      const up=await edUpload(file,'voice');
+      if(up){finalUrl=up;}else{toast('⚠️ Envoi échoué — vocal local seulement');}
+    }catch(_){toast('⚠️ Envoi échoué — vocal local seulement');}
+  }
+  S.voice={url:finalUrl,dur:rec.dur};rec.blob=null;
+  renderVoice();persist();closeVoiceModal();toast('Vocal enregistré sur ton profil');
+});
 let voiceAudio=null;
 const VMIC_SVG='<span class="vmic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5M9 21.5h6"/></svg></span>';
 function renderVoice(){const slot=$('voiceSlot');if(!S.voice){slot.innerHTML=VMIC_SVG+'<span class="empty">Clique pour enregistrer un vocal</span>';return;}slot.innerHTML='';const play=document.createElement('span');play.className='vp';play.textContent='▶';const wave=document.createElement('span');wave.className='vw';for(let i=0;i<26;i++){const b=document.createElement('i');b.style.height=(5+Math.abs(Math.sin(i*.8))*16)+'px';wave.appendChild(b);}const t=document.createElement('span');t.className='vt';t.textContent=fmt(S.voice.dur);const del=document.createElement('button');del.className='vdel';del.title='Supprimer le vocal';del.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';slot.append(play,wave,t,del);play.addEventListener('click',e=>{e.stopPropagation();if(voiceAudio&&!voiceAudio.paused){voiceAudio.pause();play.textContent='▶';return;}voiceAudio=new Audio(S.voice.url);voiceAudio.play();play.textContent='⏸';voiceAudio.addEventListener('ended',()=>play.textContent='▶');});del.addEventListener('click',e=>{e.stopPropagation();if(voiceAudio){voiceAudio.pause();voiceAudio=null;}S.voice=null;renderVoice();persist();toast('Vocal supprimé');});}
