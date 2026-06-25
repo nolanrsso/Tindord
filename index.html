@@ -5972,7 +5972,9 @@
           ${guildsHtml}
         </div>
       `;
-      if (isTop) attachDrag(c);
+      // En mode APERÇU, la carte est un endroit dédié et figé : pas de drag/swipe
+      // (sinon on peut traîner la carte et la détacher de ses GIFs de fond).
+      if (isTop && !_previewMode) attachDrag(c);
       // Voice-memo player on the card (if any)
       bindCardVoice(c);
       // Clean up the entering class once the animation completes so future transforms (drag) aren't clobbered
