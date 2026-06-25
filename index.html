@@ -5569,6 +5569,18 @@
       if (typeof startMatch === 'function') startMatch(p, { unread:false });
       else if (typeof playMatchAnimation === 'function') playMatchAnimation(p, 'm_'+Date.now());
     }
+    /* uids des likers auxquels j'ai DÉJÀ répondu (❤️ like en retour OU ✕ rejet).
+       Persisté en localStorage → un like traité ne revient JAMAIS dans le panneau,
+       même si l'écriture Supabase échoue ou sur un autre device après sync. */
+    const DISMISSED_LIKERS = (() => {
+      try { return new Set(JSON.parse(localStorage.getItem('tindord_dismissed_likers') || '[]')); }
+      catch(_){ return new Set(); }
+    })();
+    function dismissLiker(uid){
+      if (!uid) return;
+      DISMISSED_LIKERS.add(uid);
+      try { localStorage.setItem('tindord_dismissed_likers', JSON.stringify([...DISMISSED_LIKERS])); } catch(_){}
+    }
     /* Récupère les profils qui M'ONT liké (pour le panneau + badge cœur). */
     async function fetchLikesReceived(){
       try {
@@ -5582,7 +5594,7 @@
         let likedBack = new Set();
         try { const { data: mine } = await window.__supa.from('likes').select('liked_id').eq('liker_id', myId);
               likedBack = new Set((mine||[]).map(r => r.liked_id)); } catch(_){}
-        const fresh = rows.filter(r => !likedBack.has(r.liker_id));
+        const fresh = rows.filter(r => !likedBack.has(r.liker_id) && !DISMISSED_LIKERS.has(r.liker_id));
         if (!fresh.length) return [];
         const ids = fresh.map(r => r.liker_id);
         const { data: profs } = await window.__supa.from('profiles').select('*').in('id', ids);
@@ -7358,6 +7370,19 @@
     window.createMatchFromLiker = function(p){
       const idx = LIKED_ME.findIndex(x => x.tag === p.tag);
       if (idx >= 0) LIKED_ME.splice(idx, 1);
+      // Ce liker a reçu une réponse → il ne doit JAMAIS revenir dans le panneau.
+      dismissLiker(p.uid);
+      // Enregistre mon like en retour en DB (upsert direct, sans re-déclencher de match)
+      // → likedBack le filtrera aussi sur les autres appareils après sync.
+      (async () => {
+        try {
+          if (window.__supa && p.uid) {
+            const { data:{ session } } = await window.__supa.auth.getSession();
+            if (session) await window.__supa.from('likes')
+              .upsert({ liker_id: session.user.id, liked_id: p.uid }, { onConflict: 'liker_id,liked_id' });
+          }
+        } catch(_){}
+      })();
       // Discord notification (match)
       if (typeof sendDiscordNotif === 'function') sendDiscordNotif('match', p);
       // Crée le vrai match en DB (anti-doublon géré par startMatch/Realtime) + notifie l'autre.
@@ -8512,6 +8537,8 @@
             e.stopPropagation();
             const i = LIKED_ME.findIndex(x => x.tag === p.tag);
             if (i >= 0) LIKED_ME.splice(i, 1);
+            // Réponse (rejet) → ce liker ne doit JAMAIS revenir, même si le delete DB échoue.
+            dismissLiker(p.uid);
             renderLikedMe();
             if (typeof window.__heartFabRefresh === 'function') window.__heartFabRefresh();
             // Supprime le like en DB pour qu'il ne réapparaisse pas au prochain refresh.
