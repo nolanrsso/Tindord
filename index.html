@@ -5637,8 +5637,11 @@
       const wrap = document.getElementById('swipeWrap');
       wrap.innerHTML = '';
       const myP = buildUserProfile();
-      const offset = myP ? 1 : 0;
-      const pool = genderFilteredProfiles();
+      // Ta propre carte n'est dans le deck QU'en mode APERÇU (endroit dédié, figé).
+      // En mode normal (le hub), on ne se swipe pas soi-même → deck = uniquement les autres.
+      const inPreview = !!(_previewMode && myP);
+      const pool = inPreview ? [] : genderFilteredProfiles();
+      const offset = inPreview ? 1 : 0;
       const total = pool.length + offset;
       if (deckIdx >= total) {
         wrap.innerHTML = `<div class="swipe-empty"><h3>${tx('no_more')}</h3><p>${tx('no_more_sub')}</p></div>`;
@@ -5649,7 +5652,7 @@
         return;
       }
       document.body.removeAttribute('data-swipe-empty');
-      const p = (myP && deckIdx === 0) ? myP : pool[deckIdx - offset];
+      const p = inPreview ? myP : pool[deckIdx];
       // Fond selon le profil affiché : on applique SON choix de fond (p.bg)
       if (typeof applyBgChoice === 'function') applyBgChoice(p && p.bg);
       // Filet de sécurité : si un profil défectueux fait planter le rendu, on le SAUTE
@@ -6921,10 +6924,8 @@
       // LIKE → enregistre un vrai like dans Supabase (match auto si l'autre m'a déjà liké)
       if (dir === 'yes') {
         state.user.stats.liked++;
-        const myP = (typeof buildUserProfile === 'function') ? buildUserProfile() : null;
-        const offset = myP ? 1 : 0;
         const pool = (typeof genderFilteredProfiles === 'function') ? genderFilteredProfiles() : [];
-        const swiped = (myP && deckIdx === 0) ? myP : pool[deckIdx - offset];
+        const swiped = pool[deckIdx]; // mode normal : le deck ne contient que les autres
         if (swiped && !swiped.isMe && swiped.uid && typeof recordLike === 'function') {
           recordLike(swiped);
         }
