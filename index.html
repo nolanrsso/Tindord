@@ -3994,7 +3994,7 @@
           <div class="bm-col-head">
             <span class="bm-col-name">Tindord</span>
             <span class="bm-col-sub">Boost</span>
-            <div class="bm-col-price"><b>3,59€</b><small>/mois</small> · <b>14,99€</b><small>à vie</small></div>
+            <div class="bm-col-price"><b>3,79€</b><small>/mois</small> · <b>14,99€</b><small>à vie</small></div>
           </div>
           <ul class="bm-col-feats">
             <li class="on"><span>👑</span>Fake Nitro</li>
@@ -4009,7 +4009,7 @@
       <div class="bm-plans">
         <button type="button" class="bm-plan" data-plan="monthly">
           <span class="bm-plan-tag">Sans engagement</span>
-          <div class="bm-plan-price"><b>3,59€</b><small>/mois</small></div>
+          <div class="bm-plan-price"><b>3,79€</b><small>/mois</small></div>
           <span class="bm-plan-cta">Choisir</span>
         </button>
         <button type="button" class="bm-plan bm-plan--best" data-plan="lifetime">
@@ -9030,7 +9030,7 @@
         document.querySelectorAll('.bm-plan').forEach(b => b.style.opacity = active ? '.45' : '1');
         bmActive.hidden = !active;
         const bmp = document.getElementById('bmActivePlan');
-        if (active && bmp) bmp.textContent = '· ' + (state.user.boostPlan === 'lifetime' ? '14,99€ à vie' : '3,59€/mois');
+        if (active && bmp) bmp.textContent = '· ' + (state.user.boostPlan === 'lifetime' ? '14,99€ à vie' : '3,79€/mois');
       }
       const fn = document.getElementById('boostFakeNitro');
       if (fn) fn.checked = !!(state.user && state.user.fakeNitro);
@@ -9085,7 +9085,7 @@
       const cancelled = !lifetime && !!u.boostCancelled;
       box.innerHTML =
         `<div class="bill-row"><span class="bill-k">Formule</span><span class="bill-v">${lifetime ? 'Boost à vie' : 'Boost mensuel'}</span></div>` +
-        `<div class="bill-row"><span class="bill-k">Prix</span><span class="bill-v">${lifetime ? '14,99€ · paiement unique' : '3,59€ / mois'}</span></div>` +
+        `<div class="bill-row"><span class="bill-k">Prix</span><span class="bill-v">${lifetime ? '14,99€ · paiement unique' : '3,79€ / mois'}</span></div>` +
         `<div class="bill-row"><span class="bill-k">Abonné depuis</span><span class="bill-v">${u.boostSince ? fmt(u.boostSince) : '—'}</span></div>` +
         (lifetime
           ? `<div class="bill-row"><span class="bill-k">Renouvellement</span><span class="bill-v">Aucun — accès à vie</span></div>`

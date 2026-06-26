@@ -237,7 +237,10 @@
       "Bash(node --check .__i.js)",
       "Bash(GIT_EDITOR=true git rebase --continue)",
       "Bash(git --no-pager log --oneline -5)",
-      "Bash(git --no-pager log --oneline origin/master..HEAD)"
+      "Bash(git --no-pager log --oneline origin/master..HEAD)",
+      "PowerShell(git -C \"C:/Users/nolan/OneDrive/Documents/claude/Tindord\" status --short)",
+      "PowerShell(git -C \"C:/Users/nolan/OneDrive/Documents/claude/Tindord\" log --oneline -1)",
+      "Bash(git --no-pager log --oneline -3)"
     ]
   }
 }
