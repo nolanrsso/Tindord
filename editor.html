@@ -924,7 +924,7 @@ const ORB_ICON={
   game:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18c-2.5 0-4-1.7-4-4 0-3 1.5-7 4-7h12c2.5 0 4 4 4 7 0 2.3-1.5 4-4 4-1.8 0-2.6-2-4-2h-4c-1.4 0-2.2 2-4 2Z"/><circle cx="15.5" cy="12" r="1" fill="currentColor"/><circle cx="17.5" cy="14" r="1" fill="currentColor"/><path d="M8 11h4M10 9v4"/></svg>',
   film:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M17 7h5M2 17h5M17 17h5"/></svg>',
 };
-const ORBCAP_FREE=4, ORBCAP_BOOST=14;
+const ORBCAP_FREE=4, ORBCAP_BOOST=16;
 function orbMax(){ return document.body.classList.contains('not-boost')?ORBCAP_FREE:ORBCAP_BOOST; }
 let orbKind='music';
 function updateOrbCount(){
@@ -1088,7 +1088,7 @@ async function runOrbSearch(q){
   hydrateCovers(sugg,results,orbKind,reqId);
 }
 function addOrb(o){
-  if(S.orbs.length>=orbMax()){toast('Limite : '+orbMax()+' bulles'+(document.body.classList.contains('not-boost')?' (14 avec Boost)':''));return;}
+  if(S.orbs.length>=orbMax()){toast('Limite : '+orbMax()+' bulles'+(document.body.classList.contains('not-boost')?' (16 avec Boost)':''));return;}
   if(S.orbs.some(x=>x.kind===o.kind&&x.title===o.title)){toast('Déjà ajoutée');return;}
   S.orbs.push(o); renderOrbs();
   updateOrbCount();

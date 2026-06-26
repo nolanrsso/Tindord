@@ -3994,7 +3994,7 @@
           </div>
           <ul class="bm-col-feats">
             <li class="on"><span>👑</span>Fake Nitro</li>
-            <li class="on"><span>🫧</span>14 bulles</li>
+            <li class="on"><span>🫧</span>16 bulles</li>
             <li class="on"><span>🎵</span>Musique d'ambiance</li>
             <li class="on"><span>🔍</span>Filtre H/F</li>
             <li class="on"><span>👀</span>Likes secrets</li>
@@ -5972,7 +5972,7 @@
 
     /* Bubble budget — socials no longer count against the bubble limit.
        Free: 4 bubbles. Boost: 14 bubbles. */
-    function orbBudget(){ return (state.user && state.user.boost) ? 14 : 4; }
+    function orbBudget(){ return (state.user && state.user.boost) ? 16 : 4; }
     function socialsCount(){
       const s = (state.user && state.user.socials) || {};
       return ['instagram','tiktok','spotify'].filter(k => s[k]).length;
@@ -6099,7 +6099,7 @@
 
       // Sur les autres profils on affiche TOUTES leurs bulles (max 14) ; certaines
       // seront verrouillées. Sur sa propre carte, on garde son budget.
-      const maxOrbs = p.isMe ? orbBudget() : 14;
+      const maxOrbs = p.isMe ? orbBudget() : 16;
       const list = p.orbs.slice(0, maxOrbs);
       const n = list.length;
       orbit.classList.toggle('orbit--dynamic', n > 0);
@@ -7497,7 +7497,7 @@
       if (!val) return;
       state.profile = state.profile || {};
       state.profile.userOrbs = state.profile.userOrbs || [];
-      if (orbsUsed() >= orbBudget()) { showToast('🫧', 'Limite atteinte', orbBudget() + ' bulles max — Boost pour +10'); return; }
+      if (orbsUsed() >= orbBudget()) { showToast('🫧', 'Limite atteinte', orbBudget() + ' bulles max — Boost pour +12'); return; }
       const orb = orbOverride || _pendingSpotifyOrb || {kind: selectedOrbKind, title: val};
       // Empêche les doublons (même kind + même titre normalisé)
       const normTitle = (orb.title || '').toLowerCase().trim();
@@ -8242,7 +8242,7 @@
           btn.textContent = tx('connect');
           btn.classList.remove('connected');
         } else if (v) {
-          if (orbsUsed() >= orbBudget()) { showToast('🫧', 'Limite atteinte', orbBudget() + ' bulles max — Boost pour +10'); return; }
+          if (orbsUsed() >= orbBudget()) { showToast('🫧', 'Limite atteinte', orbBudget() + ' bulles max — Boost pour +12'); return; }
           state.user.socials[key] = v;
           btn.textContent = tx('connected');
           btn.classList.add('connected');
@@ -8933,11 +8933,11 @@
         if (active) {
           const plan = state.user.boostPlan === 'lifetime' ? 'À vie' : 'Mensuel';
           if (title) title.textContent = 'Tindord Boost actif';
-          if (sub)   sub.textContent   = plan + ' · 14 bulles, Fake Nitro, filtre H/F…';
+          if (sub)   sub.textContent   = plan + ' · 16 bulles, Fake Nitro, filtre H/F…';
           if (cta)   cta.textContent   = 'Gérer';
         } else {
           if (title) title.textContent = 'Passer en Tindord Boost';
-          if (sub)   sub.textContent   = '14 bulles, Fake Nitro, filtre H/F, likes secrets…';
+          if (sub)   sub.textContent   = '16 bulles, Fake Nitro, filtre H/F, likes secrets…';
           if (cta)   cta.textContent   = 'Découvrir';
         }
       }
