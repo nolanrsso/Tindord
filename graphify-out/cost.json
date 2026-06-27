@@ -24,8 +24,14 @@
       "output_tokens": 215000,
       "files": 9,
       "note": "incremental update, images skipped"
+    },
+    {
+      "date": "2026-06-27T11:46:29.077434+00:00",
+      "input_tokens": 232354,
+      "output_tokens": 18000,
+      "files": 6
     }
   ],
-  "total_input_tokens": 181386,
-  "total_output_tokens": 219500
+  "total_input_tokens": 413740,
+  "total_output_tokens": 237500
 }
