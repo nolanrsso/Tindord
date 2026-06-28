@@ -6,8 +6,12 @@
 <title>Matefindr - Swipe des profils discord</title>
 <meta name="description" content="Swipe des profils discord et like les profils qui te plaises. Match avec quelqu'un et parle avec lui" />
 <meta name="theme-color" content="#0D0B1E" />
-<!-- Favicon : symbole Matefindr (carrés imbriqués + point violet) sur carré sombre -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231c1530'/%3E%3Crect x='19' y='19' width='44' height='44' rx='14' fill='none' stroke='%23fff' stroke-width='9'/%3E%3Crect x='37' y='37' width='44' height='44' rx='14' fill='none' stroke='%23fff' stroke-width='9'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%239146FF'/%3E%3C/svg%3E" />
+<!-- Police du wordmark logo (comme le design) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<!-- Favicon : logo Matefindr (PNG transparent, sans fond) -->
+<link rel="icon" type="image/png" href="assets/favicon.png" />
 <meta name="referrer" content="no-referrer-when-downgrade" />
 <!-- Security : restrict resource origins. Discord webhooks + Supabase + media CDNs are allowed.
      Inline styles/scripts allowed because this is a single-file SPA. -->
@@ -201,13 +205,16 @@
   /* Le logo est sorti du flux pour ne pas dicter la hauteur du header. */
   .brand{
     position:absolute;left:18px;top:50%;transform:translateY(-50%);
-    display:flex;align-items:center;gap:0;text-decoration:none;color:inherit;cursor:pointer;
+    display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit;cursor:pointer;
     z-index:2;
   }
-  .brand .mark{width:96px;height:96px;display:grid;place-items:center;filter:drop-shadow(0 4px 20px rgba(145,70,255,.6))}
+  .brand .mark{width:54px;height:54px;display:grid;place-items:center;flex:0 0 auto}
+  .brand-word{font-family:'Space Grotesk',system-ui,-apple-system,sans-serif;font-weight:600;font-size:29px;letter-spacing:-.025em;color:#fff;line-height:1;display:flex;align-items:flex-end;white-space:nowrap}
+  .brand-word .bw-i{position:relative;display:inline-block}
+  .brand-word .bw-dot{position:absolute;left:50%;bottom:.66em;width:6px;height:6px;border-radius:50%;background:#9146FF;transform:translateX(-50%)}
   /* .brand est en position:absolute (hors flux) → on pousse la nav à droite
      et on réserve la largeur du logo pour éviter tout chevauchement. */
-  .nav{display:flex;align-items:center;gap:6px;margin-left:auto;padding-left:120px}
+  .nav{display:flex;align-items:center;gap:6px;margin-left:auto;padding-left:210px}
   .nav a{color:var(--ink-dim);text-decoration:none;font-size:14px;font-weight:500;padding:8px 12px;border-radius:10px;transition:.18s ease}
   .nav a:hover{color:#fff;background:rgba(255,255,255,.04)}
   /* Floating corner controls */
@@ -477,7 +484,7 @@
   @media (min-width:1100px){
     header{margin:20px 44px 0;padding:14px 22px;border-radius:22px}
     .brand{left:28px}
-    .brand .mark{width:120px;height:120px}
+    .brand .mark{width:58px;height:58px}
     .login{padding:12px 18px;font-size:15px;border-radius:13px;gap:10px}
     .login .dot{width:8px;height:8px}
   }
@@ -3504,8 +3511,9 @@
   <header data-screen-label="Header">
     <a href="/" class="brand" id="brandHome" aria-label="Recharger la page">
       <div class="mark">
-        <img src="assets/logo.svg" alt="Matefindr" class="matefindr-logo" style="width:100%;height:auto;display:block;filter:drop-shadow(0 4px 18px rgba(255,31,158,.55))" />
+        <img src="assets/logo.svg" alt="Matefindr" class="matefindr-logo" style="width:100%;height:auto;display:block" />
       </div>
+      <span class="brand-word">matef<span class="bw-i">&#305;<i class="bw-dot"></i></span>ndr</span>
     </a>
     <nav class="nav" aria-label="Navigation">
       <a href="#" class="login" id="loginBtn"><span class="dot"></span><span data-i18n="login">Se connecter</span></a>
