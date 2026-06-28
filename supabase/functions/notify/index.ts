@@ -1,4 +1,4 @@
-// Tindord — Edge Function "notify".
+// Matefindr — Edge Function "notify".
 // Déclenchée par les Supabase Database Webhooks sur INSERT dans likes/matches/messages.
 // Lit la préférence du destinataire et POST au webhook Discord configuré.
 //
@@ -48,7 +48,7 @@ async function sendWebhook(url: string, embed: Record<string, unknown>) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      username: "Tindord",
+      username: "Matefindr",
       avatar_url: "https://ui-avatars.com/api/?name=T&size=128&background=9146FF&color=fff&bold=true&format=png",
       embeds: [embed],
     }),
@@ -99,12 +99,12 @@ Deno.serve(async (req) => {
       const [recipient, sender] = await Promise.all([loadPrefs(sb, toUser), loadPrefs(sb, fromUser)]);
       const thumb = sender?.avatar_url || avatarFallback(sender?.display_name || null, sender?.c1 || null);
       const embed = {
-        title: "❤️ Nouveau like sur Tindord",
+        title: "❤️ Nouveau like sur Matefindr",
         description: `**${sender?.display_name || "Quelqu'un"}** t'a liké !`,
         color: COLORS.like,
         thumbnail: { url: thumb },
         timestamp: new Date().toISOString(),
-        footer: { text: "Tindord" },
+        footer: { text: "Matefindr" },
       };
       if (recipient?.discord_webhook && recipient.notif_like) await sendWebhook(recipient.discord_webhook, embed);
       await dmUser(sb, toUser, embed); // MP direct par le bot
@@ -122,11 +122,11 @@ Deno.serve(async (req) => {
         const thumb = other?.avatar_url || avatarFallback(other?.display_name || null, other?.c1 || null);
         const embed = {
           title: "💞 C'est un match !",
-          description: `Tu as matché avec **${other?.display_name || "quelqu'un"}** sur Tindord.`,
+          description: `Tu as matché avec **${other?.display_name || "quelqu'un"}** sur Matefindr.`,
           color: COLORS.match,
           thumbnail: { url: thumb },
           timestamp: new Date().toISOString(),
-          footer: { text: "Tindord" },
+          footer: { text: "Matefindr" },
         };
         if (me?.discord_webhook && me.notif_match) await sendWebhook(me.discord_webhook, embed);
         await dmUser(sb, meId, embed); // MP direct par le bot
@@ -143,12 +143,12 @@ Deno.serve(async (req) => {
       const [recipient, senderPrefs] = await Promise.all([loadPrefs(sb, recipientId), loadPrefs(sb, sender)]);
       const thumb = senderPrefs?.avatar_url || avatarFallback(senderPrefs?.display_name || null, senderPrefs?.c1 || null);
       const embed = {
-        title: "💬 Nouveau message Tindord",
+        title: "💬 Nouveau message Matefindr",
         description: `**${senderPrefs?.display_name || "Quelqu'un"}** t'a écrit :\n> ${content.slice(0, 200)}`,
         color: COLORS.message,
         thumbnail: { url: thumb },
         timestamp: new Date().toISOString(),
-        footer: { text: "Tindord" },
+        footer: { text: "Matefindr" },
       };
       if (recipient?.discord_webhook && recipient.notif_message) await sendWebhook(recipient.discord_webhook, embed);
       await dmUser(sb, recipientId, embed); // MP direct par le bot

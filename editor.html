@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tindord — Éditeur de profil</title>
+<title>Matefindr — Éditeur de profil</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Perf : connexions anticipées vers les CDN/API utilisés par l'éditeur -->
@@ -23,7 +23,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ====== DA Tindord (reprise du site) ====== */
+/* ====== DA Matefindr (reprise du site) ====== */
 :root{
   --accent:#9146FF;
   --c1:#393a41; --c2:#393a41;
@@ -247,7 +247,7 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
 .tag--clickable{cursor:pointer;border-radius:7px;transition:background .15s ease,filter .2s ease;padding:1px 4px;margin-left:-4px;display:inline-block}
 .tag--clickable:hover{background:rgba(255,255,255,.08)}
 .tag.tag--blur{filter:blur(5px);user-select:none}
-/* Style doré Boost sur le pseudo Tindord (carte éditeur) */
+/* Style doré Boost sur le pseudo Matefindr (carte éditeur) */
 .username--boost{
   background:linear-gradient(110deg,#FFE17A 0%,#F5C040 20%,#FFFAE6 35%,#F5C040 50%,#B27B14 65%,#F5C040 80%,#FFE17A 100%);
   background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
@@ -354,7 +354,7 @@ h1,h2,h3{font-family:"Clash Display","Inter",sans-serif}
 .tool--gif .tool-word{font-size:15px}
 .tool--back{color:#fff}
 .tool--back:hover{background:rgba(255,79,160,.16);color:#fff}
-/* Outils Tindord Boost : logo OR pour les utilisateurs non-Boost */
+/* Outils Matefindr Boost : logo OR pour les utilisateurs non-Boost */
 .tool{position:relative}
 body.not-boost .tool--boost{color:#FFD15C}
 body.not-boost .tool--boost:hover{background:rgba(255,209,92,.16);color:#FFE08A}
@@ -370,7 +370,7 @@ body.not-boost .tool--boost:hover{background:rgba(255,209,92,.16);color:#FFE08A}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:560px){.disc-fab span{display:none}.disc-fab{padding:13px}}
 
-/* Bouton upsell "Passez à Tindord Boost" — bas-droite, doré (non-Boost uniquement) */
+/* Bouton upsell "Passez à Matefindr Boost" — bas-droite, doré (non-Boost uniquement) */
 .boost-fab{position:fixed;right:22px;bottom:26px;z-index:41;display:none;align-items:center;gap:9px;padding:13px 20px;border-radius:16px;border:none;cursor:pointer;
   background:linear-gradient(180deg,#FFD15C,#F5A623);color:#3d1e00;font-family:inherit;font-weight:800;font-size:14px;
   box-shadow:0 14px 38px rgba(245,166,35,.45),0 0 0 1px rgba(255,255,255,.18) inset;transition:transform .13s ease,filter .16s ease}
@@ -517,7 +517,7 @@ body.not-boost .boost-fab{display:inline-flex}
 .modal.open{display:grid}
 .modal .box{width:min(94vw,480px);border-radius:22px;padding:20px;background:linear-gradient(180deg, rgba(28,22,58,.97), rgba(18,12,42,.97));border:1px solid var(--stroke-2);box-shadow:0 30px 90px rgba(0,0,0,.8);animation:modalIn .3s cubic-bezier(.2,.8,.3,1.15) both}
 @keyframes modalIn{from{transform:scale(.88) translateY(14px);opacity:0}}
-/* ===== DA popup Tindord Boost (or premium) ===== */
+/* ===== DA popup Matefindr Boost (or premium) ===== */
 .modal .box.boost-gate-box{position:relative;overflow:hidden;text-align:center;padding:28px 24px 20px;width:min(94vw,420px);
   border:1px solid rgba(255,209,92,.32);background:linear-gradient(180deg, rgba(40,31,14,.97) 0%, rgba(22,15,32,.98) 60%)}
 .boost-gate-box .bg-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:280px;height:280px;border-radius:50%;
@@ -624,7 +624,7 @@ body.not-boost .boost-fab{display:inline-flex}
 <div class="grain" aria-hidden="true"></div>
 
 <header class="topbar">
-  <img src="assets/logo.svg" alt="Tindord" class="logo" id="logoHome" title="Retour à l'accueil" style="cursor:pointer">
+  <img src="assets/logo.svg" alt="Matefindr" class="logo" id="logoHome" title="Retour à l'accueil" style="cursor:pointer">
   <span class="crumb">/ éditeur de profil</span>
   <button class="top-btn top-btn--settings" id="btnSettings" title="Paramètres du compte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg><span>Paramètres</span></button>
 </header>
@@ -639,8 +639,8 @@ body.not-boost .boost-fab{display:inline-flex}
       <div class="avatar editable" id="avatarSlot" title="Changer la photo de profil"><div class="ph">T</div></div>
       <div class="avatar-deco" id="avatarDeco" aria-hidden="true"></div>
       <div class="body">
-        <h1 class="username editable" id="usernameSlot">Tindord_user</h1>
-        <div class="tag">@tindord · en ligne sur Tindord</div>
+        <h1 class="username editable" id="usernameSlot">Matefindr_user</h1>
+        <div class="tag">@matefindr · en ligne sur Matefindr</div>
         <div class="divider"></div>
         <div class="bio editable" id="bioSlot">Clique ici pour écrire ta bio ✨</div>
         <div class="label-mini">Vocal du profil</div>
@@ -661,10 +661,10 @@ body.not-boost .boost-fab{display:inline-flex}
     <button class="eye-dot" data-eye="orbs" title="Masquer les bulles (aperçu)" aria-label="Masquer les bulles"></button>
   </span>
   <span class="tool-wrap">
-    <button class="tool tool--gif tool--boost" data-tool="gifs" title="GIFs (Tindord Boost)" aria-label="GIFs"><span class="tool-word">GIF</span></button>
+    <button class="tool tool--gif tool--boost" data-tool="gifs" title="GIFs (Matefindr Boost)" aria-label="GIFs"><span class="tool-word">GIF</span></button>
     <button class="eye-dot" data-eye="gifs" title="Masquer les GIFs (aperçu)" aria-label="Masquer les GIFs"></button>
   </span>
-  <button class="tool tool--boost" data-tool="bg" title="Fond (Tindord Boost)" aria-label="Fond"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3.5" width="18" height="17" rx="2.5"/><circle cx="8.5" cy="9" r="1.8"/><path d="M21 16l-5-5L5 21"/></svg></button>
+  <button class="tool tool--boost" data-tool="bg" title="Fond (Matefindr Boost)" aria-label="Fond"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3.5" width="18" height="17" rx="2.5"/><circle cx="8.5" cy="9" r="1.8"/><path d="M21 16l-5-5L5 21"/></svg></button>
   <span class="tool-sep"></span>
   <button class="tool tool--preview" id="btnPreview" title="Aperçu de ton profil" aria-label="Aperçu"><span class="tool-word">Aperçu</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
 </nav>
@@ -673,7 +673,7 @@ body.not-boost .boost-fab{display:inline-flex}
 
 <button class="disc-fab" id="btnResync" title="Recharger ton profil depuis Discord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>Mettre à jour le profil Discord</span></button>
 
-<button class="boost-fab" id="btnBoostUpsell" title="Passer à Tindord Boost"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2 4 13h5l-1 9 9-12h-5l2-8z"/></svg><span>Passez à Tindord Boost</span></button>
+<button class="boost-fab" id="btnBoostUpsell" title="Passer à Matefindr Boost"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2 4 13h5l-1 9 9-12h-5l2-8z"/></svg><span>Passez à Matefindr Boost</span></button>
 
 
 <!-- Petit popover pour saisir le pseudo d'une connexion -->
@@ -696,10 +696,10 @@ body.not-boost .boost-fab{display:inline-flex}
   <div class="conn-pop-actions"><button class="btn ghost-danger" id="gamePopClear">Tout effacer</button><button class="btn primary" id="gamePopSave">Enregistrer</button></div>
 </div>
 
-<!-- Popover pseudo Tindord : renommer + (Boost) retirer le style doré -->
+<!-- Popover pseudo Matefindr : renommer + (Boost) retirer le style doré -->
 <div class="conn-pop-backdrop" id="unameBackdrop" hidden></div>
 <div class="conn-pop" id="unamePop" hidden>
-  <div class="conn-pop-head"><b>Ton pseudo Tindord</b></div>
+  <div class="conn-pop-head"><b>Ton pseudo Matefindr</b></div>
   <input id="unameInput" maxlength="32" placeholder="Ton pseudo…" autocomplete="off">
   <button type="button" class="uname-boost-btn" id="unameBoostBtn" hidden></button>
   <div class="conn-pop-actions"><button class="btn" id="unameCancel">Fermer</button><button class="btn primary" id="unameSave">Enregistrer</button></div>
@@ -710,14 +710,14 @@ body.not-boost .boost-fab{display:inline-flex}
 <div class="modal" id="boostGate"><div class="box boost-gate-box">
   <div class="bg-glow"></div>
   <div class="bg-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#2a1a02" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5 9.5-12.5H13z"/></svg></div>
-  <h3 class="bg-title">Tindord <span>Boost</span></h3>
-  <p class="bg-sub">Ces options font partie de <b>Tindord Boost</b>.<br>Sans abonnement, elles seront retirées de ton profil.</p>
+  <h3 class="bg-title">Matefindr <span>Boost</span></h3>
+  <p class="bg-sub">Ces options font partie de <b>Matefindr Boost</b>.<br>Sans abonnement, elles seront retirées de ton profil.</p>
   <div class="bg-perks">
     <div class="bg-perk"><span class="bg-perk-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="16" rx="2.5"/><path d="M7 4v16M17 4v16M2.5 9h4.5M2.5 15h4.5M17 9h4.5M17 15h4.5"/></svg></span>GIFs sur ta carte</div>
     <div class="bg-perk"><span class="bg-perk-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3.5" width="18" height="17" rx="2.5"/><circle cx="8.5" cy="9" r="1.8"/><path d="M21 16l-5-5L5 21"/></svg></span>Fond personnalisé</div>
     <div class="bg-perk"><span class="bg-perk-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></span>Musique d'entrée</div>
   </div>
-  <button class="bg-cta" id="bgateBuy"><span>Passer en Tindord Boost</span><small>dès 3,79€/mois · résiliable</small></button>
+  <button class="bg-cta" id="bgateBuy"><span>Passer en Matefindr Boost</span><small>dès 3,79€/mois · résiliable</small></button>
   <button class="bg-later" id="bgateClose">Plus tard — retirer ces éléments</button>
 </div></div>
 
@@ -763,6 +763,8 @@ body.not-boost .boost-fab{display:inline-flex}
 
 <script>
 'use strict';
+/* Migration rebrand Tindord→Matefindr : recopie les anciennes cles localStorage tindord_* vers matefindr_* (aucun reset). */
+try{Object.keys(localStorage).forEach(function(k){if(k.indexOf('tindord_')===0){var nk='matefindr_'+k.slice(8);if(localStorage.getItem(nk)===null)localStorage.setItem(nk,localStorage.getItem(k));}});}catch(_){}
 const GIPHY_KEY = 'XQIOH50ArLIvqYv8hK8BxmDB2QLqnnZ9';
 const $ = id => document.getElementById(id);
 const fmt = s => Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
@@ -770,7 +772,7 @@ const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 const esc = s => (s||'').replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 
 const S = {
-  username:'Tindord_user', bio:'',
+  username:'Matefindr_user', bio:'',
   avatar:null, banner:null, voice:null, music:null,
   bg:{type:'preset', value:'default'},
   c1:'#393a41', c2:'#393a41', // couleur Discord par défaut
@@ -778,7 +780,7 @@ const S = {
   gifs:[],     // {url,x,y,w,rot}   (x,y = % carte, w = % largeur carte)
   connections:{}, // {appId: pseudo}
   handleBlur:false,   // floute le pseudo Discord (@tag) pour éviter les ajouts
-  boostShowName:true, // style doré Boost sur le pseudo Tindord
+  boostShowName:true, // style doré Boost sur le pseudo Matefindr
   nameCustom:false,   // pseudo renommé manuellement → Discord ne l'écrase plus
   avatarCustom:false, // photo importée manuellement → Discord ne l'écrase plus
 };
@@ -818,7 +820,7 @@ function applyTagBlur(){
   tag.title='Clique pour flouter ton pseudo Discord (éviter les ajouts)';
   tag.addEventListener('click',()=>{ S.handleBlur=!S.handleBlur; applyTagBlur(); persist(); toast(S.handleBlur?'Pseudo Discord flouté 🔒':'Pseudo Discord visible'); });
 })();
-/* Pseudo Tindord : popup rename + (Boost) retrait du style doré */
+/* Pseudo Matefindr : popup rename + (Boost) retrait du style doré */
 (function(){
   const slot=$('usernameSlot');
   const pop=$('unamePop'), back=$('unameBackdrop'), inp=$('unameInput'), boostBtn=$('unameBoostBtn');
@@ -1045,7 +1047,7 @@ const ORB_SUGGESTIONS={
   game:["Minecraft","Valorant","Rocket League","Fortnite","League of Legends","Counter-Strike 2","Grand Theft Auto V","Roblox","Apex Legends","Call of Duty: Warzone","Overwatch 2","Tom Clancy's Rainbow Six Siege","Dota 2","PUBG: Battlegrounds","Genshin Impact","World of Warcraft","Final Fantasy XIV","Destiny 2","Honkai: Star Rail","Diablo IV","The Sims 4","Stardew Valley","Terraria","Among Us","Fall Guys","Marvel Rivals","Sea of Thieves","Dead by Daylight","Phasmophobia","Warframe","Path of Exile 2","Hearthstone","Magic: The Gathering Arena","Elden Ring","Cyberpunk 2077","Baldur's Gate 3","The Witcher 3: Wild Hunt","Red Dead Redemption 2","The Elder Scrolls V: Skyrim","EA Sports FC 24","NBA 2K24","Forza Horizon 5","Mortal Kombat 1","Tekken 8","Street Fighter 6","Lethal Company","Helldivers 2","Lost Ark","New World","Hogwarts Legacy"],
   film:["One Piece","Naruto","Dragon Ball Z","Bleach","Hunter x Hunter","Attack on Titan","Jujutsu Kaisen","Demon Slayer","Chainsaw Man","My Hero Academia","Fullmetal Alchemist: Brotherhood","Death Note","JoJo's Bizarre Adventure","Vinland Saga","Spy x Family","Cowboy Bebop","Neon Genesis Evangelion","Steins;Gate","Code Geass","Haikyuu!!","Blue Lock","Re:Zero","Mob Psycho 100","Made in Abyss","Tokyo Ghoul","Fire Force","Black Clover","Frieren","Solo Leveling","Bocchi the Rock!","Spirited Away","Princess Mononoke","Howl's Moving Castle","My Neighbor Totoro","Your Name","Akira","Ghost in the Shell","Breaking Bad","Better Call Saul","The Wire","The Sopranos","Peaky Blinders","Dexter","True Detective","Fargo","Sons of Anarchy","Narcos","Ozark","Mindhunter","Prison Break","The Shield","Boardwalk Empire","The Night Of","Game of Thrones","House of the Dragon","Stranger Things","The X-Files","Black Mirror","The Twilight Zone","Doctor Who","Battlestar Galactica","The Expanse","Westworld","Dark","The Boys","The Umbrella Academy","Lost","Fringe","Foundation","Silo","The Office","Friends","Seinfeld","The Simpsons","South Park","Rick and Morty","It's Always Sunny in Philadelphia","Parks and Recreation","Brooklyn Nine-Nine","How I Met Your Mother","Arrested Development","Community","Curb Your Enthusiasm","Ted Lasso","The Good Place","Silicon Valley","The Godfather","Pulp Fiction","Fight Club","Inception","Interstellar","The Dark Knight","The Matrix","Star Wars: A New Hope","The Empire Strikes Back","Return of the Jedi","The Lord of the Rings: The Fellowship of the Ring","The Two Towers","The Return of the King","Jurassic Park","Terminator","Terminator 2: Judgment Day","Blade Runner","Alien","The Shawshank Redemption","Forrest Gump","Saving Private Ryan","Gladiator","Se7en","Shutter Island","Parasite","The Silence of the Lambs","The Shining","Psycho","Casablanca","Citizen Kane","2001: A Space Odyssey","Apocalypse Now","Taxi Driver","Goodfellas","Reservoir Dogs","The Big Lebowski","No Country for Old Men","There Will Be Blood","Whiplash","Birdman","The Grand Budapest Hotel","The Truman Show","Eternal Sunshine of the Spotless Mind","Memento","Donnie Darko","A Clockwork Orange","Full Metal Jacket","Dr. Strangelove","Lord of War","American Psycho","Scarface","Heat","Casino","The Departed","Dunkirk","Oppenheimer","Tenet","The Prestige","Batman Begins","The Dark Knight Rises","Joker","Logan","Mad Max: Fury Road","Braveheart","Troy","Kingdom of Heaven","300","Sin City","Watchmen","V for Vendetta","Children of Men","District 9","Arrival","Gravity","The Martian","Ad Astra","Moon","Ex Machina","Her","Up","Wall-E","Ratatouille","Finding Nemo","The Incredibles","Toy Story","The Lion King","Aladdin","Beauty and the Beast","Grave of the Fireflies","Weathering With You","Suzume"],
 };
-const COVER_CACHE_KEY='tindord_cover_cache_v3';
+const COVER_CACHE_KEY='matefindr_cover_cache_v3';
 const ANIME_TITLES=new Set(["One Piece","Naruto","Dragon Ball Z","Bleach","Hunter x Hunter","Attack on Titan","Jujutsu Kaisen","Demon Slayer","Chainsaw Man","My Hero Academia","Fullmetal Alchemist: Brotherhood","Death Note","JoJo's Bizarre Adventure","Vinland Saga","Spy x Family","Cowboy Bebop","Neon Genesis Evangelion","Steins;Gate","Code Geass","Haikyuu!!","Blue Lock","Re:Zero","Mob Psycho 100","Made in Abyss","Tokyo Ghoul","Fire Force","Black Clover","Frieren","Solo Leveling","Bocchi the Rock!","Spirited Away","Princess Mononoke","Howl's Moving Castle","My Neighbor Totoro","Your Name","Akira","Ghost in the Shell","Dragon Ball Super","Berserk","Psycho-Pass","Parasyte: The Maxim","The Promised Neverland","Slam Dunk","Kuroko's Basketball","Your Lie in April","Clannad","Toradora","Kaguya-sama: Love is War","Trigun","Samurai Champloo","Tengen Toppa Gurren Lagann","Konosuba","Overlord","That Time I Got Reincarnated as a Slime","Mushoku Tensei","Kill la Kill","Devilman Crybaby","Dorohedoro","Golden Kamuy","Fruits Basket","Soul Eater","Fairy Tail","YuYu Hakusho","Seven Deadly Sins","Dr. Stone","Tokyo Revengers","Weathering With You","Suzume","Grave of the Fireflies"]);
 const _suggCoverCache=(()=>{try{const raw=localStorage.getItem(COVER_CACHE_KEY);if(raw)return new Map(Object.entries(JSON.parse(raw)));}catch(_){}return new Map();})();
 let _coverCachePersistTimer=null;
@@ -1618,7 +1620,7 @@ $('gameBackdrop').addEventListener('click',closeGamePop);
 
 /* ===== REMETTRE À JOUR LE PROFIL DISCORD (re-fetch via le token stocké) ===== */
 async function resyncDiscord(){
-  const token=localStorage.getItem('tindord_discord_token');
+  const token=localStorage.getItem('matefindr_discord_token');
   if(!token){ toast('Reconnecte-toi sur le site d\'abord'); return; }
   const btn=$('btnResync'); btn&&btn.classList.add('spinning');
   try{
@@ -1647,10 +1649,10 @@ $('discOk').addEventListener('click',()=>{ $('discModal').classList.remove('open
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('boostGate').classList.contains('open'))$('bgateClose').click();else if($('discModal').classList.contains('open'))$('discModal').classList.remove('open');else if($('unamePop')&&!$('unamePop').hidden){if(window.closeUnamePop)closeUnamePop();}else if(!$('gamePop').hidden)closeGamePop();else if(!$('connPop').hidden)closeConnPop();else if($('cropModal').classList.contains('open'))$('cropCancel').click();else if($('voiceModal').classList.contains('open'))closeVoiceModal();else closeSheet();});
 
 /* ===================================================================
-   PONT avec le vrai profil Tindord (localStorage tindord_state, même
+   PONT avec le vrai profil Matefindr (localStorage matefindr_state, même
    domaine que le site) — charge ton profil, et renvoie tes modifs.
    =================================================================== */
-const STATE_KEY='tindord_state';
+const STATE_KEY='matefindr_state';
 function readSite(){ try{ return JSON.parse(localStorage.getItem(STATE_KEY)||'{}'); }catch(_){ return {}; } }
 // Snapshot du profil à l'ouverture — sert au bouton « Annuler » (avant toute écriture).
 const _entrySnapshot = localStorage.getItem(STATE_KEY);
@@ -1765,13 +1767,13 @@ function hydrateFromSite(){
   const st=readSite(); const u=st.user||{}, p=st.profile||{};
   const note=document.querySelector('.note'); // peut ne plus exister (topbar simplifiée)
   if(!u.displayName && !u.avatarUrl && !(p&&p.bio)){
-    if(note) note.textContent='Connecte-toi sur tindord.com puis reviens — ton profil se chargera ici';
+    if(note) note.textContent='Connecte-toi sur matefindr.com puis reviens — ton profil se chargera ici';
     return;
   }
-  if(note) note.textContent='Relié à ton profil Tindord — tes modifs sont sauvegardées';
+  if(note) note.textContent='Relié à ton profil Matefindr — tes modifs sont sauvegardées';
   if(u.displayName){ S.username=u.displayName; $('usernameSlot').textContent=u.displayName; }
   S.nameCustom=!!u.nameCustom;
-  if(u.discordTag){ document.querySelector('.tag').textContent='@'+u.discordTag+' · en ligne sur Tindord'; }
+  if(u.discordTag){ document.querySelector('.tag').textContent='@'+u.discordTag+' · en ligne sur Matefindr'; }
   document.body.classList.toggle('not-boost', !u.boost); // outils Boost en or pour les non-Boost
   S.handleBlur=!!u.handleBlur; S.boostShowName=(u.boostShowName!==false);
   applyTagBlur(); applyUsernameBoostStyle();
@@ -1807,7 +1809,7 @@ drawIdleWave();
 hydrateFromSite();
 renderOrbs(); // affiche au moins la bulle "+" même sans bulle existante
 
-/* ===== Gate Tindord Boost : GIFs / Fond perso / Musique d'entrée sont réservés au Boost. ===== */
+/* ===== Gate Matefindr Boost : GIFs / Fond perso / Musique d'entrée sont réservés au Boost. ===== */
 function userHasBoost(){ try{ const st=readSite(); return !!(st.user&&st.user.boost); }catch(_){ return false; } }
 function hasBoostElements(){
   if(userHasBoost()) return false;
@@ -1833,7 +1835,7 @@ function leaveEditor(go){ if(hasBoostElements()){ openBoostGate(go); return; } g
 /* ===== Bas de l'écran : Retour (gauche). Aperçu est collé à la barre d'outils. ===== */
 /* Retour (bas-gauche) : tes modifs sont déjà enregistrées en continu → on revient à l'app. */
 $('btnBack').addEventListener('click',()=>leaveEditor(()=>{ saveNow(); toast('✅ Profil enregistré'); setTimeout(()=>{location.href='index.html';},500); }));
-/* Logo Tindord → retour à l'accueil (en sauvegardant). */
+/* Logo Matefindr → retour à l'accueil (en sauvegardant). */
 $('logoHome').addEventListener('click',()=>leaveEditor(()=>{ saveNow(); location.href='index.html'; }));
 /* Aperçu (collé aux 5 outils) : sauvegarde puis ouvre l'aperçu du profil. */
 $('btnPreview').addEventListener('click',()=>leaveEditor(()=>{ saveNow(); location.href='index.html#preview'; }));
@@ -1857,7 +1859,7 @@ function renderSettingsSheet(sh){
   if(u.boost){
     const lifetime = u.boostPlan==='lifetime';
     const promo = u.boostPromo;
-    bill = `<b>Tindord Boost</b> ${promo?'· <span style="color:#5ee6a0">offert (code)</span>':''}<br>`
+    bill = `<b>Matefindr Boost</b> ${promo?'· <span style="color:#5ee6a0">offert (code)</span>':''}<br>`
       + `<small>${lifetime?'Accès à vie — aucun prélèvement':('Mensuel · prochain paiement '+(u.boostNextPayment?fmtDate(u.boostNextPayment):'—'))}</small>`;
   } else {
     bill = `<b>Gratuit</b><br><small>Aucun abonnement actif</small>`;
@@ -1871,7 +1873,7 @@ function renderSettingsSheet(sh){
       <div class="ss-group">
         <div class="ss-lbl">Abonnement &amp; facturation</div>
         <div class="ss-bill">${bill}</div>
-        ${u.boost?'':'<button class="btn primary" id="ssBoost" style="width:100%;margin-top:9px">Passer à Tindord Boost</button>'}
+        ${u.boost?'':'<button class="btn primary" id="ssBoost" style="width:100%;margin-top:9px">Passer à Matefindr Boost</button>'}
       </div>
       <div class="ss-group ss-danger">
         <div class="ss-lbl">Zone dangereuse</div>
@@ -1891,7 +1893,7 @@ function renderSettingsSheet(sh){
     location.href='index.html';
   });
   sh.querySelector('#ssDelete').addEventListener('click',()=>{
-    if(!confirm('Supprimer définitivement ton compte Tindord ? Toutes tes données locales seront effacées.')) return;
+    if(!confirm('Supprimer définitivement ton compte Matefindr ? Toutes tes données locales seront effacées.')) return;
     try{ localStorage.clear(); }catch(_){}
     try{ const sb=edSupa(); if(sb) sb.auth.signOut().catch(()=>{}); }catch(_){}
     location.href='index.html';
@@ -1905,7 +1907,7 @@ function renderSettingsSheet(sh){
    met le tuto en pause et le fait avancer une fois refermé.
    =================================================================== */
 (function(){
-  const TOUR_KEY='tindord_editor_tour_v1';
+  const TOUR_KEY='matefindr_editor_tour_v1';
 
   /* --- Warning persistant : moins de 4 bulles ⇒ infos des autres verrouillées --- */
   const warn=document.createElement('div'); warn.id='bubbleWarn'; document.body.appendChild(warn);

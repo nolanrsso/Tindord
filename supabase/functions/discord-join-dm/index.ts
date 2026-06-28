@@ -1,4 +1,4 @@
-// Tindord — Edge Function "discord-join-dm".
+// Matefindr — Edge Function "discord-join-dm".
 // Ajoute l'utilisateur fraîchement connecté au serveur Discord (grâce au scope
 // OAuth `guilds.join`), puis lui envoie un DM de bienvenue — le tout via le BOT.
 //
@@ -11,12 +11,12 @@
 // Secrets requis (à définir une seule fois) :
 //   supabase secrets set DISCORD_BOT_TOKEN="ton_bot_token" DISCORD_GUILD_ID="id_du_serveur"
 // Optionnel :
-//   supabase secrets set DISCORD_WELCOME_MESSAGE="Bienvenue sur Tindord ! 🎉"
+//   supabase secrets set DISCORD_WELCOME_MESSAGE="Bienvenue sur Matefindr ! 🎉"
 
 const BOT_TOKEN = Deno.env.get("DISCORD_BOT_TOKEN") ?? "";
 const GUILD_ID = Deno.env.get("DISCORD_GUILD_ID") ?? "";
 const WELCOME = Deno.env.get("DISCORD_WELCOME_MESSAGE") ??
-  "Bienvenue sur Tindord ! 🎉 Tu fais maintenant partie du serveur. Swipe, like, match → https://tindord.com";
+  "Bienvenue sur Matefindr ! 🎉 Tu fais maintenant partie du serveur. Swipe, like, match → https://matefindr.com";
 
 const API = "https://discord.com/api/v10";
 

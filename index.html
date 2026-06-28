@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Tindord - Swipe des profils discord</title>
+<title>Matefindr - Swipe des profils discord</title>
 <meta name="description" content="Swipe des profils discord et like les profils qui te plaises. Match avec quelqu'un et parle avec lui" />
 <meta name="theme-color" content="#0D0B1E" />
 <!-- Favicon : les 4 premières lettres du logo "tind" (carré violet) -->
@@ -3455,9 +3455,9 @@
 
 <!-- ===== Accès privé : page mot de passe (barrière côté client, mémorisée par appareil) ===== -->
 <div id="gate" hidden>
-  <img src="assets/logo.png" alt="Tindord" class="gate-logo" />
+  <img src="assets/logo.png" alt="Matefindr" class="gate-logo" />
   <h1>Accès privé</h1>
-  <p>Entre le mot de passe pour accéder à Tindord</p>
+  <p>Entre le mot de passe pour accéder à Matefindr</p>
   <form class="gate-form" id="gateForm">
     <input id="gateInput" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" aria-label="Mot de passe" />
     <button type="submit">Entrer</button>
@@ -3466,7 +3466,10 @@
 </div>
 <script>
 (function(){
-  var KEY='tindord_gate_ok';
+  /* Migration rebrand Tindord→Matefindr : recopie les anciennes cles localStorage tindord_* vers matefindr_*
+     (1re visite apres le rebrand) → aucun utilisateur beta n'est reset. Idempotent. */
+  try{Object.keys(localStorage).forEach(function(k){if(k.indexOf('tindord_')===0){var nk='matefindr_'+k.slice(8);if(localStorage.getItem(nk)===null)localStorage.setItem(nk,localStorage.getItem(k));}});}catch(_){}
+  var KEY='matefindr_gate_ok';
   var gate=document.getElementById('gate');
   try{ if(localStorage.getItem(KEY)==='1'){ gate.remove(); return; } }catch(_){}
   gate.hidden=false;
@@ -3501,7 +3504,7 @@
   <header data-screen-label="Header">
     <a href="/" class="brand" id="brandHome" aria-label="Recharger la page">
       <div class="mark">
-        <img src="assets/logo.svg" alt="Tindord" class="tindord-logo" style="width:100%;height:auto;display:block;filter:drop-shadow(0 4px 18px rgba(255,31,158,.55))" />
+        <img src="assets/logo.svg" alt="Matefindr" class="matefindr-logo" style="width:100%;height:auto;display:block;filter:drop-shadow(0 4px 18px rgba(255,31,158,.55))" />
       </div>
     </a>
     <nav class="nav" aria-label="Navigation">
@@ -3581,7 +3584,7 @@
       <span class="pulse"></span> <span data-i18n="badge">Bêta ouverte</span>
     </span>
 
-    <h1 style="padding: 21.2306px; margin: 0px">Tindord</h1>
+    <h1 style="padding: 21.2306px; margin: 0px">Matefindr</h1>
 
     <p class="tagline" data-i18n="tagline">Trouve un <span class="accent">Mate</span> pas un random</p>
 
@@ -3972,14 +3975,14 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>
       <div class="bm-head">
-        <img src="assets/logo-gold.svg" alt="Tindord Boost" class="bm-sparkle" style="width:62px;height:auto;display:block;margin:0 auto 6px;filter:drop-shadow(0 4px 18px rgba(255,216,61,.55))" />
+        <img src="assets/logo-gold.svg" alt="Matefindr Boost" class="bm-sparkle" style="width:62px;height:auto;display:block;margin:0 auto 6px;filter:drop-shadow(0 4px 18px rgba(255,216,61,.55))" />
         <h2 id="bmTitle">Compare <span class="bm-grad">les offres</span></h2>
         <p>Choisis ce qui te correspond.</p>
       </div>
       <div class="bm-compare">
         <div class="bm-col bm-col--basic">
           <div class="bm-col-head">
-            <span class="bm-col-name">Tindord</span>
+            <span class="bm-col-name">Matefindr</span>
             <span class="bm-col-sub">Basic</span>
             <div class="bm-col-price"><b>Gratuit</b></div>
           </div>
@@ -3995,7 +3998,7 @@
         <div class="bm-col bm-col--boost">
           <span class="bm-col-tag">✨ Recommandé</span>
           <div class="bm-col-head">
-            <span class="bm-col-name">Tindord</span>
+            <span class="bm-col-name">Matefindr</span>
             <span class="bm-col-sub">Boost</span>
             <div class="bm-col-price"><b>3,79€</b><small>/mois</small> · <b>14,99€</b><small>à vie</small></div>
           </div>
@@ -4084,7 +4087,7 @@
     return asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${asset}.png?size=128` : null;
   }
 
-  /* Build the user payload Tindord expects from a Supabase session.
+  /* Build the user payload Matefindr expects from a Supabase session.
      If we have a provider_token, we enrich with a direct Discord API call so
      we always get banner / decoration / public_flags / premium_type / accent_color. */
   async function userFromSupabaseSession(session){
@@ -4108,16 +4111,16 @@
     // Try session first, fallback to localStorage (captured at OAuth callback).
     let token = session.provider_token;
     if (!token) {
-      const stored = localStorage.getItem('tindord_discord_token');
-      const ts = parseInt(localStorage.getItem('tindord_discord_token_ts') || '0', 10);
+      const stored = localStorage.getItem('matefindr_discord_token');
+      const ts = parseInt(localStorage.getItem('matefindr_discord_token_ts') || '0', 10);
       // Discord access tokens last ~7 days; we keep ours up to 24h to be safe.
       if (stored && (Date.now() - ts) < 24 * 3600 * 1000) token = stored;
     }
     let guilds = [];
     if (token) {
-      console.log('[Tindord] Fetching real Discord profile…');
+      console.log('[Matefindr] Fetching real Discord profile…');
       const d = await fetchDiscordProfile(token);
-      console.log('[Tindord] Discord profile:', d);
+      console.log('[Matefindr] Discord profile:', d);
       if (d) {
         id = d.id || id;
         if (d.avatar) avatar_url = discordAvatarUrl(d.id, d.avatar);
@@ -4130,7 +4133,7 @@
         discordTag   = (d.username || '').replace(/#0$/, '') || discordTag;
       }
       guilds = await fetchDiscordGuilds(token);
-      console.log('[Tindord] Discord guilds:', guilds.length);
+      console.log('[Matefindr] Discord guilds:', guilds.length);
     }
 
     return {
@@ -4607,12 +4610,12 @@
         no_account:   'Pas encore de compte ?',
         signup:       "S'inscrire",
         signup_title: 'Créer un compte',
-        signup_sub:   'Rejoins Tindord en 30 secondes',
+        signup_sub:   'Rejoins Matefindr en 30 secondes',
         signup_submit:'Créer mon compte',
         has_account:  'Déjà inscrit ?',
         sign_in:      'Se connecter',
         msg_signed:   'Connexion réussie. Bienvenue !',
-        msg_created:  'Compte créé. Bienvenue sur Tindord !',
+        msg_created:  'Compte créé. Bienvenue sur Matefindr !',
         msg_invalid:  'Email ou mot de passe invalide.',
         msg_short_pw: 'Le mot de passe doit faire au moins 6 caractères.',
         my_account:   'Mon compte',
@@ -4642,11 +4645,11 @@
         msg_title:    'Messages',
         msg_send:     'Envoyer',
         msg_empty:    "Aucune conversation pour l'instant. Like des profils pour matcher !",
-        joined_on:    'A rejoint Tindord le',
+        joined_on:    'A rejoint Matefindr le',
         nitro:        'NITRO',
         continue:     'Continuer',
         back:         'Retour',
-        onb_finish:   'Découvrir Tindord',
+        onb_finish:   'Découvrir Matefindr',
         acc_gender:   'Genre',
         acc_age:      'Âge',
         acc_looking:  'Je cherche',
@@ -4692,12 +4695,12 @@
         no_account:   'No account yet?',
         signup:       'Sign up',
         signup_title: 'Create an account',
-        signup_sub:   'Join Tindord in 30 seconds',
+        signup_sub:   'Join Matefindr in 30 seconds',
         signup_submit:'Create my account',
         has_account:  'Already a member?',
         sign_in:      'Sign in',
         msg_signed:   'Signed in. Welcome!',
-        msg_created:  'Account created. Welcome to Tindord!',
+        msg_created:  'Account created. Welcome to Matefindr!',
         msg_invalid:  'Invalid email or password.',
         msg_short_pw: 'Password must be at least 6 characters.',
         my_account:   'My account',
@@ -4727,11 +4730,11 @@
         msg_title:    'Messages',
         msg_send:     'Send',
         msg_empty:    'No conversations yet. Like profiles to match!',
-        joined_on:    'Joined Tindord on',
+        joined_on:    'Joined Matefindr on',
         nitro:        'NITRO',
         continue:     'Continue',
         back:         'Back',
-        onb_finish:   'Discover Tindord',
+        onb_finish:   'Discover Matefindr',
         acc_gender:   'Gender',
         acc_age:      'Age',
         acc_looking:  'Looking for',
@@ -4828,8 +4831,8 @@
     if (loggedIn) {
       // Connected: skip OAuth, go straight to swipe (onboarding if profile missing)
       setTimeout(() => {
-        if (window.__tindord && typeof window.__tindord.go === 'function') {
-          window.__tindord.go(window.__tindord.hasProfile && window.__tindord.hasProfile() ? 'swipe' : 'onboarding');
+        if (window.__matefindr && typeof window.__matefindr.go === 'function') {
+          window.__matefindr.go(window.__matefindr.hasProfile && window.__matefindr.hasProfile() ? 'swipe' : 'onboarding');
         }
       }, 220);
       return;
@@ -4946,12 +4949,12 @@
 
       // Demo: persist a fake session (no backend)
       try {
-        localStorage.setItem('tindord_user', JSON.stringify({ email, mode, ts: Date.now() }));
+        localStorage.setItem('matefindr_user', JSON.stringify({ email, mode, ts: Date.now() }));
       } catch(_){}
       showMsg(mode === 'signup' ? t('msg_created') : t('msg_signed'), true);
       setTimeout(() => {
         close(); setView('providers'); setMode('signin'); emailForm.reset();
-        window.__tindord && window.__tindord.onLogin({ email, displayName: email.split('@')[0], mode });
+        window.__matefindr && window.__matefindr.onLogin({ email, displayName: email.split('@')[0], mode });
       }, 1100);
     });
 
@@ -4973,7 +4976,7 @@
     const SPOTIFY_CLIENT_ID     = '97ee507ff2694d9c916f2cd930afcb4c';
     const SPOTIFY_CLIENT_SECRET = '1775eb6d41204c489c9e0ed9cf72f2bb';
 
-    const KEY = 'tindord_state';
+    const KEY = 'matefindr_state';
     let state = { user:null, profile:null };
     try { const raw = localStorage.getItem(KEY); if (raw) state = JSON.parse(raw); } catch(_){}
 
@@ -5015,7 +5018,7 @@
     }
 
     // Hand-off used by login/signup handlers
-    window.__tindord = {
+    window.__matefindr = {
       onLogin(user){
         // Déjà connecté et déjà dans l'app ? (ex : onAuthStateChange qui refire quand on
         // revient sur l'onglet) → on met à jour les données SANS changer l'écran courant.
@@ -5032,7 +5035,7 @@
         try {
           const key = state.user.discordId || state.user.email || state.user.discordTag;
           if (key && !state.profile) {
-            const archives = JSON.parse(localStorage.getItem('tindord_archived_profiles') || '{}');
+            const archives = JSON.parse(localStorage.getItem('matefindr_archived_profiles') || '{}');
             const arch = archives[key];
             if (arch && arch.profile) {
               state.profile = arch.profile;
@@ -5047,7 +5050,7 @@
                   state.user.bannerCustom = true;
                 }
               }
-              console.log('[Tindord] Restored archived profile for', key);
+              console.log('[Matefindr] Restored archived profile for', key);
             }
           }
         } catch (e) { console.warn('restore archive failed', e); }
@@ -5070,10 +5073,10 @@
     window.__discordJoinDM = async function(){
       try {
         const u = state.user || {};
-        const token  = localStorage.getItem('tindord_discord_token');
+        const token  = localStorage.getItem('matefindr_discord_token');
         const userId = u.discordId;
         if (!token || !userId) return;
-        const doneKey = 'tindord_joindm_' + userId;
+        const doneKey = 'matefindr_joindm_' + userId;
         if (localStorage.getItem(doneKey) === '1') return;
         const res = await fetch(SUPABASE_URL + '/functions/v1/discord-join-dm', {
           method: 'POST',
@@ -5085,9 +5088,9 @@
           body: JSON.stringify({ access_token: token, user_id: userId }),
         });
         const data = await res.json().catch(() => ({}));
-        console.log('[Tindord] discord join+DM:', data);
+        console.log('[Matefindr] discord join+DM:', data);
         if (data && (data.joined || data.dm)) localStorage.setItem(doneKey, '1');
-      } catch (e) { console.warn('[Tindord] discord join+DM failed', e); }
+      } catch (e) { console.warn('[Matefindr] discord join+DM failed', e); }
     };
 
     // ---------- Onboarding (welcome → age → genre → pays → perso) ----------
@@ -5293,7 +5296,7 @@
         ] },
       { name:'Mo', tag:'mo.zzz', age:23, gender:'male', looking:'sleep', status:'dnd', nitro:false,
         joinedOn:'21 août 2025',
-        activity:{type:'call', title:'Dans un appel', sub:'Voicechat — Tindord Chill'},
+        activity:{type:'call', title:'Dans un appel', sub:'Voicechat — Matefindr Chill'},
         games:['Minecraft','Rocket League'], bio:'Insomniaque. Sleepcall ce soir ?',
         common:{friends:0, servers:1}, c1:'#FFB66E', c2:'#FF4FA0', initial:'M',
         orbs:[
@@ -5417,7 +5420,7 @@
         showBoostName: u.boostShowName !== false,
         handleBlur: !!u.handleBlur,
         joinedOn: new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'}),
-        activity: {type:'game', title:'Tindord', sub:'Swipe en cours…'},
+        activity: {type:'game', title:'Matefindr', sub:'Swipe en cours…'},
         games: [p.game].filter(Boolean),
         bio: p.bio || '✏️ Complète ton profil dans Mon compte !',
         common: {friends:0, servers:0},
@@ -5483,8 +5486,8 @@
         if (error && /data/i.test((error.message || '') + (error.details || ''))) {
           ({ error } = await window.__supa.from('profiles').upsert(base, { onConflict: 'id' }));
         }
-        if (error) console.warn('[Tindord] sync profile failed', error.message || error);
-      } catch (e) { console.warn('[Tindord] sync profile error', e); }
+        if (error) console.warn('[Matefindr] sync profile failed', error.message || error);
+      } catch (e) { console.warn('[Matefindr] sync profile error', e); }
     }
     window.__syncMyProfileToCloud = syncMyProfileToCloud;
     window.__scheduleCloudSync = scheduleCloudSync;
@@ -5509,13 +5512,13 @@
         rank: o.rank || null, customX: o.customX, customY: o.customY,
       }));
       return {
-        name: r.display_name || 'Tindord',
+        name: r.display_name || 'Matefindr',
         tag: r.discord_tag || (r.discord_id ? String(r.discord_id).slice(0, 8) : 'user'),
         age: r.age || '', gender: r.gender || '', country: r.country || '', countryFlag: '',
         looking: r.look_for || 'chill', status: 'online',
         nitro: false, boost: false,
         joinedOn: r.created_at ? new Date(r.created_at).toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'}) : 'récemment',
-        activity: {type:'game', title:'Tindord', sub:'Sur Tindord'},
+        activity: {type:'game', title:'Matefindr', sub:'Sur Matefindr'},
         games: [], bio: r.bio || '',
         common: {friends:0, servers:0},
         c1:'#5865F2', c2:'#404EED',
@@ -5542,11 +5545,11 @@
           // Timeout 8s : un Supabase lent ne doit jamais bloquer indéfiniment.
           const result = await Promise.race([q, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))]);
           const { data, error } = result;
-          if (error) { console.warn('[Tindord] fetch profiles failed', error.message || error); return _remoteProfiles; }
+          if (error) { console.warn('[Matefindr] fetch profiles failed', error.message || error); return _remoteProfiles; }
           _remoteProfiles = (data || []).map(rowToProfile).filter(Boolean);
           _remoteFetchedAt = Date.now();
           return _remoteProfiles;
-        } catch (e) { console.warn('[Tindord] fetch profiles error', e); return _remoteProfiles; }
+        } catch (e) { console.warn('[Matefindr] fetch profiles error', e); return _remoteProfiles; }
         finally { _profilesInFlight = null; }
       })();
       return _profilesInFlight;
@@ -5565,7 +5568,7 @@
         const { data: back } = await window.__supa.from('likes')
           .select('liker_id').eq('liker_id', profile.uid).eq('liked_id', myId).limit(1);
         if (back && back.length && typeof triggerMatch === 'function') triggerMatch(profile);
-      } catch(e){ console.warn('[Tindord] like error', e); }
+      } catch(e){ console.warn('[Matefindr] like error', e); }
     }
     function triggerMatch(p){
       // Like réciproque détecté → crée le match en DB (l'autre est notifié via Realtime) + anim.
@@ -5576,13 +5579,13 @@
        Persisté en localStorage → un like traité ne revient JAMAIS dans le panneau,
        même si l'écriture Supabase échoue ou sur un autre device après sync. */
     const DISMISSED_LIKERS = (() => {
-      try { return new Set(JSON.parse(localStorage.getItem('tindord_dismissed_likers') || '[]')); }
+      try { return new Set(JSON.parse(localStorage.getItem('matefindr_dismissed_likers') || '[]')); }
       catch(_){ return new Set(); }
     })();
     function dismissLiker(uid){
       if (!uid) return;
       DISMISSED_LIKERS.add(uid);
-      try { localStorage.setItem('tindord_dismissed_likers', JSON.stringify([...DISMISSED_LIKERS])); } catch(_){}
+      try { localStorage.setItem('matefindr_dismissed_likers', JSON.stringify([...DISMISSED_LIKERS])); } catch(_){}
     }
     /* Récupère les profils qui M'ONT liké (pour le panneau + badge cœur). */
     async function fetchLikesReceived(){
@@ -5602,7 +5605,7 @@
         const ids = fresh.map(r => r.liker_id);
         const { data: profs } = await window.__supa.from('profiles').select('*').in('id', ids);
         return fresh.map(r => { const pr = (profs||[]).find(p => p.id === r.liker_id); return pr ? rowToProfile(pr) : null; }).filter(Boolean);
-      } catch(e){ console.warn('[Tindord] fetch likes error', e); return []; }
+      } catch(e){ console.warn('[Matefindr] fetch likes error', e); return []; }
     }
     async function refreshLikesReceived(){
       const list = await fetchLikesReceived();
@@ -5670,7 +5673,7 @@
         // (ensureDeck est rappelé à chaque swipe → stoppe l'ancienne, lance celle de la nouvelle carte)
         playProfileEntryMusic(p);
       } catch (err) {
-        console.warn('[Tindord] profil illisible, on passe au suivant', err, p);
+        console.warn('[Matefindr] profil illisible, on passe au suivant', err, p);
         wrap.innerHTML = '';
         if (deckIdx < total - 1) { deckIdx++; ensureDeckSync(); return; }
         wrap.innerHTML = `<div class="swipe-empty"><h3>${tx('no_more')}</h3><p>${tx('no_more_sub')}</p></div>`;
@@ -5796,7 +5799,7 @@
       if (type === 'music') return `<svg width="18" height="18" viewBox="0 0 24 24" fill="#1DB954"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.6 14.4a.7.7 0 0 1-.96.23c-2.6-1.6-5.9-1.96-9.78-1.07a.7.7 0 1 1-.3-1.37c4.2-.94 7.83-.54 10.7 1.24a.7.7 0 0 1 .23.97Zm1.25-2.78a.88.88 0 0 1-1.2.28c-2.97-1.83-7.5-2.36-11.02-1.3a.88.88 0 0 1-.5-1.69c4-1.2 8.97-.6 12.4 1.5.4.25.55.81.32 1.21Zm.1-2.9c-3.56-2.12-9.44-2.32-12.83-1.28a1.05 1.05 0 1 1-.6-2.02c3.9-1.18 10.4-.95 14.5 1.5a1.05 1.05 0 1 1-1.07 1.8Z"/></svg>`;
       return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 12h2M9 11v2M14 12h.01M16 13h.01"/></svg>`;
     }
-    const STATUS_LABEL = { online:'En ligne sur Tindord', idle:'Inactif', dnd:'Ne pas déranger', offline:'Inactif' };
+    const STATUS_LABEL = { online:'En ligne sur Matefindr', idle:'Inactif', dnd:'Ne pas déranger', offline:'Inactif' };
     /* Moon icon shown over the avatar for inactive/offline users (Discord-style) */
     const STATUS_MOON_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="#dcddde"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>';
     // Outline-style SVG icons (white) for looking_for badges — same DA as ♂ ♀ ⭐
@@ -5979,7 +5982,7 @@
             // Garde-fou : certains profils (anciennes sauvegardes) n'ont pas d'objet activity.
             // Sans ce fallback, p.activity.type lève une exception qui fait planter buildCard
             // → la carte ne se construit pas → le deck reste vide et on ne peut plus swiper.
-            const act = (p.activity && typeof p.activity === 'object') ? p.activity : { type:'game', title:'Tindord', sub:'Sur Tindord' };
+            const act = (p.activity && typeof p.activity === 'object') ? p.activity : { type:'game', title:'Matefindr', sub:'Sur Matefindr' };
             return `
             <div class="activity">
               <div class="icon">${activityIcon(act.type)}</div>
@@ -7115,7 +7118,7 @@
         rtMyId().then(me => {
           if (!me) return;
           window.__supa.from('messages').insert({ match_id: activeConvo.matchId, sender_id: me, body: v })
-            .then(({ error }) => { if (error) console.warn('[Tindord] send msg', error.message || error); });
+            .then(({ error }) => { if (error) console.warn('[Matefindr] send msg', error.message || error); });
         });
       }
       renderMsgList();
@@ -7205,9 +7208,9 @@
       try {
         const { data, error } = await window.__supa.from('matches')
           .upsert({ user_a:a, user_b:b }, { onConflict:'user_a,user_b' }).select('id').limit(1);
-        if (error) { console.warn('[Tindord] match upsert', error.message || error); return null; }
+        if (error) { console.warn('[Matefindr] match upsert', error.message || error); return null; }
         return (data && data[0] && data[0].id) || null;
-      } catch(e){ console.warn('[Tindord] match err', e); return null; }
+      } catch(e){ console.warn('[Matefindr] match err', e); return null; }
     }
     // Construit/maj une conversation locale liée à un matchId.
     function rtUpsertConvo(matchId, otherId, p, opts){
@@ -7303,7 +7306,7 @@
       try {
         const { data, error } = await window.__supa.from('matches').select('*')
           .or(`user_a.eq.${me},user_b.eq.${me}`).order('created_at', { ascending:false }).limit(200);
-        if (error) { console.warn('[Tindord] load matches', error.message || error); return; }
+        if (error) { console.warn('[Matefindr] load matches', error.message || error); return; }
         matches = data || [];
       } catch(_){ return; }
       for (const m of matches) {
@@ -7351,7 +7354,7 @@
         RT.pollFails = (RT.pollFails || 0) + 1;
         if (RT.pollFails >= 3 && RT.pollTimer) {
           clearInterval(RT.pollTimer); RT.pollTimer = null;
-          console.warn('[Tindord] sondage Realtime arrêté (tables matches/messages manquantes ?)', e && e.message);
+          console.warn('[Matefindr] sondage Realtime arrêté (tables matches/messages manquantes ?)', e && e.message);
         }
       }
     }
@@ -7366,7 +7369,7 @@
           .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages' }, payload => rtHandleIncomingMessage(payload.new))
           .on('postgres_changes', { event:'INSERT', schema:'public', table:'matches'  }, payload => rtHandleNewMatch(payload.new))
           .subscribe();
-      } catch(e){ console.warn('[Tindord] realtime subscribe', e); }
+      } catch(e){ console.warn('[Matefindr] realtime subscribe', e); }
       // Filet de sécurité : sondage toutes les 2 s (instantané garanti même sans Realtime).
       if (!RT.pollTimer) RT.pollTimer = setInterval(rtPoll, 2000);
     }
@@ -7798,7 +7801,7 @@
     };
     /* Cache: kind+title -> coverUrl. Mirrored in localStorage so covers fetched
        in a previous session are instantly available — no Wikipedia/Wikidata round-trip. */
-    const COVER_CACHE_KEY = 'tindord_cover_cache_v3';
+    const COVER_CACHE_KEY = 'matefindr_cover_cache_v3';
     /* Titres reconnus comme anime → on fetch via Jikan (artwork de qualité) au lieu
        de Wikipedia/Wikidata qui retournent souvent des posters moches ou des covers
        de tome 1 de manga. Liste à étendre quand on ajoute des animes dans ORB_SUGGESTIONS.film. */
@@ -8206,7 +8209,7 @@
       if (typeof refreshBillingUI === 'function') refreshBillingUI();
       const u = state.user || {};
       const p = state.profile || {};
-      document.getElementById('accName').textContent = u.displayName || u.email || 'Tindord user';
+      document.getElementById('accName').textContent = u.displayName || u.email || 'Matefindr user';
       document.getElementById('accHandle').textContent = u.discordTag ? '@' + u.discordTag : (u.email || '—');
       const avi = document.getElementById('accAvatar');
       if (u.avatarUrl) {
@@ -8466,7 +8469,7 @@
         nitro: !!p.nitro,
         boost: !!p.boost,
         joinedOn: p.joinedOn || 'récemment',
-        activity: p.activity || { type:'game', title:'Tindord', sub:'Vient de te liker' },
+        activity: p.activity || { type:'game', title:'Matefindr', sub:'Vient de te liker' },
         games: p.games || [],
         bio: p.bio || 'Vient de liker ton profil. Réponds vite ?',
         common: p.common || { friends:0, servers:0 },
@@ -8567,7 +8570,7 @@
         const cta = document.createElement('div');
         cta.className = 'liked-paywall';
         cta.innerHTML = `
-          <p class="lp-text">Pour voir qui t'as liké, passe à <b>Tindord Boost</b> ✨</p>
+          <p class="lp-text">Pour voir qui t'as liké, passe à <b>Matefindr Boost</b> ✨</p>
           <button type="button" class="acc-btn acc-btn--primary lp-cta" id="likedPaywallCta">Découvrir Boost</button>
         `;
         list.appendChild(cta);
@@ -9019,11 +9022,11 @@
         banner.classList.toggle('is-active', active);
         if (active) {
           const plan = state.user.boostPlan === 'lifetime' ? 'À vie' : 'Mensuel';
-          if (title) title.textContent = 'Tindord Boost actif';
+          if (title) title.textContent = 'Matefindr Boost actif';
           if (sub)   sub.textContent   = plan + ' · 16 bulles, Fake Nitro, filtre H/F…';
           if (cta)   cta.textContent   = 'Gérer';
         } else {
-          if (title) title.textContent = 'Passer en Tindord Boost';
+          if (title) title.textContent = 'Passer en Matefindr Boost';
           if (sub)   sub.textContent   = '16 bulles, Fake Nitro, filtre H/F, likes secrets…';
           if (cta)   cta.textContent   = 'Découvrir';
         }
@@ -9079,7 +9082,7 @@
           <div class="bill-row"><span class="bill-k">Statut</span><span class="bill-v">Aucun abonnement actif</span></div>`;
         const btn = document.createElement('button');
         btn.type = 'button'; btn.className = 'acc-btn acc-btn--primary'; btn.style.cssText = 'width:100%;margin-top:11px';
-        btn.textContent = 'Passer en Tindord Boost';
+        btn.textContent = 'Passer en Matefindr Boost';
         btn.onclick = () => { window.location.href = 'checkout.html?plan=monthly'; };
         box.appendChild(btn);
         return;
@@ -9113,7 +9116,7 @@
           btn.textContent = "Résilier l'abonnement";
           btn.onclick = () => {
             const until = u.boostNextPayment ? fmt(u.boostNextPayment) : 'la fin de la période';
-            if (!confirm("Résilier ton abonnement Tindord Boost ?\nTu gardes les avantages jusqu'au " + until + ", puis ton compte repassera en gratuit.")) return;
+            if (!confirm("Résilier ton abonnement Matefindr Boost ?\nTu gardes les avantages jusqu'au " + until + ", puis ton compte repassera en gratuit.")) return;
             state.user.boostCancelled = true; // on garde boost=true jusqu'à l'échéance
             save();
             refreshBillingUI();
@@ -9375,8 +9378,8 @@
           token = session?.provider_token;
         } catch {}
         if (!token) {
-          const stored = localStorage.getItem('tindord_discord_token');
-          const ts = parseInt(localStorage.getItem('tindord_discord_token_ts') || '0', 10);
+          const stored = localStorage.getItem('matefindr_discord_token');
+          const ts = parseInt(localStorage.getItem('matefindr_discord_token_ts') || '0', 10);
           if (stored && (Date.now() - ts) < 7 * 24 * 3600 * 1000) token = stored;
         }
 
@@ -9717,15 +9720,15 @@
       const enabled = u.notifTypes || {};
       if (type !== 'test' && !enabled[type]) return false;
       const meta = {
-        like:    { title: '❤️ Nouveau like sur Tindord',    color: 0xFF4FA0, desc: `**${p?.name || 'Quelqu\'un'}** t'a liké !` },
-        match:   { title: '💞 C\'est un match !',           color: 0x9146FF, desc: `Tu as matché avec **${p?.name || 'quelqu\'un'}** sur Tindord.` },
-        message: { title: '💬 Nouveau message Tindord',     color: 0x5BE9FF, desc: `**${p?.name || 'Quelqu\'un'}** t'a écrit : ${extra ? `\n> ${String(extra).slice(0,200)}` : ''}` },
+        like:    { title: '❤️ Nouveau like sur Matefindr',    color: 0xFF4FA0, desc: `**${p?.name || 'Quelqu\'un'}** t'a liké !` },
+        match:   { title: '💞 C\'est un match !',           color: 0x9146FF, desc: `Tu as matché avec **${p?.name || 'quelqu\'un'}** sur Matefindr.` },
+        message: { title: '💬 Nouveau message Matefindr',     color: 0x5BE9FF, desc: `**${p?.name || 'Quelqu\'un'}** t'a écrit : ${extra ? `\n> ${String(extra).slice(0,200)}` : ''}` },
         test:    { title: '🔔 Notification de test',        color: 0x3BD17C, desc: `Si tu vois ce message dans Discord, ton webhook est bien configuré !` },
       }[type] || null;
       if (!meta) return false;
       const thumbUrl = profileToAvatarUrl(p);
       const body = {
-        username: 'Tindord',
+        username: 'Matefindr',
         avatar_url: 'https://ui-avatars.com/api/?name=T&size=128&background=9146FF&color=fff&bold=true&format=png',
         embeds: [{
           title: meta.title,
@@ -9733,7 +9736,7 @@
           color: meta.color,
           thumbnail: thumbUrl ? { url: thumbUrl } : undefined,
           timestamp: new Date().toISOString(),
-          footer: { text: 'Tindord' },
+          footer: { text: 'Matefindr' },
         }],
       };
       try {
@@ -9751,7 +9754,7 @@
     window.sendDiscordNotif = sendDiscordNotif;
 
     /* Sync notif prefs to Supabase so the server-side Edge Function can read them.
-       When Tindord runs against the real backend (likes/matches/messages tables +
+       When Matefindr runs against the real backend (likes/matches/messages tables +
        database webhooks → Edge Function "notify"), this is what makes the Discord
        webhook fire even when the user's tab is closed. */
     async function syncNotifPrefsToSupabase(){
@@ -9772,7 +9775,7 @@
           c1:              u.profileColor || '#36393F',
           updated_at:      new Date().toISOString(),
         }, { onConflict: 'user_id' });
-      } catch (e) { console.warn('[Tindord] syncNotifPrefs failed (table user_notif_prefs missing?):', e?.message || e); }
+      } catch (e) { console.warn('[Matefindr] syncNotifPrefs failed (table user_notif_prefs missing?):', e?.message || e); }
     }
     window.__syncNotifPrefs = syncNotifPrefsToSupabase;
 
@@ -10189,7 +10192,7 @@
       if (typeof renderUserOrbs === 'function') renderUserOrbs();
       if (typeof window.__refreshBullesCta === 'function') window.__refreshBullesCta();
       const n = ((state.profile && state.profile.userOrbs) || []).length;
-      console.log('[Tindord] orbs after close:', n, state.profile && state.profile.userOrbs);
+      console.log('[Matefindr] orbs after close:', n, state.profile && state.profile.userOrbs);
     }
     window.openOrbEditOverlay = openOrbEditOverlay;
 
@@ -10431,7 +10434,7 @@
     document.getElementById('accSave')?.addEventListener('click', doAccSave);
     // Delete account
     document.getElementById('accDeleteAccount')?.addEventListener('click', () => {
-      if (!confirm('Supprimer définitivement ton compte Tindord ? Toutes tes données locales seront effacées.')) return;
+      if (!confirm('Supprimer définitivement ton compte Matefindr ? Toutes tes données locales seront effacées.')) return;
       try { localStorage.clear(); } catch {}
       try { if (window.__supa) window.__supa.auth.signOut().catch(() => {}); } catch {}
       state = { user:null, profile:null };
@@ -10456,7 +10459,7 @@
         const u = state.user || {};
         const key = u.discordId || u.email || u.discordTag;
         if (key && state.profile) {
-          const archives = JSON.parse(localStorage.getItem('tindord_archived_profiles') || '{}');
+          const archives = JSON.parse(localStorage.getItem('matefindr_archived_profiles') || '{}');
           archives[key] = {
             profile: state.profile,
             userExtras: {
@@ -10485,7 +10488,7 @@
             },
             savedAt: Date.now(),
           };
-          localStorage.setItem('tindord_archived_profiles', JSON.stringify(archives));
+          localStorage.setItem('matefindr_archived_profiles', JSON.stringify(archives));
         }
       } catch (e) { console.warn('archive failed', e); }
       state = { user:null, profile:null };
@@ -10554,9 +10557,9 @@
           const params = new URLSearchParams(hash.slice(1));
           const pt = params.get('provider_token');
           if (pt) {
-            localStorage.setItem('tindord_discord_token', pt);
-            localStorage.setItem('tindord_discord_token_ts', String(Date.now()));
-            console.log('[Tindord] Discord provider_token captured.');
+            localStorage.setItem('matefindr_discord_token', pt);
+            localStorage.setItem('matefindr_discord_token_ts', String(Date.now()));
+            console.log('[Matefindr] Discord provider_token captured.');
           }
         } catch {}
       }
@@ -10564,22 +10567,22 @@
 
       try {
         const { data: { session } } = await window.__supa.auth.getSession();
-        console.log('[Tindord] Supabase session:', !!session, 'provider_token:', !!session?.provider_token);
+        console.log('[Matefindr] Supabase session:', !!session, 'provider_token:', !!session?.provider_token);
         if (session) {
           const u = await userFromSupabaseSession(session);
-          if (u) window.__tindord.onLogin(u);
+          if (u) window.__matefindr.onLogin(u);
           if (window.__rtStart) window.__rtStart(); // temps réel : matches + messages
         }
         window.__supa.auth.onAuthStateChange(async (event, s) => {
-          console.log('[Tindord] auth event:', event, 'provider_token:', !!s?.provider_token);
+          console.log('[Matefindr] auth event:', event, 'provider_token:', !!s?.provider_token);
           if (s) {
             // Save token from session if present (Supabase may include it in SIGNED_IN)
             if (s.provider_token) {
-              localStorage.setItem('tindord_discord_token', s.provider_token);
-              localStorage.setItem('tindord_discord_token_ts', String(Date.now()));
+              localStorage.setItem('matefindr_discord_token', s.provider_token);
+              localStorage.setItem('matefindr_discord_token_ts', String(Date.now()));
             }
             const u = await userFromSupabaseSession(s);
-            if (u) window.__tindord.onLogin(u);
+            if (u) window.__matefindr.onLogin(u);
             if (window.__rtStart) window.__rtStart(); // temps réel : matches + messages
           }
         });
@@ -10591,8 +10594,8 @@
            écrasés). */
         async function autoResyncDiscord(){
           try {
-            const stored = localStorage.getItem('tindord_discord_token');
-            const ts = parseInt(localStorage.getItem('tindord_discord_token_ts') || '0', 10);
+            const stored = localStorage.getItem('matefindr_discord_token');
+            const ts = parseInt(localStorage.getItem('matefindr_discord_token_ts') || '0', 10);
             if (!stored || (Date.now() - ts) > 7 * 24 * 3600 * 1000) return;
             const d = await fetchDiscordProfile(stored);
             if (!d) return;
@@ -10616,8 +10619,8 @@
             if (typeof updateChip === 'function') updateChip();
             if (typeof refreshAccountPreview === 'function') refreshAccountPreview();
             if (typeof ensureDeck === 'function' && document.body.getAttribute('data-screen') === 'swipe') ensureDeck();
-            console.log('[Tindord] auto-resync Discord OK');
-          } catch (e) { console.warn('[Tindord] auto-resync failed', e); }
+            console.log('[Matefindr] auto-resync Discord OK');
+          } catch (e) { console.warn('[Matefindr] auto-resync failed', e); }
         }
         // Toutes les 5 minutes
         setInterval(autoResyncDiscord, 5 * 60 * 1000);

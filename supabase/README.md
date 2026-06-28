@@ -1,4 +1,4 @@
-# Tindord — Auto-join du serveur Discord à la création de compte
+# Matefindr — Auto-join du serveur Discord à la création de compte
 
 Quand un utilisateur se connecte avec Discord, le **bot l'ajoute automatiquement au serveur** (puis lui envoie un DM de bienvenue). C'est l'Edge Function `discord-join-dm`.
 
@@ -30,7 +30,7 @@ Le bot token reste **uniquement côté serveur** (secret Supabase) — jamais da
 4. **Secrets Supabase** :
    ```bash
    supabase secrets set DISCORD_BOT_TOKEN="ton_bot_token" DISCORD_GUILD_ID="id_du_serveur"
-   # optionnel : DISCORD_WELCOME_MESSAGE="Bienvenue sur Tindord ! 🎉"
+   # optionnel : DISCORD_WELCOME_MESSAGE="Bienvenue sur Matefindr ! 🎉"
    ```
    (ID du serveur : Discord → Paramètres avancés → Mode développeur, puis clic droit sur le serveur → Copier l'identifiant.)
 
@@ -52,7 +52,7 @@ Erreur `join_echoue` status 403 = le bot n'a pas la permission *Créer une invit
 
 ---
 
-# Tindord — Notifications Discord en prod
+# Matefindr — Notifications Discord en prod
 
 ## Pourquoi ça ne marche pas tel quel
 

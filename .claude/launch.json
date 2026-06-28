@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "tindord",
+      "name": "matefindr",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-p", "8090", "."],
       "port": 8090

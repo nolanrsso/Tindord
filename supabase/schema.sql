@@ -1,4 +1,4 @@
--- Tindord — schéma minimal pour notifications Discord côté serveur.
+-- Matefindr — schéma minimal pour notifications Discord côté serveur.
 -- À exécuter dans Supabase SQL Editor.
 
 -- 1. Préférences notifications par user (lié à auth.users)

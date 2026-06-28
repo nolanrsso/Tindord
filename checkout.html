@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Tindord Boost — Paiement</title>
-<meta name="description" content="Passe en Tindord Boost : 16 bulles, Fake Nitro, musique d'ambiance, filtre H/F, likes secrets et GIFs personnalisables." />
+<title>Matefindr Boost — Paiement</title>
+<meta name="description" content="Passe en Matefindr Boost : 16 bulles, Fake Nitro, musique d'ambiance, filtre H/F, likes secrets et GIFs personnalisables." />
 <meta name="theme-color" content="#0D0B1E" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237a2bff'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black,Arial,sans-serif' font-weight='900' font-size='26' fill='white'%3Etind%3C/text%3E%3C/svg%3E" />
 <meta http-equiv="Content-Security-Policy" content="
@@ -178,14 +178,14 @@
 <div class="scene" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
 
 <header class="topbar">
-  <a class="brand" href="/" aria-label="Retour à Tindord"><img src="assets/logo.svg" alt="Tindord" /><small>/ paiement</small></a>
+  <a class="brand" href="/" aria-label="Retour à Matefindr"><img src="assets/logo.svg" alt="Matefindr" /><small>/ paiement</small></a>
   <a class="back" href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</a>
 </header>
 
 <main class="wrap">
   <div class="intro">
-    <span class="eyebrow">✦ Tindord Boost</span>
-    <h1>Débloque <span class="grad">tout Tindord</span></h1>
+    <span class="eyebrow">✦ Matefindr Boost</span>
+    <h1>Débloque <span class="grad">tout Matefindr</span></h1>
     <p>Compare les deux offres, choisis ta formule et profite de Boost en quelques secondes.</p>
   </div>
 
@@ -193,7 +193,7 @@
   <section class="offer">
     <!-- Côté GRATUIT -->
     <div class="pcard pcard--free">
-      <span class="pcard-eyebrow">Tindord</span>
+      <span class="pcard-eyebrow">Matefindr</span>
       <div class="pcard-title">Basic</div>
       <div class="pcard-sub">Pour découvrir l'appli</div>
       <div class="price-big">Gratuit</div>
@@ -211,9 +211,9 @@
     <!-- Côté BOOST : prix mensuel + prix unique -->
     <div class="pcard pcard--boost">
       <span class="badge-reco">✨ Recommandé</span>
-      <span class="pcard-eyebrow">Tindord</span>
+      <span class="pcard-eyebrow">Matefindr</span>
       <div class="pcard-title">Boost</div>
-      <div class="pcard-sub">Toute la puissance de Tindord</div>
+      <div class="pcard-sub">Toute la puissance de Matefindr</div>
 
       <div class="price-opts" id="priceOpts">
         <button type="button" class="price-opt" data-plan="monthly">
@@ -248,7 +248,7 @@
 
     <div class="summary">
       <div class="s-left">
-        <b>Tindord Boost</b>
+        <b>Matefindr Boost</b>
         <small id="sumPlan">Abonnement mensuel</small>
       </div>
       <div class="s-total">
@@ -309,13 +309,15 @@
   <div class="sbox">
     <div class="scheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
     <h2>Boost activé ✨</h2>
-    <p>Bienvenue dans <b>Tindord Boost</b> — <span id="successPlan"></span>. Tes bonus sont débloqués.</p>
-    <a class="sbtn" id="goApp">Revenir sur Tindord</a>
+    <p>Bienvenue dans <b>Matefindr Boost</b> — <span id="successPlan"></span>. Tes bonus sont débloqués.</p>
+    <a class="sbtn" id="goApp">Revenir sur Matefindr</a>
   </div>
 </div>
 
 <script>
-  const KEY='tindord_state';
+  /* Migration rebrand Tindord→Matefindr : recopie les anciennes cles tindord_* vers matefindr_* (aucun reset). */
+  try{Object.keys(localStorage).forEach(function(k){if(k.indexOf('tindord_')===0){var nk='matefindr_'+k.slice(8);if(localStorage.getItem(nk)===null)localStorage.setItem(nk,localStorage.getItem(k));}});}catch(_){}
+  const KEY='matefindr_state';
   const PLANS={
     monthly:{ label:'Abonnement mensuel', total:'3,79€', cycle:'par mois', pay:'Payer 3,79€', success:'3,79€ / mois' },
     lifetime:{ label:'Paiement unique', total:'14,99€', cycle:'accès à vie', pay:'Payer 14,99€', success:'14,99€ à vie' },
@@ -361,7 +363,7 @@
     if(normCode($('promo').value)===FREE_CODE){
       freePromo=true;
       applyFreeUI();
-      msg.hidden=false; msg.className='promo-msg ok'; msg.textContent='🎉 Code valide — Tindord Boost offert !';
+      msg.hidden=false; msg.className='promo-msg ok'; msg.textContent='🎉 Code valide — Matefindr Boost offert !';
       $('promo').disabled=true; $('promoApply').disabled=true;
     }else{
       clearFreeUI();
